@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		81C986E75AD259FEA3F1322D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E2A8B359923463C4A316AFE8 /* Assets.xcassets */; };
 		0269E9F53FD478CA96A57AC7 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 905025C4FEBBFCB841184C93 /* CoreGraphics.framework */; };
 		02AF86FF0874E931B85D022D /* wild.wav in Resources */ = {isa = PBXBuildFile; fileRef = 7CFC7C61AE8CE7DFBA5152AA /* wild.wav */; };
 		0BF2195AAFD706A3E026C715 /* skill.wav in Resources */ = {isa = PBXBuildFile; fileRef = 33D86336EED43E49D733888B /* skill.wav */; };
@@ -51,6 +52,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E2A8B359923463C4A316AFE8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1664F5ABD078B354451DD8E3 /* GDProgressStore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GDProgressStore.h; sourceTree = "<group>"; };
 		1963FB029408FEA6E3CBDC66 /* GDLevelCatalog.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GDLevelCatalog.h; sourceTree = "<group>"; };
 		19A076B1525D5E0C67502782 /* fall.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = fall.wav; sourceTree = "<group>"; };
@@ -208,6 +210,7 @@
 		AE1C08C27330943E5F8EFFD4 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				E2A8B359923463C4A316AFE8 /* Assets.xcassets */,
 				13139B67B72417489B663A08 /* Audio */,
 				B4FE614D18D503E8CB82D6BC /* Data */,
 				2F34DDD5C40639313DC77C74 /* Images */,
@@ -313,6 +316,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				81C986E75AD259FEA3F1322D /* Assets.xcassets in Resources */,
 				E622D62694DCAFBEB9008D30 /* GDLevelsData.inc in Resources */,
 				4FB760F7981B54AE7574DAA7 /* blast.wav in Resources */,
 				409A72FE72C70DAA04F634A3 /* candy_background.png in Resources */,

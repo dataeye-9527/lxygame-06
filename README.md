@@ -347,6 +347,8 @@ A 至 C 是渐进集成顺序，最终原型必须包含全部已确认机制，
 
 打开 `GummyRicochet.xcodeproj`，选择已有 iOS 模拟器运行 `GummyRicochet`。工程已提交，不要求安装 XcodeGen；修改 `project.yml` 后可使用已安装的 `xcodegen generate` 同步工程。最低 iOS 15，支持横屏 iPhone / iPad，无第三方依赖。
 
+应用图标位于 `Resources/Assets.xcassets/AppIcon.appiconset/`，已配置 iPhone、iPad 与 1024×1024 App Store 图标，全部为无 Alpha 的 RGB PNG。原始生成图及提示词见 `docs/art/app-icon-prompt.md`。提交云端前需重新 Archive，让新图标进入新的安装包；旧归档不会自动包含它。
+
 ```sh
 DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild \
   -project GummyRicochet.xcodeproj -scheme GummyRicochet -configuration Debug \
