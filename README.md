@@ -4,7 +4,7 @@
 >
 > 当前阶段：核心玩法已获认可；本轮增强音效与界面反馈，加入无尽本机排行榜及 30 关目标模式。采用 Objective-C + SpriteKit；实际验证范围和边界见第 13 节。
 >
-> 产品名称：待定。
+> 产品名称：Gummy Ricochet。
 
 ## 1. 开发目标与决策状态
 
@@ -30,7 +30,8 @@
 | 技能主动释放、技能不返能、万能单色最大组判定 | 已确认 | 2026-09-30 确认为原型基线；具体边界见第 5 节 |
 | 横屏、软糖美术方向与首版样图 | 已确认 | 用户已批准样图，实际棋盘须比样图更密；首版实现采用长行 18 格、短行 17 格 |
 | 无尽本机排行榜、30 关目标模式 | 已确认 | 记录多局成绩并按分数排序；关卡保留实时压行和不同目标 |
-| 正式名称、长期平衡 | 待定 | 两种模式均保留，后续真机试玩调参 |
+| 正式名称 Gummy Ricochet | 已确认 | 替换被占用的 Gummy Drop，保留已申请的 Bundle ID |
+| 长期平衡 | 待定 | 两种模式均保留，后续真机试玩调参 |
 
 2026-09-30 决策：用户接受前六项推荐方案（黄色范围、红色瞄准方式、主动释放、万能判色、返能限制、横屏），并选择软糖美术。以下仍标为建议的数值、交互边界和工程方案不因此自动升级为最终产品规则。
 
@@ -258,7 +259,7 @@
 
 ## 9. 技术结构建议
 
-本阶段使用 Objective-C + SpriteKit 实现 iOS 无尽与关卡模式，工程由 `project.yml` 管理，最低 iOS 15，支持 iPhone / iPad 横屏；不引入 CocoaPods 或其他第三方依赖。`GummyDrop` 为原型工程名，正式产品名称仍待定。
+本阶段使用 Objective-C + SpriteKit 实现 iOS 无尽与关卡模式，工程由 `project.yml` 管理，最低 iOS 15，支持 iPhone / iPad 横屏；不引入 CocoaPods 或其他第三方依赖。正式产品名称为 **Gummy Ricochet**，工程、Target 与 Scheme 使用 `GummyRicochet`。已申请的 Bundle ID `com.lxygame.gummydrop.prototype` 保持不变。
 
 下表保留规划时的职责划分；实际核心集中于 `Sources/Core/GDEngine.m`，界面由 `GameScene`、`FrontendScene` 和 `GummyUI` 组织：
 
@@ -330,7 +331,7 @@ A 至 C 是渐进集成顺序，最终原型必须包含全部已确认机制，
 
 黄色范围、红色命中爆破、主动释放、万能单色判定、返能限制与横屏已经确认，无需重复确认。
 
-无尽与关卡模式方向已确认。正式名称、数值平衡与真机手感仍待后续试玩确定。
+无尽与关卡模式方向已确认，正式名称已确认为 Gummy Ricochet。数值平衡与真机手感仍待后续试玩确定。
 
 ## 13. 实施与验证记录
 
@@ -344,11 +345,11 @@ A 至 C 是渐进集成顺序，最终原型必须包含全部已确认机制，
 
 ### 运行与检查
 
-打开 `GummyDrop.xcodeproj`，选择已有 iOS 模拟器运行 `GummyDrop`。工程已提交，不要求安装 XcodeGen；修改 `project.yml` 后可使用已安装的 `xcodegen generate` 同步工程。最低 iOS 15，支持横屏 iPhone / iPad，无第三方依赖。
+打开 `GummyRicochet.xcodeproj`，选择已有 iOS 模拟器运行 `GummyRicochet`。工程已提交，不要求安装 XcodeGen；修改 `project.yml` 后可使用已安装的 `xcodegen generate` 同步工程。最低 iOS 15，支持横屏 iPhone / iPad，无第三方依赖。
 
 ```sh
 DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild \
-  -project GummyDrop.xcodeproj -scheme GummyDrop -configuration Debug \
+  -project GummyRicochet.xcodeproj -scheme GummyRicochet -configuration Debug \
   -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
   -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO build
 DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer scripts/test_core.sh --focused
@@ -366,7 +367,7 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer scripts/test_settings.s
 - 真实局冷恢复比较的 19 项字段全部一致，包含棋盘、随机状态、当前 / 下一发 / 保留槽、炮台、能量、计时和操作记录；结果：`docs/qa/ui-v2/cold-restore-comparison.json`。这是该次快照的比较范围，未宣称全部存档边界均已验证。
 - 真实瞄准运行日志：Aim Guide On 时 `nodes=25 valid=1`，Off 时 `nodes=0 valid=1`，关闭辅助后射击预测仍有效；音效创建取得非零 SystemSoundID。记录：`docs/qa/ui-v2/aim-feedback.log`，不替代音效听感或真机触感验证。
 
-Home / Game / Settings / Help / Paused / Result 六页最终截图已归档到 `docs/qa/ui-v2/`，对应美术验收记录为 `docs/art/ui-v2-art-review.md`；Help 的 WILD 说明已改为 `auto-match a color` 并补取最终运行图。归档说明：`docs/qa/ui-v2/README.md`。`build/` 保留原始截图、完整日志和构建产物，不纳入 Git。真机的音效听感、触感、不同屏幕比例及长期平衡尚未验证；正式名称与长期平衡仍待定。
+Home / Game / Settings / Help / Paused / Result 六页最终截图已归档到 `docs/qa/ui-v2/`，对应美术验收记录为 `docs/art/ui-v2-art-review.md`；Help 的 WILD 说明已改为 `auto-match a color` 并补取最终运行图。归档说明：`docs/qa/ui-v2/README.md`。`build/` 保留原始截图、完整日志和构建产物，不纳入 Git。真机的音效听感、触感、不同屏幕比例及长期平衡尚未验证；正式名称现已确认为 Gummy Ricochet，长期平衡仍待真机试玩验证。
 
 
 ### 本轮音效、排行榜与 30 关验收（当前版本）

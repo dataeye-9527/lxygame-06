@@ -1,4 +1,4 @@
-name: GummyDrop
+name: GummyRicochet
 options:
   bundleIdPrefix: com.lxygame
   deploymentTarget:
@@ -14,11 +14,11 @@ settings:
     GENERATE_INFOPLIST_FILE: NO
     INFOPLIST_FILE: Sources/Info.plist
     PRODUCT_BUNDLE_IDENTIFIER: com.lxygame.gummydrop.prototype
-    PRODUCT_NAME: GummyDrop
+    PRODUCT_NAME: GummyRicochet
     MARKETING_VERSION: '0.1.0'
     CURRENT_PROJECT_VERSION: '1'
 targets:
-  GummyDrop:
+  GummyRicochet:
     type: application
     platform: iOS
     sources:

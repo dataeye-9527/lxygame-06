@@ -54,7 +54,7 @@
 		1664F5ABD078B354451DD8E3 /* GDProgressStore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GDProgressStore.h; sourceTree = "<group>"; };
 		1963FB029408FEA6E3CBDC66 /* GDLevelCatalog.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GDLevelCatalog.h; sourceTree = "<group>"; };
 		19A076B1525D5E0C67502782 /* fall.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = fall.wav; sourceTree = "<group>"; };
-		1C275140B8FC3FA6529D4956 /* GummyDrop.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = GummyDrop.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1C275140B8FC3FA6529D4956 /* GummyRicochet.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = GummyRicochet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		20004F6A9F8197B04720B071 /* match_alt.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = match_alt.wav; sourceTree = "<group>"; };
 		2437D292004EF37F05D7648A /* menu_hero.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_hero.png; sourceTree = "<group>"; };
 		244B3740918BB2D1CA01A17A /* sweep.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = sweep.wav; sourceTree = "<group>"; };
@@ -226,7 +226,7 @@
 		C4E472A11CD9122F5A645EB5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1C275140B8FC3FA6529D4956 /* GummyDrop.app */,
+				1C275140B8FC3FA6529D4956 /* GummyRicochet.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -255,9 +255,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		6A278DA53FA0DFF6A872039F /* GummyDrop */ = {
+		6A278DA53FA0DFF6A872039F /* GummyRicochet */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = D21BB5F49F560D514D6AFC7E /* Build configuration list for PBXNativeTarget "GummyDrop" */;
+			buildConfigurationList = D21BB5F49F560D514D6AFC7E /* Build configuration list for PBXNativeTarget "GummyRicochet" */;
 			buildPhases = (
 				1E287AFFD835C9F5DCEA8102 /* Sources */,
 				7F4720506B1A8393D8D2EE0E /* Resources */,
@@ -267,11 +267,11 @@
 			);
 			dependencies = (
 			);
-			name = GummyDrop;
+			name = GummyRicochet;
 			packageProductDependencies = (
 			);
-			productName = GummyDrop;
-			productReference = 1C275140B8FC3FA6529D4956 /* GummyDrop.app */;
+			productName = GummyRicochet;
+			productReference = 1C275140B8FC3FA6529D4956 /* GummyRicochet.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -289,7 +289,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 8ADF8FBD9A813E62C84E46C8 /* Build configuration list for PBXProject "GummyDrop" */;
+			buildConfigurationList = 8ADF8FBD9A813E62C84E46C8 /* Build configuration list for PBXProject "GummyRicochet" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -303,7 +303,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				6A278DA53FA0DFF6A872039F /* GummyDrop */,
+				6A278DA53FA0DFF6A872039F /* GummyRicochet */,
 			);
 		};
 /* End PBXProject section */
@@ -445,7 +445,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.lxygame.gummydrop.prototype;
-				PRODUCT_NAME = GummyDrop;
+				PRODUCT_NAME = GummyRicochet;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -510,7 +510,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.lxygame.gummydrop.prototype;
-				PRODUCT_NAME = GummyDrop;
+				PRODUCT_NAME = GummyRicochet;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
@@ -538,7 +538,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		8ADF8FBD9A813E62C84E46C8 /* Build configuration list for PBXProject "GummyDrop" */ = {
+		8ADF8FBD9A813E62C84E46C8 /* Build configuration list for PBXProject "GummyRicochet" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4168219A5A539BE29CE470D2 /* Debug */,
@@ -547,7 +547,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		D21BB5F49F560D514D6AFC7E /* Build configuration list for PBXNativeTarget "GummyDrop" */ = {
+		D21BB5F49F560D514D6AFC7E /* Build configuration list for PBXNativeTarget "GummyRicochet" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BFF9D3192D7966C0A7EB918E /* Debug */,

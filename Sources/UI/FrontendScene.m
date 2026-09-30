@@ -51,7 +51,7 @@ static UIColor *MenuBlue(void) { return [UIColor colorWithRed:.65 green:.86 blue
     self.runSnapshot=[self validSnapshotForKey:@"GummyRunSnapshot"];
     self.levelSnapshot=[self validSnapshotForKey:@"GummyLevelRunSnapshot"];
     SKNode *titleCard=[GummyUI surface:CGSizeMake(465,100) color:MenuCream() radius:40]; titleCard.position=CGPointMake(335,577); [self addChild:titleCard];
-    [self text:@"GUMMY DROP" size:48 at:CGPointMake(335,578)];
+    [self text:@"GUMMY RICOCHET" size:38 at:CGPointMake(335,578)];
     SKSpriteNode *hero=[GummyUI image:@"menu_hero" size:CGSizeMake(480,360)]; hero.position=CGPointMake(335,339); if(hero) [self addChild:hero];
     [hero runAction:[SKAction repeatActionForever:[SKAction sequence:@[[SKAction moveByX:0 y:6 duration:2],[SKAction moveByX:0 y:-6 duration:2]]]]];
     GDProgressStore *progress=[[GDProgressStore alloc] initWithDefaults:NSUserDefaults.standardUserDefaults];

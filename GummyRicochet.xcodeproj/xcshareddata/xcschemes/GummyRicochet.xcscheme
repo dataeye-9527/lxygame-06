@@ -16,9 +16,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "6A278DA53FA0DFF6A872039F"
-               BuildableName = "GummyDrop.app"
-               BlueprintName = "GummyDrop"
-               ReferencedContainer = "container:GummyDrop.xcodeproj">
+               BuildableName = "GummyRicochet.app"
+               BlueprintName = "GummyRicochet"
+               ReferencedContainer = "container:GummyRicochet.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "6A278DA53FA0DFF6A872039F"
-            BuildableName = "GummyDrop.app"
-            BlueprintName = "GummyDrop"
-            ReferencedContainer = "container:GummyDrop.xcodeproj">
+            BuildableName = "GummyRicochet.app"
+            BlueprintName = "GummyRicochet"
+            ReferencedContainer = "container:GummyRicochet.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <Testables>
@@ -58,9 +58,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "6A278DA53FA0DFF6A872039F"
-            BuildableName = "GummyDrop.app"
-            BlueprintName = "GummyDrop"
-            ReferencedContainer = "container:GummyDrop.xcodeproj">
+            BuildableName = "GummyRicochet.app"
+            BlueprintName = "GummyRicochet"
+            ReferencedContainer = "container:GummyRicochet.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>
@@ -77,9 +77,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "6A278DA53FA0DFF6A872039F"
-            BuildableName = "GummyDrop.app"
-            BlueprintName = "GummyDrop"
-            ReferencedContainer = "container:GummyDrop.xcodeproj">
+            BuildableName = "GummyRicochet.app"
+            BlueprintName = "GummyRicochet"
+            ReferencedContainer = "container:GummyRicochet.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>
