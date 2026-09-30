@@ -8,65 +8,101 @@
 
 /* Begin PBXBuildFile section */
 		0269E9F53FD478CA96A57AC7 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 905025C4FEBBFCB841184C93 /* CoreGraphics.framework */; };
+		02AF86FF0874E931B85D022D /* wild.wav in Resources */ = {isa = PBXBuildFile; fileRef = 7CFC7C61AE8CE7DFBA5152AA /* wild.wav */; };
 		0BF2195AAFD706A3E026C715 /* skill.wav in Resources */ = {isa = PBXBuildFile; fileRef = 33D86336EED43E49D733888B /* skill.wav */; };
+		105FA76A80F5FC681C3F2FA8 /* levels.json in Resources */ = {isa = PBXBuildFile; fileRef = ED27CD84D2E5A0001B3CBE51 /* levels.json */; };
 		19F376E80C39FC5FD05C23A4 /* SpriteKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25FFFF186C73E95F1040EF1F /* SpriteKit.framework */; };
 		1CA56B1A2725E928201141BF /* GameScene.m in Sources */ = {isa = PBXBuildFile; fileRef = EC7BB04664622FFF5AA15840 /* GameScene.m */; };
 		1F95B57C42B332C44E136562 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B40EB94ABAB55D0E0F431C7D /* UIKit.framework */; };
 		22B5955043DF5B53384096B3 /* tap.wav in Resources */ = {isa = PBXBuildFile; fileRef = 89CA24DCC01955D7ABF7561F /* tap.wav */; };
 		2A882A02CDF7CD9B76F367E9 /* cannon.png in Resources */ = {isa = PBXBuildFile; fileRef = CD599F0572A5C0DC81566AAC /* cannon.png */; };
+		2B823C073438C9BAD65C3470 /* combo.wav in Resources */ = {isa = PBXBuildFile; fileRef = B80728B761C800BFE479AC51 /* combo.wav */; };
 		409A72FE72C70DAA04F634A3 /* candy_background.png in Resources */ = {isa = PBXBuildFile; fileRef = 45E16096C3E3255B8380DA48 /* candy_background.png */; };
+		41EADDBE3EA77F17E9020EF6 /* ready.wav in Resources */ = {isa = PBXBuildFile; fileRef = B925BCC42BFE90188EA158E8 /* ready.wav */; };
+		477BF8A7DBF6AC4C322A4A7B /* freeze.wav in Resources */ = {isa = PBXBuildFile; fileRef = 95C3F982E2DDD2BCFC141519 /* freeze.wav */; };
 		48CD53EF0A738D54630195B0 /* menu_hero.png in Resources */ = {isa = PBXBuildFile; fileRef = 2437D292004EF37F05D7648A /* menu_hero.png */; };
+		4FB760F7981B54AE7574DAA7 /* blast.wav in Resources */ = {isa = PBXBuildFile; fileRef = 3A85F55E66B1719A5F44EE1F /* blast.wav */; };
+		58EBD52549D2F97B70B6A60B /* fall.wav in Resources */ = {isa = PBXBuildFile; fileRef = 19A076B1525D5E0C67502782 /* fall.wav */; };
+		632077405976B012947CD191 /* win.wav in Resources */ = {isa = PBXBuildFile; fileRef = 835CD9B4AA73DB7B552F6992 /* win.wav */; };
 		6AB8CCB970174F0A0DEA142D /* shot.wav in Resources */ = {isa = PBXBuildFile; fileRef = 782A2B01D3DA2BBC0877CCD7 /* shot.wav */; };
+		7311F40092E2E3374EC494ED /* GDRunRecords.m in Sources */ = {isa = PBXBuildFile; fileRef = 2F6D55CF8E41E71375605CB4 /* GDRunRecords.m */; };
+		7493E488426FDFF0A4C8D3F6 /* sweep.wav in Resources */ = {isa = PBXBuildFile; fileRef = 244B3740918BB2D1CA01A17A /* sweep.wav */; };
+		82CD545B6D64A22BEE024382 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = D272DF48097CEE9FE1215743 /* manifest.json */; };
 		872658176964791DC007DE73 /* game_over.wav in Resources */ = {isa = PBXBuildFile; fileRef = 61109488FB96A3B351A03920 /* game_over.wav */; };
 		9AC2977B62862F4B7F361E93 /* wild_icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 539372B81C89FDFC996C0C45 /* wild_icon.png */; };
 		9E5374FE4D8B3C91E2C1E654 /* match.wav in Resources */ = {isa = PBXBuildFile; fileRef = 4D027C79FE5BA7105A8F092D /* match.wav */; };
 		A24BA7A082D39BB680B1A1F2 /* GummyUI.m in Sources */ = {isa = PBXBuildFile; fileRef = 80C19E204A7E5BD7601E3F27 /* GummyUI.m */; };
+		A58DC156905905714C80D75D /* GDAudioFeedback.m in Sources */ = {isa = PBXBuildFile; fileRef = 367291599704709A047A983F /* GDAudioFeedback.m */; };
 		A84031A3D5EE4C4BA9471806 /* GDEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = AF6639D30BE5211B884C355C /* GDEngine.m */; };
 		AAD281235EDD3B8A8C006130 /* gummy_white.png in Resources */ = {isa = PBXBuildFile; fileRef = 37FCE4549BECC6409A28CE39 /* gummy_white.png */; };
 		B40192562720142421662CF4 /* gummy_red.png in Resources */ = {isa = PBXBuildFile; fileRef = D72F14DCD0D60E92605BEF1D /* gummy_red.png */; };
+		C0EAE5025627FDAD151AD889 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61A4AE61C9D5A4D413DE3813 /* AVFoundation.framework */; };
 		C7D9ABC40AFF2DDC82E146A2 /* gummy_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = EC38EA19EA9A429851876C1E /* gummy_blue.png */; };
 		CAC41297E9AF04EDE0CC35C7 /* GDSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = E838D7D21BBEF2D8D86B2CAA /* GDSettings.m */; };
 		CC19F4F43EB24C6FBFDECF3C /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 89B4AB1508199764BAAE9035 /* AppDelegate.m */; };
 		CE89D5045C5EA6EFAD5BFAD1 /* FrontendScene.m in Sources */ = {isa = PBXBuildFile; fileRef = 72B0AA38080E279633E794D5 /* FrontendScene.m */; };
 		DC66992829FF71A3C9978E6D /* gummy_yellow.png in Resources */ = {isa = PBXBuildFile; fileRef = D3D21F3B1CB155CF2E6FCA5C /* gummy_yellow.png */; };
-		EF4C38E5F80D247F56662AFA /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D06F0BB4AA7B142D9005BBE1 /* AudioToolbox.framework */; };
+		E17399543C1400D7AE1CD339 /* GDLevelCatalog.m in Sources */ = {isa = PBXBuildFile; fileRef = F084813AB153F0BECE6A2AC6 /* GDLevelCatalog.m */; };
+		E622D62694DCAFBEB9008D30 /* GDLevelsData.inc in Resources */ = {isa = PBXBuildFile; fileRef = 334A64CBD0172BC6630F6FCF /* GDLevelsData.inc */; };
+		E7906533F03E786BCFCC3FEE /* match_alt.wav in Resources */ = {isa = PBXBuildFile; fileRef = 20004F6A9F8197B04720B071 /* match_alt.wav */; };
 		EF7C5A17B22BD8AD8BEB3D2C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FA4195A577DBC1107376CEE1 /* main.m */; };
+		F5E28CC881B782DA518E8528 /* GDProgressStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 57A1256B9508AB3ED4CD52F8 /* GDProgressStore.m */; };
 		F8D645FE52D3B5157A890477 /* error.wav in Resources */ = {isa = PBXBuildFile; fileRef = D49D9D946030B60D52CBCC2C /* error.wav */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1664F5ABD078B354451DD8E3 /* GDProgressStore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GDProgressStore.h; sourceTree = "<group>"; };
+		1963FB029408FEA6E3CBDC66 /* GDLevelCatalog.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GDLevelCatalog.h; sourceTree = "<group>"; };
+		19A076B1525D5E0C67502782 /* fall.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = fall.wav; sourceTree = "<group>"; };
 		1C275140B8FC3FA6529D4956 /* GummyDrop.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = GummyDrop.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		20004F6A9F8197B04720B071 /* match_alt.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = match_alt.wav; sourceTree = "<group>"; };
 		2437D292004EF37F05D7648A /* menu_hero.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_hero.png; sourceTree = "<group>"; };
+		244B3740918BB2D1CA01A17A /* sweep.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = sweep.wav; sourceTree = "<group>"; };
 		25FFFF186C73E95F1040EF1F /* SpriteKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SpriteKit.framework; path = System/Library/Frameworks/SpriteKit.framework; sourceTree = SDKROOT; };
+		2F6D55CF8E41E71375605CB4 /* GDRunRecords.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GDRunRecords.m; sourceTree = "<group>"; };
 		30FA82514F83FD4FB0BD666F /* GameScene.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GameScene.h; sourceTree = "<group>"; };
+		334A64CBD0172BC6630F6FCF /* GDLevelsData.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = GDLevelsData.inc; sourceTree = "<group>"; };
 		33D86336EED43E49D733888B /* skill.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = skill.wav; sourceTree = "<group>"; };
+		367291599704709A047A983F /* GDAudioFeedback.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GDAudioFeedback.m; sourceTree = "<group>"; };
 		37FCE4549BECC6409A28CE39 /* gummy_white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = gummy_white.png; sourceTree = "<group>"; };
+		3A85F55E66B1719A5F44EE1F /* blast.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = blast.wav; sourceTree = "<group>"; };
 		3B816389930A59956E92D792 /* GummyUI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GummyUI.h; sourceTree = "<group>"; };
 		45E16096C3E3255B8380DA48 /* candy_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = candy_background.png; sourceTree = "<group>"; };
 		4D027C79FE5BA7105A8F092D /* match.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = match.wav; sourceTree = "<group>"; };
 		539372B81C89FDFC996C0C45 /* wild_icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = wild_icon.png; sourceTree = "<group>"; };
+		57A1256B9508AB3ED4CD52F8 /* GDProgressStore.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GDProgressStore.m; sourceTree = "<group>"; };
 		5A28AB58ED4155C2CC91FA8C /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		61109488FB96A3B351A03920 /* game_over.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = game_over.wav; sourceTree = "<group>"; };
+		61A4AE61C9D5A4D413DE3813 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		72B0AA38080E279633E794D5 /* FrontendScene.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FrontendScene.m; sourceTree = "<group>"; };
 		74C183E99AE580D8352A2811 /* GDEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GDEngine.h; sourceTree = "<group>"; };
 		782A2B01D3DA2BBC0877CCD7 /* shot.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = shot.wav; sourceTree = "<group>"; };
 		78572DC3C066FB6E345D5B5A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		7CFC7C61AE8CE7DFBA5152AA /* wild.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = wild.wav; sourceTree = "<group>"; };
 		80C19E204A7E5BD7601E3F27 /* GummyUI.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GummyUI.m; sourceTree = "<group>"; };
+		835CD9B4AA73DB7B552F6992 /* win.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = win.wav; sourceTree = "<group>"; };
 		89B4AB1508199764BAAE9035 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		89CA24DCC01955D7ABF7561F /* tap.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = tap.wav; sourceTree = "<group>"; };
 		905025C4FEBBFCB841184C93 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		95C3F982E2DDD2BCFC141519 /* freeze.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = freeze.wav; sourceTree = "<group>"; };
 		9940739B8D4FADE2A31A5E01 /* FrontendScene.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FrontendScene.h; sourceTree = "<group>"; };
 		AD53D748C9A7C4A35EBB0645 /* GDSettings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GDSettings.h; sourceTree = "<group>"; };
 		AF6639D30BE5211B884C355C /* GDEngine.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GDEngine.m; sourceTree = "<group>"; };
+		B40E93696969C0A49884E7AE /* GDRunRecords.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GDRunRecords.h; sourceTree = "<group>"; };
 		B40EB94ABAB55D0E0F431C7D /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		B80728B761C800BFE479AC51 /* combo.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = combo.wav; sourceTree = "<group>"; };
+		B925BCC42BFE90188EA158E8 /* ready.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ready.wav; sourceTree = "<group>"; };
 		CD599F0572A5C0DC81566AAC /* cannon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cannon.png; sourceTree = "<group>"; };
-		D06F0BB4AA7B142D9005BBE1 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		D272DF48097CEE9FE1215743 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = manifest.json; sourceTree = "<group>"; };
 		D3D21F3B1CB155CF2E6FCA5C /* gummy_yellow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = gummy_yellow.png; sourceTree = "<group>"; };
 		D49D9D946030B60D52CBCC2C /* error.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = error.wav; sourceTree = "<group>"; };
+		D4ACEFEAE3082738199AE4FF /* GDAudioFeedback.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GDAudioFeedback.h; sourceTree = "<group>"; };
 		D72F14DCD0D60E92605BEF1D /* gummy_red.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = gummy_red.png; sourceTree = "<group>"; };
 		E838D7D21BBEF2D8D86B2CAA /* GDSettings.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GDSettings.m; sourceTree = "<group>"; };
 		EC38EA19EA9A429851876C1E /* gummy_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = gummy_blue.png; sourceTree = "<group>"; };
 		EC7BB04664622FFF5AA15840 /* GameScene.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GameScene.m; sourceTree = "<group>"; };
+		ED27CD84D2E5A0001B3CBE51 /* levels.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = levels.json; sourceTree = "<group>"; };
+		F084813AB153F0BECE6A2AC6 /* GDLevelCatalog.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GDLevelCatalog.m; sourceTree = "<group>"; };
 		FA4195A577DBC1107376CEE1 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -78,7 +114,7 @@
 				19F376E80C39FC5FD05C23A4 /* SpriteKit.framework in Frameworks */,
 				1F95B57C42B332C44E136562 /* UIKit.framework in Frameworks */,
 				0269E9F53FD478CA96A57AC7 /* CoreGraphics.framework in Frameworks */,
-				EF4C38E5F80D247F56662AFA /* AudioToolbox.framework in Frameworks */,
+				C0EAE5025627FDAD151AD889 /* AVFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,8 +124,17 @@
 		041145BA92CDD5DBE06F9A85 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				D4ACEFEAE3082738199AE4FF /* GDAudioFeedback.h */,
+				367291599704709A047A983F /* GDAudioFeedback.m */,
 				74C183E99AE580D8352A2811 /* GDEngine.h */,
 				AF6639D30BE5211B884C355C /* GDEngine.m */,
+				1963FB029408FEA6E3CBDC66 /* GDLevelCatalog.h */,
+				F084813AB153F0BECE6A2AC6 /* GDLevelCatalog.m */,
+				334A64CBD0172BC6630F6FCF /* GDLevelsData.inc */,
+				1664F5ABD078B354451DD8E3 /* GDProgressStore.h */,
+				57A1256B9508AB3ED4CD52F8 /* GDProgressStore.m */,
+				B40E93696969C0A49884E7AE /* GDRunRecords.h */,
+				2F6D55CF8E41E71375605CB4 /* GDRunRecords.m */,
 				AD53D748C9A7C4A35EBB0645 /* GDSettings.h */,
 				E838D7D21BBEF2D8D86B2CAA /* GDSettings.m */,
 			);
@@ -99,12 +144,22 @@
 		13139B67B72417489B663A08 /* Audio */ = {
 			isa = PBXGroup;
 			children = (
+				3A85F55E66B1719A5F44EE1F /* blast.wav */,
+				B80728B761C800BFE479AC51 /* combo.wav */,
 				D49D9D946030B60D52CBCC2C /* error.wav */,
+				19A076B1525D5E0C67502782 /* fall.wav */,
+				95C3F982E2DDD2BCFC141519 /* freeze.wav */,
 				61109488FB96A3B351A03920 /* game_over.wav */,
+				D272DF48097CEE9FE1215743 /* manifest.json */,
+				20004F6A9F8197B04720B071 /* match_alt.wav */,
 				4D027C79FE5BA7105A8F092D /* match.wav */,
+				B925BCC42BFE90188EA158E8 /* ready.wav */,
 				782A2B01D3DA2BBC0877CCD7 /* shot.wav */,
 				33D86336EED43E49D733888B /* skill.wav */,
+				244B3740918BB2D1CA01A17A /* sweep.wav */,
 				89CA24DCC01955D7ABF7561F /* tap.wav */,
+				7CFC7C61AE8CE7DFBA5152AA /* wild.wav */,
+				835CD9B4AA73DB7B552F6992 /* win.wav */,
 			);
 			path = Audio;
 			sourceTree = "<group>";
@@ -154,9 +209,18 @@
 			isa = PBXGroup;
 			children = (
 				13139B67B72417489B663A08 /* Audio */,
+				B4FE614D18D503E8CB82D6BC /* Data */,
 				2F34DDD5C40639313DC77C74 /* Images */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		B4FE614D18D503E8CB82D6BC /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				ED27CD84D2E5A0001B3CBE51 /* levels.json */,
+			);
+			path = Data;
 			sourceTree = "<group>";
 		};
 		C4E472A11CD9122F5A645EB5 /* Products */ = {
@@ -170,7 +234,7 @@
 		C872D2A04DAA02A51CE0101B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				D06F0BB4AA7B142D9005BBE1 /* AudioToolbox.framework */,
+				61A4AE61C9D5A4D413DE3813 /* AVFoundation.framework */,
 				905025C4FEBBFCB841184C93 /* CoreGraphics.framework */,
 				25FFFF186C73E95F1040EF1F /* SpriteKit.framework */,
 				B40EB94ABAB55D0E0F431C7D /* UIKit.framework */,
@@ -249,20 +313,32 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E622D62694DCAFBEB9008D30 /* GDLevelsData.inc in Resources */,
+				4FB760F7981B54AE7574DAA7 /* blast.wav in Resources */,
 				409A72FE72C70DAA04F634A3 /* candy_background.png in Resources */,
 				2A882A02CDF7CD9B76F367E9 /* cannon.png in Resources */,
+				2B823C073438C9BAD65C3470 /* combo.wav in Resources */,
 				F8D645FE52D3B5157A890477 /* error.wav in Resources */,
+				58EBD52549D2F97B70B6A60B /* fall.wav in Resources */,
+				477BF8A7DBF6AC4C322A4A7B /* freeze.wav in Resources */,
 				872658176964791DC007DE73 /* game_over.wav in Resources */,
 				C7D9ABC40AFF2DDC82E146A2 /* gummy_blue.png in Resources */,
 				B40192562720142421662CF4 /* gummy_red.png in Resources */,
 				AAD281235EDD3B8A8C006130 /* gummy_white.png in Resources */,
 				DC66992829FF71A3C9978E6D /* gummy_yellow.png in Resources */,
+				105FA76A80F5FC681C3F2FA8 /* levels.json in Resources */,
+				82CD545B6D64A22BEE024382 /* manifest.json in Resources */,
 				9E5374FE4D8B3C91E2C1E654 /* match.wav in Resources */,
+				E7906533F03E786BCFCC3FEE /* match_alt.wav in Resources */,
 				48CD53EF0A738D54630195B0 /* menu_hero.png in Resources */,
+				41EADDBE3EA77F17E9020EF6 /* ready.wav in Resources */,
 				6AB8CCB970174F0A0DEA142D /* shot.wav in Resources */,
 				0BF2195AAFD706A3E026C715 /* skill.wav in Resources */,
+				7493E488426FDFF0A4C8D3F6 /* sweep.wav in Resources */,
 				22B5955043DF5B53384096B3 /* tap.wav in Resources */,
+				02AF86FF0874E931B85D022D /* wild.wav in Resources */,
 				9AC2977B62862F4B7F361E93 /* wild_icon.png in Resources */,
+				632077405976B012947CD191 /* win.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -275,7 +351,11 @@
 			files = (
 				CC19F4F43EB24C6FBFDECF3C /* AppDelegate.m in Sources */,
 				CE89D5045C5EA6EFAD5BFAD1 /* FrontendScene.m in Sources */,
+				A58DC156905905714C80D75D /* GDAudioFeedback.m in Sources */,
 				A84031A3D5EE4C4BA9471806 /* GDEngine.m in Sources */,
+				E17399543C1400D7AE1CD339 /* GDLevelCatalog.m in Sources */,
+				F5E28CC881B782DA518E8528 /* GDProgressStore.m in Sources */,
+				7311F40092E2E3374EC494ED /* GDRunRecords.m in Sources */,
 				CAC41297E9AF04EDE0CC35C7 /* GDSettings.m in Sources */,
 				1CA56B1A2725E928201141BF /* GameScene.m in Sources */,
 				A24BA7A082D39BB680B1A1F2 /* GummyUI.m in Sources */,

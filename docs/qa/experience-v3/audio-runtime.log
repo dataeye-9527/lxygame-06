@@ -1,0 +1,32 @@
+2026-09-30 14:56:22.131 GummyDrop[54355:838263] QA audio tour begin
+2026-09-30 14:56:24.123 GummyDrop[54355:838263] QA sound clip=tap feedback=0 playing=1 volume=0.40 rate=1.00 voices=1
+2026-09-30 14:56:24.730 GummyDrop[54355:838263] QA sound clip=shot feedback=1 playing=1 volume=0.43 rate=1.00 voices=1
+2026-09-30 14:56:25.093 GummyDrop[54355:838263] QA sound clip=match feedback=2 playing=1 volume=0.43 rate=1.02 voices=2
+2026-09-30 14:56:25.850 GummyDrop[54355:838263] QA sound clip=skill feedback=3 playing=1 volume=0.43 rate=1.00 voices=1
+2026-09-30 14:56:26.757 GummyDrop[54355:838263] QA sound clip=game_over feedback=4 playing=1 volume=0.43 rate=1.00 voices=1
+2026-09-30 14:56:27.760 GummyDrop[54355:838263] QA sound clip=error feedback=5 playing=1 volume=0.43 rate=1.00 voices=1
+2026-09-30 14:56:28.751 GummyDrop[54355:838263] QA sound clip=fall feedback=6 playing=1 volume=0.43 rate=1.00 voices=1
+2026-09-30 14:56:29.754 GummyDrop[54355:838263] QA sound clip=combo feedback=7 playing=1 volume=0.43 rate=1.00 voices=1
+2026-09-30 14:56:30.756 GummyDrop[54355:838263] QA sound clip=freeze feedback=8 playing=1 volume=0.43 rate=1.00 voices=1
+2026-09-30 14:56:31.695 GummyDrop[54355:838263] QA sound clip=blast feedback=9 playing=1 volume=0.43 rate=1.00 voices=1
+2026-09-30 14:56:32.495 GummyDrop[54355:838263] QA sound clip=sweep feedback=10 playing=1 volume=0.43 rate=1.00 voices=1
+2026-09-30 14:56:33.593 GummyDrop[54355:838263] QA sound clip=wild feedback=11 playing=1 volume=0.43 rate=1.00 voices=1
+2026-09-30 14:56:34.532 GummyDrop[54355:838263] QA sound clip=ready feedback=12 playing=1 volume=0.43 rate=1.00 voices=1
+2026-09-30 14:56:35.481 GummyDrop[54355:838263] QA sound clip=win feedback=13 playing=1 volume=0.43 rate=1.00 voices=1
+2026-09-30 14:56:36.431 GummyDrop[54355:838263] QA sound clip=fall feedback=6 playing=1 volume=0.45 rate=1.00 voices=1
+2026-09-30 14:56:36.441 GummyDrop[54355:838263] QA sound clip=combo feedback=7 playing=1 volume=0.45 rate=1.00 voices=2
+2026-09-30 14:56:36.452 GummyDrop[54355:838263] QA sound clip=freeze feedback=8 playing=1 volume=0.45 rate=1.00 voices=3
+2026-09-30 14:56:36.473 GummyDrop[54355:838263] QA sound clip=blast feedback=9 playing=1 volume=0.45 rate=1.00 voices=3
+2026-09-30 14:56:36.494 GummyDrop[54355:838263] QA sound clip=sweep feedback=10 playing=1 volume=0.45 rate=1.00 voices=3
+2026-09-30 14:56:36.516 GummyDrop[54355:838263] QA sound clip=wild feedback=11 playing=1 volume=0.45 rate=1.00 voices=3
+2026-09-30 14:56:36.537 GummyDrop[54355:838263] QA sound clip=combo feedback=7 playing=1 volume=0.45 rate=1.00 voices=3
+2026-09-30 14:56:36.569 GummyDrop[54355:838263] QA sound clip=freeze feedback=8 playing=1 volume=0.45 rate=1.00 voices=3
+2026-09-30 14:56:36.590 GummyDrop[54355:838263] QA sound clip=blast feedback=9 playing=1 volume=0.45 rate=1.00 voices=3
+2026-09-30 14:56:36.612 GummyDrop[54355:838263] QA sound clip=sweep feedback=10 playing=1 volume=0.45 rate=1.00 voices=3
+2026-09-30 14:56:36.644 GummyDrop[54355:838263] QA sound clip=wild feedback=11 playing=1 volume=0.45 rate=1.00 voices=3
+2026-09-30 14:56:36.665 GummyDrop[54355:838263] QA sound clip=combo feedback=7 playing=1 volume=0.45 rate=1.00 voices=3
+2026-09-30 14:56:36.687 GummyDrop[54355:838263] QA sound clip=freeze feedback=8 playing=1 volume=0.45 rate=1.00 voices=3
+2026-09-30 14:56:36.708 GummyDrop[54355:838263] QA sound clip=blast feedback=9 playing=1 volume=0.45 rate=1.00 voices=3
+2026-09-30 14:56:36.741 GummyDrop[54355:838263] QA audio disabled voices=0
+2026-09-30 14:56:36.743 GummyDrop[54355:838263] QA audio disabled request voices=0
+2026-09-30 14:56:36.744 GummyDrop[54355:838263] QA audio tour end restoredSound=1

@@ -1,0 +1,24 @@
+2026-09-30 15:44:11.062 GummyDrop[62395:903083] QA release launcher=0 x=580.42 y=500.21 angle=31.92 cancelled=0 valid=1 fired=1 matches=7 color=2 bounced=0
+2026-09-30 15:44:11.389 GummyDrop[62395:903083] QA event source=0 removed=7 fallen=0 points=70 score=70 objective=0/1 phase=2
+2026-09-30 15:44:32.937 GummyDrop[62395:903083] QA release launcher=2 x=541.85 y=500.21 angle=-36.98 cancelled=0 valid=1 fired=1 matches=7 color=1 bounced=0
+2026-09-30 15:44:33.434 GummyDrop[62395:903083] QA event source=0 removed=7 fallen=0 points=70 score=140 objective=0/1 phase=2
+2026-09-30 15:45:05.837 GummyDrop[62395:903083] QA release launcher=0 x=168.62 y=162.58 angle=-63.92 cancelled=0 valid=1 fired=1 matches=5 color=0 bounced=1
+2026-09-30 15:45:06.421 GummyDrop[62395:903083] QA event source=0 removed=5 fallen=0 points=50 score=190 objective=0/1 phase=2
+2026-09-30 15:45:07.502 GummyDrop[62395:903083] QA release launcher=0 x=168.62 y=182.76 angle=-58.20 cancelled=0 valid=1 fired=1 matches=7 color=3 bounced=1
+2026-09-30 15:45:08.068 GummyDrop[62395:903083] QA event source=0 removed=7 fallen=0 points=70 score=260 objective=0/1 phase=2
+2026-09-30 15:45:26.927 GummyDrop[62395:903083] QA release launcher=0 x=168.62 y=207.09 angle=-52.13 cancelled=0 valid=1 fired=1 matches=7 color=2 bounced=1
+2026-09-30 15:45:27.333 GummyDrop[62395:903083] QA event source=0 removed=7 fallen=2 points=100 score=360 objective=0/1 phase=2
+2026-09-30 15:45:28.588 GummyDrop[62395:903083] QA release launcher=0 x=168.62 y=151.90 angle=-67.20 cancelled=0 valid=1 fired=1 matches=7 color=1 bounced=1
+2026-09-30 15:45:29.266 GummyDrop[62395:903083] QA event source=0 removed=7 fallen=0 points=70 score=430 objective=0/1 phase=2
+2026-09-30 15:46:01.079 GummyDrop[62395:903083] QA release launcher=0 x=984.50 y=315.08 angle=70.98 cancelled=0 valid=1 fired=1 matches=7 color=0 bounced=1
+2026-09-30 15:46:02.137 GummyDrop[62395:903083] QA event source=0 removed=7 fallen=6 points=160 score=590 objective=0/1 phase=2
+2026-09-30 15:46:05.198 GummyDrop[62395:903083] QA event source=4 removed=0 fallen=0 points=0 score=590 objective=0/1 phase=2
+2026-09-30 15:46:07.722 GummyDrop[62395:903083] QA release launcher=0 x=168.62 y=162.58 angle=-63.92 cancelled=0 valid=1 fired=1 matches=5 color=1 bounced=1
+2026-09-30 15:46:08.365 GummyDrop[62395:903083] QA event source=2 removed=5 fallen=0 points=50 score=640 objective=0/1 phase=2
+2026-09-30 15:46:09.771 GummyDrop[62395:903083] QA release launcher=0 x=168.62 y=172.67 angle=-60.98 cancelled=0 valid=1 fired=1 matches=10 color=1 bounced=1
+2026-09-30 15:46:10.465 GummyDrop[62395:903083] QA event source=0 removed=10 fallen=5 points=175 score=815 objective=0/1 phase=2
+2026-09-30 15:49:36.011 GummyDrop[62395:903083] QA release launcher=0 x=168.62 y=175.04 angle=-60.31 cancelled=0 valid=1 fired=1 matches=0 color=0 bounced=1
+2026-09-30 15:49:36.762 GummyDrop[62395:903083] QA event source=0 removed=0 fallen=0 points=0 score=815 objective=0/1 phase=2
+2026-09-30 15:49:38.665 GummyDrop[62395:903083] QA release launcher=0 x=168.62 y=207.09 angle=-52.13 cancelled=0 valid=1 fired=1 matches=9 color=2 bounced=1
+2026-09-30 15:49:39.209 GummyDrop[62395:903083] QA event source=0 removed=9 fallen=1 points=105 score=920 objective=0/1 phase=2
+2026-09-30 15:49:41.745 GummyDrop[62395:903083] QA event source=3 removed=6 fallen=0 points=60 score=980 objective=1/1 phase=5

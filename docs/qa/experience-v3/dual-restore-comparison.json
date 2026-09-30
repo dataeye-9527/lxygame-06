@@ -1,0 +1,18 @@
+[
+  {
+    "snapshotKey": "GummyLevelRunSnapshot",
+    "fieldsCompared": 32,
+    "changedFields": [],
+    "runID": "B4E83F40-E968-49F6-B432-6C04570283D9",
+    "mode": 1,
+    "levelID": 2
+  },
+  {
+    "snapshotKey": "GummyRunSnapshot",
+    "fieldsCompared": 32,
+    "changedFields": [],
+    "runID": "A54799F0-1DEE-457F-B917-BC6C5483B540",
+    "mode": 0,
+    "levelID": 0
+  }
+]

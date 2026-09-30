@@ -1,0 +1,111 @@
+{
+  "levelID": 1,
+  "lastOperations": [
+    {
+      "revision": 8,
+      "score": 430,
+      "time": 21.83728229168628,
+      "action": "shot"
+    },
+    {
+      "revision": 10,
+      "score": 590,
+      "time": 26.0,
+      "action": "pressure"
+    },
+    {
+      "revision": 10,
+      "score": 590,
+      "time": 28.487282291680458,
+      "action": "launcher:0"
+    },
+    {
+      "revision": 10,
+      "score": 590,
+      "time": 28.487282291680458,
+      "action": "blast"
+    },
+    {
+      "revision": 11,
+      "score": 640,
+      "time": 30.53728229168337,
+      "action": "launcher:0"
+    },
+    {
+      "revision": 11,
+      "score": 640,
+      "time": 30.53728229168337,
+      "action": "shot"
+    },
+    {
+      "revision": 12,
+      "score": 815,
+      "time": 33.93179412501922,
+      "action": "launcher:0"
+    },
+    {
+      "revision": 12,
+      "score": 815,
+      "time": 33.93179412501922,
+      "action": "shot"
+    },
+    {
+      "revision": 13,
+      "score": 815,
+      "time": 36.56512745835062,
+      "action": "launcher:0"
+    },
+    {
+      "revision": 13,
+      "score": 815,
+      "time": 36.56512745835062,
+      "action": "shot"
+    },
+    {
+      "revision": 14,
+      "score": 920,
+      "time": 39.63179412501631,
+      "action": "yellow"
+    },
+    {
+      "revision": 15,
+      "score": 980,
+      "time": 39.63179412501631,
+      "action": "won"
+    }
+  ],
+  "stats": {
+    "directRemoved": 77,
+    "redUses": 1,
+    "launcher2Shots": 1,
+    "fallenRemoved": 14,
+    "energy1Full": 1,
+    "energy2Full": 1,
+    "yellowUses": 1,
+    "pressureRows": 1,
+    "wavesCleared": 1,
+    "launcher0Shots": 9,
+    "normalShots": 10,
+    "holdUses": 1,
+    "bouncedShots": 9
+  },
+  "version": "campaign-v1",
+  "energy": [
+    13,
+    10,
+    0,
+    9
+  ],
+  "wave": 1,
+  "seed": 20261001,
+  "phase": 5,
+  "mode": 1,
+  "stars": 2,
+  "objectiveTarget": 1,
+  "objectiveCurrent": 1,
+  "elapsed": 39.63179412501631,
+  "board": [],
+  "runID": "697922F4-5F3C-47FD-9DE2-F0B699DFA1CC",
+  "score": 980,
+  "shotsPerMinute": 15.139360032688225
+}

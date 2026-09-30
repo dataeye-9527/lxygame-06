@@ -1,0 +1,245 @@
+{
+  "layoutHash" : "b3b130db3edf56c2",
+  "stars" : 3,
+  "target" : 2,
+  "score" : 1820,
+  "skills" : 2,
+  "objective" : 0,
+  "won" : true,
+  "bounces" : 6,
+  "fallen" : 0,
+  "waveClears" : [
+    {
+      "shots" : 3,
+      "fallen" : 0,
+      "elapsed" : 4.6924133182153831,
+      "authoredWave" : 1
+    },
+    {
+      "shots" : 6,
+      "fallen" : 0,
+      "elapsed" : 12.391684381039887,
+      "authoredWave" : 2
+    }
+  ],
+  "progress" : 2,
+  "topology" : "0:0,0:1,0:2,0:3,0:4,0:5,0:6,0:7,0:8,0:9,0:10,0:11,0:12,0:13,0:14,0:15,0:16,0:17,1:0,1:1,1:2,1:3,1:4,1:5,1:6,1:7,1:8,1:9,1:10,1:11,1:12,1:13,1:14,1:15,1:16,2:0,2:1,2:2,2:3,2:4,2:5,2:6,2:7,2:8,2:9,2:10,2:11,2:12,2:13,2:14,2:15,2:16,2:17,3:0,3:1,3:2,3:3,3:5,3:6,3:7,3:8,3:9,3:11,3:12,3:13,3:14,3:15,4:0,4:1,4:2,4:3,4:6,4:7,4:8,4:9,4:12,4:13,4:14,4:15,5:1,5:2,5:3,5:7,5:8,5:9,5:13,5:14,5:15",
+  "level" : 11,
+  "seed" : 20261011,
+  "elapsed" : 12.391684381039887,
+  "launchers" : [
+    0
+  ],
+  "timeBudget" : {
+    "perTurnMinimum" : 2,
+    "projectileSpeed" : 1250,
+    "resolution" : 0.38
+  },
+  "shots" : 6,
+  "actions" : [
+    {
+      "x" : -379.25670615594044,
+      "launcher" : 0,
+      "elapsed" : 0,
+      "y" : 56.758679706644905,
+      "current" : 2,
+      "next" : 2,
+      "held" : -1,
+      "blast" : false,
+      "flight" : 0.31996602600561663,
+      "resolution" : 0.38,
+      "planning" : 1.3000339739943834
+    },
+    {
+      "hold" : true
+    },
+    {
+      "x" : -480.11583240941684,
+      "launcher" : 0,
+      "elapsed" : 2,
+      "y" : 209.14019724764577,
+      "current" : 3,
+      "next" : 0,
+      "held" : 2,
+      "blast" : false,
+      "flight" : 0.46653894424156062,
+      "resolution" : 0.38,
+      "planning" : 1.1534610557584393
+    },
+    {
+      "x" : -520.37332917412482,
+      "launcher" : 0,
+      "elapsed" : 3.9999999999999996,
+      "y" : 311.33980669408425,
+      "current" : 0,
+      "next" : 0,
+      "held" : 2,
+      "blast" : false,
+      "flight" : 0.69241331821538366,
+      "resolution" : 0.38,
+      "planning" : 0.92758668178461645
+    },
+    {
+      "x" : -480.11583240941684,
+      "launcher" : 0,
+      "elapsed" : 5.9999999999999991,
+      "y" : 209.14019724764577,
+      "current" : 0,
+      "next" : 3,
+      "held" : 2,
+      "blast" : false,
+      "flight" : 0.46653894424156062,
+      "resolution" : 0.38,
+      "planning" : 1.1534610557584393
+    },
+    {
+      "x" : -520.37332917412482,
+      "launcher" : 0,
+      "elapsed" : 7.9999999999999982,
+      "y" : 311.33980669408425,
+      "current" : 3,
+      "next" : 3,
+      "held" : 2,
+      "blast" : false,
+      "flight" : 0.69241331821538366,
+      "resolution" : 0.38,
+      "planning" : 0.92758668178461645
+    },
+    {
+      "yellow" : true,
+      "elapsed" : 9.9999999999999982,
+      "resolution" : 0.38
+    },
+    {
+      "wild" : true
+    },
+    {
+      "x" : -354.49786023705576,
+      "launcher" : 0,
+      "elapsed" : 12,
+      "y" : 29.739140678701844,
+      "current" : 3,
+      "next" : 1,
+      "held" : 2,
+      "blast" : false,
+      "flight" : 0.39168438103988656,
+      "resolution" : 0.38,
+      "planning" : 1.2283156189601137
+    }
+  ],
+  "directRemoved" : 182,
+  "diagnostics" : {
+    "levelID" : 11,
+    "lastOperations" : [
+      {
+        "revision" : 9,
+        "score" : 1600,
+        "time" : 12,
+        "action" : "launcher:0"
+      },
+      {
+        "revision" : 9,
+        "score" : 1600,
+        "time" : 12,
+        "action" : "launcher:0"
+      },
+      {
+        "revision" : 9,
+        "score" : 1600,
+        "time" : 12,
+        "action" : "launcher:0"
+      },
+      {
+        "revision" : 9,
+        "score" : 1600,
+        "time" : 12,
+        "action" : "launcher:0"
+      },
+      {
+        "revision" : 9,
+        "score" : 1600,
+        "time" : 12,
+        "action" : "launcher:0"
+      },
+      {
+        "revision" : 9,
+        "score" : 1600,
+        "time" : 12,
+        "action" : "launcher:0"
+      },
+      {
+        "revision" : 9,
+        "score" : 1600,
+        "time" : 12,
+        "action" : "launcher:0"
+      },
+      {
+        "revision" : 9,
+        "score" : 1600,
+        "time" : 12,
+        "action" : "launcher:0"
+      },
+      {
+        "revision" : 9,
+        "score" : 1600,
+        "time" : 12,
+        "action" : "launcher:0"
+      },
+      {
+        "revision" : 9,
+        "score" : 1600,
+        "time" : 12,
+        "action" : "launcher:0"
+      },
+      {
+        "revision" : 9,
+        "score" : 1600,
+        "time" : 12,
+        "action" : "shot"
+      },
+      {
+        "revision" : 10,
+        "score" : 1820,
+        "time" : 12.391684381039887,
+        "action" : "won"
+      }
+    ],
+    "stats" : {
+      "energy0Full" : 1,
+      "directRemoved" : 182,
+      "fallenRemoved" : 0,
+      "energy2Full" : 1,
+      "yellowUses" : 1,
+      "wildShots" : 1,
+      "wavesCleared" : 2,
+      "energy3Full" : 1,
+      "launcher0Shots" : 6,
+      "whiteUses" : 1,
+      "normalShots" : 6,
+      "holdUses" : 1,
+      "bouncedShots" : 6
+    },
+    "version" : "campaign-v1",
+    "energy" : [
+      20,
+      0,
+      0,
+      0
+    ],
+    "wave" : 2,
+    "seed" : 20261011,
+    "phase" : 5,
+    "mode" : 1,
+    "stars" : 3,
+    "objectiveTarget" : 2,
+    "objectiveCurrent" : 2,
+    "elapsed" : 12.391684381039887,
+    "board" : [
+
+    ],
+    "runID" : "F1942BA3-5E30-4442-A171-DA4E0EF74A2F",
+    "score" : 1820,
+    "shotsPerMinute" : 29.051740581032252
+  },
+  "pressureRows" : 0
+}

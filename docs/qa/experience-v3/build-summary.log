@@ -1,0 +1,4 @@
+Debug generic iOS Simulator: exit=0, BUILD SUCCEEDED
+Release generic iOS Simulator: exit=0, BUILD SUCCEEDED
+/Users/edy/Documents/ChatGPT/lxygame-06/Sources/Core/GDEngine.m:14:16: warning: unused function 'GDReadPoint' [-Wunused-function]
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer; xcodebuild -project GummyDrop.xcodeproj -scheme GummyDrop -sdk iphonesimulator -destination generic/platform=iOS Simulator -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO build

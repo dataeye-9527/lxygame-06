@@ -3,7 +3,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 typedef NS_ENUM(NSInteger, GDColor) { GDColorBlue, GDColorRed, GDColorYellow, GDColorWhite };
-typedef NS_ENUM(NSInteger, GDPhase) { GDPhaseReady, GDPhaseFlying, GDPhaseResolving, GDPhasePaused, GDPhaseGameOver };
+typedef NS_ENUM(NSInteger, GDPhase) { GDPhaseReady, GDPhaseFlying, GDPhaseResolving, GDPhasePaused, GDPhaseGameOver, GDPhaseWon };
+typedef NS_ENUM(NSInteger, GDGameMode) { GDGameModeEndless, GDGameModeLevel };
+typedef NS_ENUM(NSInteger, GDObjective) { GDObjectiveClear, GDObjectiveCollect, GDObjectiveFall, GDObjectiveSurvive };
 typedef NS_ENUM(NSInteger, GDSource) { GDSourceNormal, GDSourceWild, GDSourceBlast, GDSourceYellow, GDSourcePressure };
 
 @interface GDCell : NSObject <NSCopying>
@@ -27,11 +29,17 @@ typedef NS_ENUM(NSInteger, GDSource) { GDSourceNormal, GDSourceWild, GDSourceBla
 @property(nonatomic) GDSource source;
 @property(nonatomic, copy) NSArray<GDCell *> *removed, *fallen;
 @property(nonatomic, nullable) GDCell *placed;
-@property(nonatomic) BOOL pushed, newWave, gameOver;
-@property(nonatomic) NSInteger points;
+@property(nonatomic) BOOL pushed, newWave, gameOver, won;
+@property(nonatomic) NSInteger points, rowPhase; // phase used by removed/fallen coordinates before any new wave
 @end
 
 @interface GDEngine : NSObject
+@property(nonatomic, readonly) GDGameMode mode;
+@property(nonatomic, readonly) NSInteger levelID, objectiveCurrent, objectiveTarget, stars, totalWaves;
+@property(nonatomic, readonly) GDObjective objective;
+@property(nonatomic, readonly) GDColor objectiveColor;
+@property(nonatomic, readonly) NSString *runID;
+@property(nonatomic, readonly) BOOL won;
 @property(nonatomic, readonly) CGFloat radius, boardWidth, dangerY, launchY;
 @property(nonatomic, readonly) NSInteger longColumns, initialRows, rowPhase, revision;
 @property(nonatomic, readonly) NSArray<GDCell *> *cells;
@@ -44,9 +52,11 @@ typedef NS_ENUM(NSInteger, GDSource) { GDSourceNormal, GDSourceWild, GDSourceBla
 @property(nonatomic, readonly) NSTimeInterval pressureRemaining, pressureInterval, freezeRemaining, elapsed;
 @property(nonatomic, readonly) NSArray<NSNumber *> *energy;
 @property(nonatomic, readonly) NSInteger energyThreshold;
+- (nullable instancetype)initWithLevelID:(NSInteger)levelID seed:(NSUInteger)seed;
 - (instancetype)initWithSeed:(NSUInteger)seed;
 - (nullable instancetype)initWithSnapshot:(NSDictionary *)snapshot;
 - (CGPoint)centerOfCell:(GDCell *)cell;
+- (CGPoint)centerOfCell:(GDCell *)cell rowPhase:(NSInteger)rowPhase;
 - (CGPoint)launcherPoint:(NSInteger)launcher;
 - (NSArray<GDCell *> *)neighborsOfCell:(GDCell *)cell;
 - (BOOL)selectLauncher:(NSInteger)launcher;

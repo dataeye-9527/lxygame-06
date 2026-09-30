@@ -32,6 +32,6 @@ targets:
       - sdk: SpriteKit.framework
       - sdk: UIKit.framework
       - sdk: CoreGraphics.framework
-      - sdk: AudioToolbox.framework
+      - sdk: AVFoundation.framework
     scheme:
       gatherCoverageData: false

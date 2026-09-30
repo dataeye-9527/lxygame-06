@@ -3,6 +3,8 @@
 #import "GDEngine.h"
 #import "FrontendScene.h"
 #import "GDSettings.h"
+#import "GDLevelCatalog.h"
+#import "GDRunRecords.h"
 #import <UIKit/UIKit.h>
 
 static UIColor *Ink(void) { return [UIColor colorWithRed:.34 green:.26 blue:.43 alpha:1]; }
@@ -13,6 +15,13 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
 @interface GameScene ()
 @property(nonatomic) GDEngine *engine;
 @property(nonatomic) NSDictionary *initialRunSnapshot;
+@property(nonatomic) NSInteger initialLevelID, combo;
+#if DEBUG
+@property(nonatomic) BOOL clockValidation, qaPresentationFixture;
+#endif
+@property(nonatomic) NSTimeInterval flightRemaining, resolutionRemaining;
+@property(nonatomic) NSArray<NSNumber *> *displayedEnergy;
+@property(nonatomic) SKLabelNode *modeLabel, *objectiveLabel;
 @property(nonatomic) NSMutableDictionary<NSString *,NSValue *> *overlayControls;
 @property(nonatomic) SKNode *playfield, *boardPieces, *effects, *aimLayer, *hud, *overlay;
 @property(nonatomic) NSMutableDictionary<NSString *,SKNode *> *pieceNodes;
@@ -23,12 +32,14 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
 @property(nonatomic) SKNode *nextPiece, *heldPiece, *currentPiece;
 @property(nonatomic) GDShot *preview;
 @property(nonatomic) UITouch *aimTouch;
+@property(nonatomic) CGPoint aimTouchStart;
 @property(nonatomic) BOOL aiming, yellowArmed, renderedGameOver;
 @property(nonatomic) NSTimeInterval lastTime;
 @property(nonatomic) NSInteger renderedRevision, displayedNext, displayedHeld, displayedCurrent, generation;
 @end
 
 @implementation GameScene
+- (instancetype)initWithSize:(CGSize)size levelID:(NSInteger)levelID { if((self=[super initWithSize:size])) self.initialLevelID=levelID; return self; }
 - (instancetype)initWithSize:(CGSize)size runSnapshot:(NSDictionary *)snapshot {
     if((self=[super initWithSize:size])) self.initialRunSnapshot=snapshot; return self;
 }
@@ -40,12 +51,23 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     self.anchorPoint=CGPointZero;
     self.pieceNodes=[NSMutableDictionary dictionary]; self.skillCards=[NSMutableArray array]; self.launcherNodes=[NSMutableArray array]; self.energyFills=[NSMutableArray array]; self.energyLabels=[NSMutableArray array];
     self.displayedNext=self.displayedHeld=self.displayedCurrent=-99; self.renderedRevision=-1;
+    self.flightRemaining=self.resolutionRemaining=-1; self.displayedEnergy=@[@0,@0,@0,@0];
+#if DEBUG
     NSArray *args=NSProcessInfo.processInfo.arguments;
+#endif
     NSDictionary *saved=self.initialRunSnapshot; self.initialRunSnapshot=nil;
     NSUInteger seed=[self newRunSeed];
-    self.engine=saved ? [[GDEngine alloc] initWithSnapshot:saved] : [[GDEngine alloc] initWithSeed:seed];
+    self.engine=saved ? [[GDEngine alloc] initWithSnapshot:saved] : (self.initialLevelID>0?[[GDEngine alloc] initWithLevelID:self.initialLevelID seed:[GDLevelCatalog levelForID:self.initialLevelID].seed]:[[GDEngine alloc] initWithSeed:seed]);
     if(!self.engine) self.engine=[[GDEngine alloc] initWithSeed:seed];
 #if DEBUG
+    if([args containsObject:@"-qa-last-level"]){
+        GDLevel *last=GDLevelCatalog.levels.lastObject;
+        GDEngine *fixtureEngine=[[GDEngine alloc] initWithLevelID:last.levelID seed:last.seed];
+        NSMutableDictionary *fixture=[fixtureEngine.snapshot mutableCopy];
+        fixture[@"won"]=@YES; fixture[@"stars"]=@3; fixture[@"completionRecorded"]=@YES;
+        fixture[@"clearedWaves"]=@(fixtureEngine.objectiveTarget); fixture[@"collected"]=@(fixtureEngine.objectiveTarget); fixture[@"fallenTotal"]=@(fixtureEngine.objectiveTarget); fixture[@"elapsed"]=@(MAX(fixtureEngine.objectiveTarget,1));
+        self.engine=[[GDEngine alloc] initWithSnapshot:fixture]; self.qaPresentationFixture=YES;
+    }
     if(!saved && [args containsObject:@"-qa-ready"]) [self.engine setFixtureEnergy:@[@20,@20,@20,@20]];
     if(!saved && [args containsObject:@"-qa-failure"]){
         NSMutableArray *cells=[self.engine.cells mutableCopy];
@@ -53,9 +75,11 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
         [self.engine loadFixture:cells phase:0 current:GDColorBlue next:GDColorYellow];
     }
 #endif
+    self.displayedEnergy=[self.engine.energy copy];
     [self buildLayout]; [self syncBoard]; [self refreshHUD];
     if(self.engine.phase==GDPhasePaused) [self.engine resume];
 #if DEBUG
+    if([args containsObject:@"-qa-clock"]) [self validatePresentationClock];
     if(saved && [args containsObject:@"-qa-feedback"]){ NSData *data=[NSJSONSerialization dataWithJSONObject:self.engine.snapshot options:0 error:nil]; NSLog(@"QA restored snapshot=%@",[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]); }
 #endif
 }
@@ -80,6 +104,8 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     SKNode *timer=[GummyUI surface:CGSizeMake(146,54) color:[UIColor colorWithRed:.94 green:.42 blue:.59 alpha:1] radius:25]; timer.position=CGPointMake(604,645); [self.hud addChild:timer];
     self.timerTitle=[GummyUI label:@"NEW ROW" size:13 color:UIColor.whiteColor]; self.timerTitle.position=CGPointMake(604,658); [self.hud addChild:self.timerTitle];
     self.timerLabel=[GummyUI label:@"00:12" size:25 color:UIColor.whiteColor]; self.timerLabel.position=CGPointMake(604,636); [self.hud addChild:self.timerLabel];
+    self.modeLabel=[GummyUI label:@"ENDLESS" size:18 color:Ink()]; self.modeLabel.position=CGPointMake(871,658); [self.hud addChild:self.modeLabel];
+    self.objectiveLabel=[GummyUI label:@"" size:13 color:Ink()]; self.objectiveLabel.position=CGPointMake(871,635); [self.hud addChild:self.objectiveLabel];
     SKNode *pause=[GummyUI button:@"Ⅱ" size:CGSizeMake(55,52) name:@"pause" color:Cream()]; pause.position=CGPointMake(1133,643); [self.hud addChild:pause];
     SKNode *left=[GummyUI surface:CGSizeMake(144,605) color:[UIColor colorWithRed:1 green:.86 blue:.82 alpha:1] radius:25]; left.position=CGPointMake(82,329); [self.hud addChild:left];
     NSArray *names=@[@"FREEZE",@"BLAST",@"SWEEP",@"WILD"];
@@ -119,6 +145,9 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     self.statusLabel=[GummyUI label:@"" size:17 color:Cream()]; self.statusLabel.position=CGPointMake(588,190); self.statusLabel.zPosition=60; [self.hud addChild:self.statusLabel];
 }
 - (void)syncBoard {
+#if DEBUG
+    if(self.clockValidation) return;
+#endif
     if(self.renderedRevision==self.engine.revision) return;
     NSMutableSet *keys=[NSMutableSet set];
     for(GDCell *cell in self.engine.cells){
@@ -135,17 +164,34 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     self.timerTitle.text=frozen?@"FROZEN":@"NEW ROW";
     NSTimeInterval remaining=frozen?self.engine.freezeRemaining:self.engine.pressureRemaining;
     NSInteger seconds=(NSInteger)ceil(MAX(0,remaining)); self.timerLabel.text=[NSString stringWithFormat:@"%02ld:%02ld",(long)(seconds/60),(long)(seconds%60)];
+    self.modeLabel.text=self.engine.mode==GDGameModeLevel?[NSString stringWithFormat:@"LEVEL %02ld",(long)self.engine.levelID]:@"ENDLESS";
+    if(self.engine.mode==GDGameModeLevel){
+        NSArray *verbs=@[@"CLEAR WAVES",@"COLLECT",@"DROP",@"SURVIVE"];
+        NSString *kind=verbs[self.engine.objective];
+        if(self.engine.objective==GDObjectiveCollect) kind=[NSString stringWithFormat:@"%@ %@",kind,@[@"BLUE",@"RED",@"YELLOW",@"WHITE"][self.engine.objectiveColor]];
+        self.objectiveLabel.text=[NSString stringWithFormat:@"%@  %ld / %ld%@   ·   WAVE %ld/%ld",kind,(long)self.engine.objectiveCurrent,(long)self.engine.objectiveTarget,self.engine.objective==GDObjectiveSurvive?@"s":@"",(long)self.engine.wave,(long)self.engine.totalWaves];
+    } else self.objectiveLabel.text=[NSString stringWithFormat:@"WAVE %ld",(long)self.engine.wave];
     self.timerLabel.fontColor=frozen?[UIColor colorWithRed:.73 green:.96 blue:1 alpha:1]:UIColor.whiteColor;
     for(NSInteger i=0;i<4;i++){
         NSInteger energy=self.engine.energy[i].integerValue; CGFloat amount=MAX(0,MIN(1,(CGFloat)energy/self.engine.energyThreshold));
         CGPathRef path=CGPathCreateWithRoundedRect(CGRectMake(0,-5.5,MAX(1,106*amount),11),5,5,NULL); self.energyFills[i].path=path; CGPathRelease(path);
         self.energyLabels[i].text=energy>=self.engine.energyThreshold?@"READY":[NSString stringWithFormat:@"%ld/%ld",(long)energy,(long)self.engine.energyThreshold];
         self.energyLabels[i].fontColor=Ink();
+        NSInteger previous=self.displayedEnergy[i].integerValue;
+        if(energy>previous){
+            [self pulse:self.energyFills[i] amount:1.13];
+            [self floatingText:[NSString stringWithFormat:@"+%ld",(long)(energy-previous)] at:CGPointMake(126,552-i*146-11) color:[GummyUI color:i] size:17 layer:self.hud];
+        }
+        if(energy>=self.engine.energyThreshold && previous<self.engine.energyThreshold){ [self pulse:self.skillCards[i] amount:1.06]; [GDSettings.sharedSettings playFeedback:GDFeedbackReady]; }
+        if(i==GDColorBlue && frozen) self.energyLabels[i].text=[NSString stringWithFormat:@"%.0fs",ceil(self.engine.freezeRemaining)];
+        if(i==GDColorRed && self.engine.blastArmed) self.energyLabels[i].text=@"AIM";
+        if(i==GDColorWhite && self.engine.wildRemaining>0) self.energyLabels[i].text=[NSString stringWithFormat:@"%ld SHOTS",(long)self.engine.wildRemaining];
         SKNode *ready=[self.skillCards[i] childNodeWithName:@"readyOutline"];
         if(energy>=self.engine.energyThreshold && !ready){ SKShapeNode *outline=[GummyUI panel:CGSizeMake(126,134) fill:UIColor.clearColor stroke:[GummyUI color:i] radius:19]; outline.name=@"readyOutline"; outline.lineWidth=3; outline.zPosition=3; [self.skillCards[i] addChild:outline]; }
         else if(energy<self.engine.energyThreshold) [ready removeFromParent];
         self.skillCards[i].alpha=self.engine.phase==GDPhaseReady?1:.7;
     }
+    self.displayedEnergy=[self.engine.energy copy];
     for(NSInteger i=0;i<3;i++){ self.launcherNodes[i].alpha=self.engine.launcher==i?1:.80; [self.launcherNodes[i] childNodeWithName:@"activeGlow"].hidden=self.engine.launcher!=i; }
     if(self.displayedNext!=self.engine.nextColor){ [self.nextPiece removeAllChildren]; [self.nextPiece addChild:[GummyUI piece:self.engine.nextColor diameter:74]]; self.displayedNext=self.engine.nextColor; }
     if(self.displayedHeld!=self.engine.heldColor){ [self.heldPiece removeAllChildren]; if(self.engine.heldColor>=0) [self.heldPiece addChild:[GummyUI piece:self.engine.heldColor diameter:74]]; else { SKLabelNode *empty=[GummyUI label:@"+" size:37 color:[UIColor colorWithRed:.66 green:.52 blue:.64 alpha:1]]; [self.heldPiece addChild:empty]; } self.displayedHeld=self.engine.heldColor; }
@@ -160,6 +206,9 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     SKNode *ring=[self.currentPiece childNodeWithName:@"wildRing"];
     if(wild && !ring){ SKShapeNode *r=[SKShapeNode shapeNodeWithCircleOfRadius:32]; r.name=@"wildRing"; r.strokeColor=UIColor.whiteColor; r.lineWidth=2.5; r.fillColor=UIColor.clearColor; [self.currentPiece addChild:r]; }
     if(!wild) [ring removeFromParent];
+    SKNode *blastRing=[self.currentPiece childNodeWithName:@"blastRing"];
+    if(self.engine.blastArmed && !blastRing){ SKShapeNode *r=[SKShapeNode shapeNodeWithCircleOfRadius:33]; r.name=@"blastRing"; r.strokeColor=[GummyUI color:GDColorRed]; r.lineWidth=3; r.fillColor=[[GummyUI color:GDColorRed] colorWithAlphaComponent:.12]; [self.currentPiece addChild:r]; }
+    if(!self.engine.blastArmed) [blastRing removeFromParent];
     if(self.engine.blastArmed) self.statusLabel.text=@"BLAST  ·  Drag to aim";
     else if(self.yellowArmed) self.statusLabel.text=@"SWEEP  ·  Tap again to use";
     else if(!self.aiming) self.statusLabel.text=@"";
@@ -177,47 +226,70 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     return nil;
 }
 - (void)handleControl:(NSString *)control {
+#if DEBUG
+    if(self.qaPresentationFixture && ![@[@"home",@"levels",@"allLevels"] containsObject:control]) return;
+#endif
     if(![control isEqualToString:@"overlay"] && ![control isEqualToString:@"next"]) [GDSettings.sharedSettings playFeedback:GDFeedbackTap];
     if([control isEqualToString:@"pause"]){ [self pauseGame]; return; }
     if([control isEqualToString:@"resume"]){ [self.overlay removeFromParent]; self.overlay=nil; [GummyUI setOverlayDimmed:NO]; self.playfield.paused=NO; [self.engine resume]; self.lastTime=0; return; }
+    if([control isEqualToString:@"levels"] || [control isEqualToString:@"allLevels"]){ [self saveRun]; [self.view presentScene:[FrontendScene levelsScene]]; return; }
+    if([control isEqualToString:@"scores"]){ [self.view presentScene:[FrontendScene leaderboardScene]]; return; }
+    if([control isEqualToString:@"nextLevel"]){ NSInteger next=self.engine.levelID+1; if([GDLevelCatalog levelForID:next]){ GameScene *scene=[[GameScene alloc] initWithSize:self.size levelID:next]; scene.scaleMode=self.scaleMode; [self.view presentScene:scene]; } return; }
     if([control isEqualToString:@"retry"]){ [self restart]; return; }
     if([control isEqualToString:@"home"]){ [self goHome]; return; }
     if([control isEqualToString:@"settings"]){ [self.view presentScene:[FrontendScene settingsSceneReturningTo:self]]; return; }
     if(self.engine.phase!=GDPhaseReady) return;
     [self clearAim];
-    if([control hasPrefix:@"launcher"]){ [self.engine selectLauncher:[[control substringFromIndex:8] integerValue]]; self.yellowArmed=NO; }
-    else if([control isEqualToString:@"hold"]){ [self.engine hold]; self.yellowArmed=NO; }
+    if([control hasPrefix:@"launcher"]){ if([self.engine selectLauncher:[[control substringFromIndex:8] integerValue]]) [self pulse:self.launcherNodes[self.engine.launcher] amount:1.07]; self.yellowArmed=NO; }
+    else if([control isEqualToString:@"hold"]){ if([self.engine hold]){ [self pulse:self.heldPiece amount:1.17]; [self pulse:self.currentPiece amount:1.13]; } self.yellowArmed=NO; }
     else if([control hasPrefix:@"skill"]){
         NSInteger i=[[control substringFromIndex:5] integerValue];
         if(i==GDColorYellow){
-            if(self.yellowArmed){ self.yellowArmed=NO; GDEvent *event=[self.engine activateYellow]; if(event){ [GDSettings.sharedSettings playFeedback:GDFeedbackSkill]; [self animateEvent:event]; } }
+            if(self.yellowArmed){ self.yellowArmed=NO; GDEvent *event=[self.engine activateYellow]; if(event){ [GDSettings.sharedSettings playFeedback:GDFeedbackSweep]; [self animateEvent:event]; } }
             else if(self.engine.energy[GDColorYellow].integerValue>=self.engine.energyThreshold){ self.yellowArmed=YES; [self highlightCells:[self.engine yellowTargets] color:[GummyUI color:GDColorYellow]]; }
-        } else { self.yellowArmed=NO; if([self.engine activateSkill:i]) [GDSettings.sharedSettings playFeedback:GDFeedbackSkill]; }
+        } else { self.yellowArmed=NO; if([self.engine activateSkill:i]){ [GDSettings.sharedSettings playFeedback:i==GDColorBlue?GDFeedbackFreeze:(i==GDColorRed?GDFeedbackTap:GDFeedbackWild)]; [self skillEffect:i]; } }
     }
     [self refreshHUD];
 }
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    if(self.aimTouch) return;
     UITouch *touch=touches.anyObject; CGPoint p=[touch locationInNode:self]; NSString *control=[self controlAt:p];
     if([control hasPrefix:@"launcher"] && self.engine.phase==GDPhaseReady){
-        [self handleControl:control]; self.aimTouch=touch; return;
+        [self handleControl:control]; self.aimTouch=touch; self.aimTouchStart=p; return;
     }
     if(control){ [self handleControl:control]; return; }
     if(self.engine.phase!=GDPhaseReady || self.aimTouch || p.x<174 || p.x>1002 || p.y<153 || p.y>607) return;
-    self.yellowArmed=NO; self.aimTouch=touch; self.aiming=YES; [self updateAim:p];
+    self.yellowArmed=NO; self.aimTouch=touch; self.aimTouchStart=p; self.aiming=YES; [self updateAim:p];
 }
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    if(self.aimTouch && [touches containsObject:self.aimTouch]){ CGPoint p=[self.aimTouch locationInNode:self]; self.aiming=YES; [self updateAim:p]; }
+    if(self.aimTouch && [touches containsObject:self.aimTouch]){
+        CGPoint p=[self.aimTouch locationInNode:self];
+        if(!self.aiming && hypot(p.x-self.aimTouchStart.x,p.y-self.aimTouchStart.y)<8) return;
+        self.aiming=YES; [self updateAim:p];
+    }
 }
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     if(!self.aimTouch || ![touches containsObject:self.aimTouch]) return;
-    CGPoint p=[self.aimTouch locationInNode:self]; GDShot *shot=self.preview;
-    BOOL cancel=p.y<153 || p.x<174 || p.x>1002 || [self controlAt:p]!=nil;
+    CGPoint p=[self.aimTouch locationInNode:self];
+    BOOL cancel=p.y<120 || p.x<160 || p.x>1016 || [self controlAt:p]!=nil;
+    // The release may contain a final position that was never delivered as a move.
+    // A cannon tap only selects it; a drag or a board touch establishes aiming.
+    if(hypot(p.x-self.aimTouchStart.x,p.y-self.aimTouchStart.y)>=8) self.aiming=YES;
+    if(!cancel && self.aiming) [self updateAim:p];
+    GDShot *shot=self.aiming?self.preview:nil;
     [self clearAim];
-    if(!cancel && shot.valid && [self.engine beginShot:shot]) [self flyShot:shot];
+    BOOL fired=!cancel && shot.valid && [self.engine beginShot:shot];
+#if DEBUG
+    if([NSProcessInfo.processInfo.arguments containsObject:@"-qa-feedback"]){ CGPoint target=BoardPoint(p), start=[self.engine launcherPoint:self.engine.launcher]; NSLog(@"QA release launcher=%ld x=%.2f y=%.2f angle=%.2f cancelled=%d valid=%d fired=%d matches=%lu color=%ld bounced=%d",(long)self.engine.launcher,p.x,p.y,atan2(target.x-start.x,start.y-target.y)*180/M_PI,cancel,shot.valid,fired,(unsigned long)shot.expectedMatches.count,(long)shot.resolvedColor,shot.bounced); }
+#endif
+    if(fired) [self flyShot:shot];
     else if(self.engine.blastArmed) [self.engine cancelBlast];
     [self refreshHUD];
 }
-- (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event { [self clearAim]; [self.engine cancelBlast]; [self refreshHUD]; }
+- (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    if(!self.aimTouch || ![touches containsObject:self.aimTouch]) return;
+    [self clearAim]; [self.engine cancelBlast]; [self refreshHUD];
+}
 - (void)clearAim { self.aiming=NO; self.aimTouch=nil; self.preview=nil; [self.aimLayer removeAllChildren]; self.statusLabel.text=@""; }
 - (void)updateAim:(CGPoint)point {
     [self.aimLayer removeAllChildren];
@@ -245,7 +317,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
         self.statusLabel.text=self.engine.wildRemaining>0?[NSString stringWithFormat:@"WILD  ·  %ld match",(long)self.preview.expectedMatches.count]:@"";
     } else if(self.preview.valid && self.preview.hitCell){
         CGPoint p=ScenePoint([self.engine centerOfCell:self.preview.hitCell]); SKShapeNode *blast=[SKShapeNode shapeNodeWithCircleOfRadius:65]; blast.position=p; blast.strokeColor=[GummyUI color:GDColorRed]; blast.fillColor=[[GummyUI color:GDColorRed] colorWithAlphaComponent:.14]; blast.lineWidth=2; [self.aimLayer addChild:blast]; self.statusLabel.text=@"BLAST";
-    } else self.statusLabel.text=@"Drag up to aim  ·  Release below board to cancel";
+    } else self.statusLabel.text=@"Drag up to aim  ·  Release below cannons to cancel";
 #if DEBUG
     if([NSProcessInfo.processInfo.arguments containsObject:@"-qa-feedback"]) NSLog(@"QA aim guide enabled=1 nodes=%lu valid=%d",(unsigned long)self.aimLayer.children.count,self.preview.valid);
 #endif
@@ -257,77 +329,223 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     [GDSettings.sharedSettings playFeedback:GDFeedbackShot];
     SKNode *projectile=[GummyUI piece:shot.blast?GDColorRed:self.engine.currentColor diameter:45]; projectile.position=ScenePoint(shot.points.firstObject.CGPointValue); [self.effects addChild:projectile];
     NSMutableArray *actions=[NSMutableArray array];
+    NSTimeInterval trailTime=0;
+    for(NSInteger i=1;i<shot.points.count;i++){
+        CGPoint a=ScenePoint(shot.points[i-1].CGPointValue), b=ScenePoint(shot.points[i].CGPointValue); CGFloat length=hypot(b.x-a.x,b.y-a.y);
+        for(CGFloat d=35;d<length;d+=48){ SKShapeNode *dot=[SKShapeNode shapeNodeWithCircleOfRadius:4]; dot.fillColor=[[GummyUI color:shot.blast?GDColorRed:self.engine.currentColor] colorWithAlphaComponent:.55]; dot.strokeColor=UIColor.clearColor; dot.position=CGPointMake(a.x+(b.x-a.x)*d/length,a.y+(b.y-a.y)*d/length); dot.hidden=YES; [self.effects addChild:dot]; [dot runAction:[SKAction sequence:@[[SKAction waitForDuration:trailTime+d/1250.],[SKAction unhide],[SKAction group:@[[SKAction scaleTo:.1 duration:.17],[SKAction fadeOutWithDuration:.17]]],[SKAction removeFromParent]]]]; }
+        trailTime+=length/1250.;
+    }
     for(NSInteger i=1;i<shot.points.count;i++){ CGPoint a=shot.points[i-1].CGPointValue,b=shot.points[i].CGPointValue; NSTimeInterval duration=hypot(b.x-a.x,b.y-a.y)/1250.; [actions addObject:[SKAction moveTo:ScenePoint(b) duration:duration]]; }
-    NSInteger generation=self.generation;
-    __weak typeof(self) weakSelf=self;
-    [actions addObject:[SKAction runBlock:^{ [projectile removeFromParent]; GameScene *scene=weakSelf; if(!scene || scene.generation!=generation) return; GDEvent *event=[scene.engine resolveShot]; if(event) [scene animateEvent:event]; }]];
+    self.flightRemaining=0;
+    for(SKAction *action in actions) self.flightRemaining+=action.duration;
+    [actions addObject:[SKAction removeFromParent]];
+    [self recoilLauncher];
+
     [projectile runAction:[SKAction sequence:actions]];
 }
+- (void)pulse:(SKNode *)node amount:(CGFloat)amount {
+    [node removeActionForKey:@"pulse"]; node.xScale=node.yScale=1;
+    SKAction *grow=[SKAction scaleTo:amount duration:.10]; grow.timingMode=SKActionTimingEaseOut;
+    [node runAction:[SKAction sequence:@[grow,[SKAction scaleTo:.98 duration:.10],[SKAction scaleTo:1 duration:.12]]] withKey:@"pulse"];
+}
+- (void)floatingText:(NSString *)text at:(CGPoint)p color:(UIColor *)color size:(CGFloat)size layer:(SKNode *)layer {
+    SKLabelNode *label=[GummyUI label:text size:size color:color]; label.position=p; label.name=@"feedback"; label.zPosition=90; [layer addChild:label];
+    [label runAction:[SKAction sequence:@[[SKAction group:@[[SKAction moveByX:0 y:25 duration:.58],[SKAction sequence:@[[SKAction waitForDuration:.18],[SKAction fadeOutWithDuration:.4]]]]],[SKAction removeFromParent]]]];
+}
+- (void)burstAt:(CGPoint)p radius:(CGFloat)radius color:(UIColor *)color {
+    SKShapeNode *ring=[SKShapeNode shapeNodeWithCircleOfRadius:radius]; ring.position=p; ring.strokeColor=color; ring.fillColor=UIColor.clearColor; ring.lineWidth=3; ring.alpha=.9; ring.zPosition=10; [self.effects addChild:ring];
+    [ring runAction:[SKAction sequence:@[[SKAction group:@[[SKAction scaleTo:1.9 duration:.3],[SKAction fadeOutWithDuration:.3]]],[SKAction removeFromParent]]]];
+}
+- (void)recoilLauncher {
+    SKNode *launcher=self.launcherNodes[self.engine.launcher];
+    [launcher removeActionForKey:@"recoil"]; launcher.xScale=launcher.yScale=1;
+    [launcher runAction:[SKAction sequence:@[[SKAction group:@[[SKAction scaleXTo:1.12 duration:.06],[SKAction scaleYTo:.86 duration:.06]]],[SKAction group:@[[SKAction scaleXTo:.97 duration:.12],[SKAction scaleYTo:1.06 duration:.12]]],[SKAction scaleTo:1 duration:.13]]] withKey:@"recoil"];
+    [self burstAt:self.currentPiece.position radius:25 color:Cream()];
+}
+- (void)skillEffect:(NSInteger)color {
+    [self pulse:self.skillCards[color] amount:1.07];
+    if(color==GDColorBlue){
+        SKShapeNode *rim=[GummyUI panel:CGSizeMake(822,546) fill:UIColor.clearColor stroke:[GummyUI color:color] radius:15]; rim.position=CGPointMake(588,324); rim.lineWidth=5; [self.effects addChild:rim];
+        [rim runAction:[SKAction sequence:@[[SKAction fadeAlphaTo:.3 duration:.18],[SKAction fadeAlphaTo:.8 duration:.12],[SKAction fadeOutWithDuration:.32],[SKAction removeFromParent]]]];
+        [self burstAt:CGPointMake(604,645) radius:28 color:[GummyUI color:color]];
+    } else if(color==GDColorWhite){
+        for(NSInteger i=0;i<3;i++){ SKNode *star=[GummyUI image:@"wild_icon" size:CGSizeMake(18,18)]; if(!star) continue; star.position=CGPointMake(self.currentPiece.position.x+(i-1)*27,self.currentPiece.position.y+40); [self.effects addChild:star]; [star runAction:[SKAction sequence:@[[SKAction group:@[[SKAction moveByX:0 y:24 duration:.5],[SKAction fadeOutWithDuration:.5]]],[SKAction removeFromParent]]]]; }
+    } else if(color==GDColorRed && self.engine.blastArmed) [self burstAt:self.currentPiece.position radius:31 color:[GummyUI color:color]];
+}
 - (void)animateEvent:(GDEvent *)event {
-    if(event.removed.count || event.fallen.count) [GDSettings.sharedSettings playFeedback:GDFeedbackMatch];
+#if DEBUG
+    if(self.clockValidation){ self.resolutionRemaining=.38; return; }
+    if([NSProcessInfo.processInfo.arguments containsObject:@"-qa-feedback"]) NSLog(@"QA event source=%ld removed=%lu fallen=%lu points=%ld score=%ld objective=%ld/%ld phase=%ld",(long)event.source,(unsigned long)event.removed.count,(unsigned long)event.fallen.count,(long)event.points,(long)self.engine.score,(long)self.engine.objectiveCurrent,(long)self.engine.objectiveTarget,(long)self.engine.phase);
+#endif
     [self clearAim]; self.yellowArmed=NO;
-    for(GDCell *cell in event.removed){ SKNode *node=self.pieceNodes[cell.key]; if(!node) continue; [self.pieceNodes removeObjectForKey:cell.key]; CGPoint position=node.position; [node removeFromParent]; [self.effects addChild:node]; node.position=position;
-        [node runAction:[SKAction sequence:@[[SKAction scaleTo:1.15 duration:.07],[SKAction group:@[[SKAction scaleTo:.15 duration:.20],[SKAction fadeOutWithDuration:.20]]],[SKAction removeFromParent]]]];
-        for(NSInteger i=0;i<4;i++){ SKShapeNode *crumb=[SKShapeNode shapeNodeWithCircleOfRadius:2.5]; crumb.fillColor=[GummyUI color:cell.color]; crumb.strokeColor=UIColor.clearColor; crumb.position=position; [self.effects addChild:crumb]; CGFloat a=(i*1.57)+.4; [crumb runAction:[SKAction sequence:@[[SKAction group:@[[SKAction moveByX:cos(a)*28 y:sin(a)*28 duration:.22],[SKAction fadeOutWithDuration:.22]]],[SKAction removeFromParent]]]]; }
+    NSInteger count=event.removed.count+event.fallen.count;
+    if(event.source==GDSourceNormal || event.source==GDSourceWild){
+        if(count){ self.combo++; GDFeedbackType type=event.fallen.count>=6?GDFeedbackFall:(self.combo>1 || count>=10?GDFeedbackCombo:GDFeedbackMatch); [GDSettings.sharedSettings playFeedback:type intensity:MIN(1,.35+count/30.0)]; }
+        else self.combo=0;
+    } else if(event.source==GDSourceBlast) [GDSettings.sharedSettings playFeedback:GDFeedbackBlast];
+
+    CGPoint center=CGPointZero;
+    for(GDCell *cell in event.removed){ CGPoint p=ScenePoint([self.engine centerOfCell:cell rowPhase:event.rowPhase]); center.x+=p.x; center.y+=p.y; }
+    if(event.removed.count){ center.x/=event.removed.count; center.y/=event.removed.count; [self burstAt:center radius:event.source==GDSourceBlast?45:24 color:event.source==GDSourceBlast?[GummyUI color:GDColorRed]:Cream()]; }
+    if(event.source==GDSourceYellow && event.removed.count){
+        CGFloat minY=680,maxY=0; for(GDCell *cell in event.removed){ CGFloat y=ScenePoint([self.engine centerOfCell:cell rowPhase:event.rowPhase]).y; minY=MIN(minY,y); maxY=MAX(maxY,y); }
+        SKShapeNode *sweep=[GummyUI panel:CGSizeMake(808,maxY-minY+46) fill:[[GummyUI color:GDColorYellow] colorWithAlphaComponent:.10] stroke:[GummyUI color:GDColorYellow] radius:15]; sweep.position=CGPointMake(588,(minY+maxY)/2); sweep.lineWidth=3; [self.effects addChild:sweep];
+        [sweep runAction:[SKAction sequence:@[[SKAction group:@[[SKAction scaleYTo:.1 duration:.32],[SKAction fadeOutWithDuration:.32]]],[SKAction removeFromParent]]]];
     }
-    for(GDCell *cell in event.fallen){ SKNode *node=self.pieceNodes[cell.key]; if(!node) continue; [self.pieceNodes removeObjectForKey:cell.key]; CGPoint position=node.position; [node removeFromParent]; [self.effects addChild:node]; node.position=position; [node runAction:[SKAction sequence:@[[SKAction group:@[[SKAction moveByX:(cell.column%3-1)*15 y:-115 duration:.38],[SKAction rotateByAngle:(cell.column%2?.5:-.5) duration:.38],[SKAction fadeOutWithDuration:.38]]],[SKAction removeFromParent]]]]; }
-    if(event.pushed){
-        for(SKNode *node in self.pieceNodes.allValues) [node runAction:[SKAction moveByX:0 y:-self.engine.radius*sqrt(3) duration:.20]];
-        self.renderedRevision=-1;
-    } else { [self syncBoard]; }
-    if(event.points>0){ SKLabelNode *points=[GummyUI label:[NSString stringWithFormat:@"+%ld",(long)event.points] size:27 color:Cream()]; points.position=CGPointMake(588,355); [self.effects addChild:points]; [points runAction:[SKAction sequence:@[[SKAction group:@[[SKAction moveByX:0 y:44 duration:.6],[SKAction fadeOutWithDuration:.6]]],[SKAction removeFromParent]]]]; }
-    [self refreshHUD];
-    NSInteger generation=self.generation; __weak typeof(self) weakSelf=self;
-    [self.playfield runAction:[SKAction sequence:@[[SKAction waitForDuration:.38],[SKAction runBlock:^{ GameScene *scene=weakSelf; if(!scene || scene.generation!=generation) return; [scene syncBoard]; GDEvent *next=[scene.engine finishResolution]; if(next) [scene animateEvent:next]; else { [scene refreshHUD]; if(scene.engine.phase==GDPhaseGameOver) [scene showOverlay:YES]; } }]]] withKey:@"resolution"];
+    NSInteger index=0;
+    for(GDCell *cell in event.removed){
+        SKNode *node=self.pieceNodes[cell.key]; if(!node) continue; [self.pieceNodes removeObjectForKey:cell.key]; CGPoint position=node.position; [node removeFromParent]; [self.effects addChild:node]; node.position=position;
+        [node runAction:[SKAction sequence:@[[SKAction waitForDuration:MIN(.09,index*.008)],[SKAction group:@[[SKAction scaleXTo:1.24 duration:.06],[SKAction scaleYTo:.73 duration:.06]]],[SKAction scaleTo:1.13 duration:.07],[SKAction group:@[[SKAction scaleTo:.05 duration:.17],[SKAction fadeOutWithDuration:.17]]],[SKAction removeFromParent]]]];
+        if(index++<30) for(NSInteger i=0;i<2;i++){ SKShapeNode *crumb=[SKShapeNode shapeNodeWithCircleOfRadius:3]; crumb.fillColor=[GummyUI color:cell.color]; crumb.strokeColor=UIColor.clearColor; crumb.position=position; [self.effects addChild:crumb]; CGFloat angle=(i*3.14)+cell.column*.7; [crumb runAction:[SKAction sequence:@[[SKAction group:@[[SKAction moveByX:cos(angle)*32 y:sin(angle)*32 duration:.28],[SKAction fadeOutWithDuration:.28]]],[SKAction removeFromParent]]]]; }
+    }
+    for(GDCell *cell in event.fallen){
+        SKNode *node=self.pieceNodes[cell.key]; if(!node) continue; [self.pieceNodes removeObjectForKey:cell.key]; CGPoint position=node.position; [node removeFromParent]; [self.effects addChild:node]; node.position=position;
+        SKAction *fall=[SKAction moveByX:(cell.column%5-2)*13 y:-170 duration:.46]; fall.timingMode=SKActionTimingEaseIn;
+        [node runAction:[SKAction sequence:@[[SKAction waitForDuration:(cell.column%4)*.013],[SKAction scaleTo:1.06 duration:.05],[SKAction group:@[fall,[SKAction rotateByAngle:(cell.column%2?.7:-.7) duration:.46],[SKAction sequence:@[[SKAction waitForDuration:.17],[SKAction fadeOutWithDuration:.29]]]]],[SKAction removeFromParent]]]];
+    }
+    if(event.pushed){ for(SKNode *node in self.pieceNodes.allValues) [node runAction:[SKAction moveByX:0 y:-self.engine.radius*sqrt(3) duration:.20]]; self.renderedRevision=-1; }
+    else [self syncBoard];
+    if(event.placed){ SKNode *node=self.pieceNodes[event.placed.key]; [node runAction:[SKAction sequence:@[[SKAction group:@[[SKAction scaleXTo:1.15 duration:.06],[SKAction scaleYTo:.8 duration:.06]]],[SKAction group:@[[SKAction scaleXTo:.97 duration:.09],[SKAction scaleYTo:1.06 duration:.09]]],[SKAction scaleTo:1 duration:.12]]]]; }
+    if(event.points>0){ [self pulse:self.scoreLabel amount:1.12]; [self floatingText:[NSString stringWithFormat:@"+%ld",(long)event.points] at:CGPointMake(325,608) color:Ink() size:23 layer:self.hud]; }
+    if(self.combo>1 && count && (event.source==GDSourceNormal || event.source==GDSourceWild)) [self floatingText:[NSString stringWithFormat:@"COMBO %ld",(long)self.combo] at:CGPointMake(588,198) color:Cream() size:22 layer:self.effects];
+    if(event.fallen.count>=6) [self floatingText:[NSString stringWithFormat:@"DROP +%lu",(unsigned long)event.fallen.count] at:CGPointMake(810,199) color:[GummyUI color:GDColorYellow] size:18 layer:self.effects];
+    [self refreshHUD]; self.resolutionRemaining=.38;
 }
 - (void)update:(NSTimeInterval)currentTime {
     NSTimeInterval delta=self.lastTime>0?MIN(.25,MAX(0,currentTime-self.lastTime)):0; self.lastTime=currentTime;
-    GDEvent *event=[self.engine advanceTime:delta]; if(event){ [self clearAim]; [self animateEvent:event]; }
+    [self advanceGameClock:delta];
     [self refreshHUD];
-    if(self.engine.phase==GDPhaseGameOver && !self.overlay) [self showOverlay:YES];
+    if([self finished] && !self.overlay) [self showOverlay:YES];
+}
+- (void)advanceGameClock:(NSTimeInterval)delta {
+    // Split at authoritative phase boundaries so a long frame cannot shorten
+    // flight/resolution or count its remaining time in the wrong phase.
+    NSTimeInterval remaining=delta;
+    for(NSInteger boundary=0;boundary<8 && remaining>0 && self.engine.phase!=GDPhasePaused && ![self finished];boundary++){
+        BOOL flying=self.flightRemaining>=0 && self.engine.phase==GDPhaseFlying;
+        BOOL resolving=self.resolutionRemaining>=0 && self.engine.phase==GDPhaseResolving;
+        NSTimeInterval interval=flying?self.flightRemaining:(resolving?self.resolutionRemaining:remaining);
+        NSTimeInterval step=MIN(remaining,MAX(0,interval));
+        if(self.engine.phase==GDPhaseReady){
+            NSTimeInterval pressureDeadline=self.engine.freezeRemaining+MAX(0,self.engine.pressureRemaining);
+            step=MIN(step,MAX(.0000001,pressureDeadline));
+            if(self.engine.mode==GDGameModeLevel && self.engine.objective==GDObjectiveSurvive) step=MIN(step,MAX(.0000001,self.engine.objectiveTarget-self.engine.elapsed));
+        }
+        GDEvent *event=step>0?[self.engine advanceTime:step]:nil;
+        remaining-=step;
+        if(flying){
+            self.flightRemaining-=step;
+            if(self.flightRemaining<=.000001){ self.flightRemaining=-1; GDEvent *resolved=[self.engine resolveShot]; if(resolved) [self animateEvent:resolved]; }
+        } else if(resolving){
+            self.resolutionRemaining-=step;
+            if(self.resolutionRemaining<=.000001){ self.resolutionRemaining=-1; [self syncBoard]; GDEvent *next=[self.engine finishResolution]; if(next) [self animateEvent:next]; }
+        }
+        if(event) [self animateEvent:event];
+    }
+}
+#if DEBUG
+- (GameScene *)clockProbe {
+    GameScene *probe=[[GameScene alloc] initWithSize:self.size runSnapshot:nil];
+    probe.clockValidation=YES; probe.engine=[[GDEngine alloc] initWithSeed:20260930];
+    NSMutableArray *safeBoard=[NSMutableArray array]; for(GDCell *cell in probe.engine.cells) if(cell.row<3) [safeBoard addObject:cell];
+    [probe.engine loadFixture:safeBoard phase:probe.engine.rowPhase current:GDColorBlue next:GDColorYellow];
+    probe.flightRemaining=probe.resolutionRemaining=-1; return probe;
+}
+- (BOOL)probeStartShot:(GameScene *)probe {
+    GDShot *shot=[probe.engine previewToward:CGPointMake(414,280)];
+    if(!shot.valid || ![probe.engine beginShot:shot]) return NO;
+    probe.flightRemaining=0;
+    for(NSInteger i=1;i<shot.points.count;i++){ CGPoint a=shot.points[i-1].CGPointValue,b=shot.points[i].CGPointValue; probe.flightRemaining+=hypot(b.x-a.x,b.y-a.y)/1250.; }
+    return YES;
+}
+- (NSDictionary *)probeSnapshotWithStep:(NSTimeInterval)step jitter:(BOOL)jitter {
+    GameScene *probe=[self clockProbe]; NSTimeInterval time=0; NSInteger shotIndex=0,frame=0;
+    while(time<13-.000001){
+        if(shotIndex<5 && fabs(time-shotIndex*1.2)<.000001){ [self probeStartShot:probe]; shotIndex++; }
+        NSTimeInterval next=shotIndex<5?shotIndex*1.2:13;
+        NSTimeInterval amount=jitter?[@[@(.004),@(.033),@(.011),@(.072)][frame++%4] doubleValue]:step;
+        amount=MIN(amount,MIN(next-time,13-time)); [probe advanceGameClock:amount]; time+=amount;
+    }
+    NSMutableDictionary *snapshot=[probe.engine.snapshot mutableCopy];
+    [snapshot removeObjectsForKeys:@[@"runID",@"operations",@"elapsed",@"difficulty",@"pressure"]];
+    return @{@"state":snapshot,@"elapsed":@(probe.engine.elapsed),@"pressure":@(probe.engine.pressureRemaining),@"phase":@(probe.engine.phase)};
+}
+- (void)validatePresentationClock {
+    NSArray *preferenceKeys=@[@"GDPrototypeBestScore",@"GDPrototypeLastRun",@"GDEndlessRecords",@"GDCampaignProgress"];
+    NSMutableDictionary *originalPreferences=[NSMutableDictionary dictionary];
+    for(NSString *key in preferenceKeys) originalPreferences[key]=[NSUserDefaults.standardUserDefaults objectForKey:key]?:NSNull.null;
+    NSDictionary *sixty=[self probeSnapshotWithStep:1./60 jitter:NO], *hundredTwenty=[self probeSnapshotWithStep:1./120 jitter:NO], *jitter=[self probeSnapshotWithStep:0 jitter:YES];
+    BOOL equal=[sixty[@"state"] isEqual:hundredTwenty[@"state"]] && [sixty[@"state"] isEqual:jitter[@"state"]] && [sixty[@"phase"] isEqual:hundredTwenty[@"phase"]] && [sixty[@"phase"] isEqual:jitter[@"phase"]];
+    for(NSString *key in @[@"elapsed",@"pressure"]) equal=equal && fabs([sixty[key] doubleValue]-[hundredTwenty[key] doubleValue])<.000001 && fabs([sixty[key] doubleValue]-[jitter[key] doubleValue])<.000001;
+    GameScene *probe=[self clockProbe]; BOOL shot=[self probeStartShot:probe]; [probe advanceGameClock:probe.flightRemaining/2];
+    NSTimeInterval flight=probe.flightRemaining; NSDictionary *before=probe.engine.snapshot; [probe.engine pause]; [probe advanceGameClock:2]; BOOL flightPause=[before isEqual:probe.engine.snapshot] && probe.flightRemaining==flight; [probe.engine resume];
+    [probe advanceGameClock:probe.flightRemaining+.05]; NSTimeInterval resolution=probe.resolutionRemaining; before=probe.engine.snapshot; [probe.engine pause]; [probe advanceGameClock:2]; BOOL resolutionPause=resolution>0 && [before isEqual:probe.engine.snapshot] && probe.resolutionRemaining==resolution; [probe.engine resume];
+    GameScene *refund=[self clockProbe]; [refund.engine setFixtureEnergy:@[@20,@20,@20,@20]]; [refund.engine activateSkill:GDColorWhite]; [self probeStartShot:refund]; GDEngine *cold=[[GDEngine alloc] initWithSnapshot:refund.engine.snapshot]; [cold resume]; BOOL wildRefund=cold.phase==GDPhaseReady && cold.wildRemaining==3 && cold.score==0;
+    refund=[self clockProbe]; [refund.engine setFixtureEnergy:@[@20,@20,@20,@20]]; [refund.engine activateSkill:GDColorRed]; [self probeStartShot:refund]; cold=[[GDEngine alloc] initWithSnapshot:refund.engine.snapshot]; [cold resume]; BOOL blastRefund=cold.phase==GDPhaseReady && cold.energy[GDColorRed].integerValue==20 && !cold.blastArmed;
+    for(NSString *key in preferenceKeys){ id saved=originalPreferences[key]; if(saved==NSNull.null) [NSUserDefaults.standardUserDefaults removeObjectForKey:key]; else [NSUserDefaults.standardUserDefaults setObject:saved forKey:key]; }
+    NSLog(@"QA clock sixty120Jitter=%d shot=%d flightPause=%d resolutionPause=%d coldWildRefund=%d coldBlastRefund=%d elapsed=%.9f pressure=%.9f",equal,shot,flightPause,resolutionPause,wildRefund,blastRefund,[sixty[@"elapsed"] doubleValue],[sixty[@"pressure"] doubleValue]);
+}
+#endif
+- (NSString *)snapshotKey { return self.engine.mode==GDGameModeLevel?@"GummyLevelRunSnapshot":@"GummyRunSnapshot"; }
+- (BOOL)finished { return self.engine.phase==GDPhaseGameOver || self.engine.phase==GDPhaseWon; }
+- (void)saveRun {
+#if DEBUG
+    if(self.qaPresentationFixture) return;
+#endif
+    if([self finished]) [NSUserDefaults.standardUserDefaults removeObjectForKey:[self snapshotKey]];
+    else [NSUserDefaults.standardUserDefaults setObject:self.engine.snapshot forKey:[self snapshotKey]];
+    [NSUserDefaults.standardUserDefaults setObject:self.engine.diagnostics forKey:@"GummyLastDiagnostics"];
 }
 - (void)pauseGame {
-    if(self.overlay || self.engine.phase==GDPhaseGameOver) return;
+    if(self.overlay || [self finished]) return;
     [self clearAim]; self.yellowArmed=NO; [self.engine cancelBlast]; [self.engine pause]; self.playfield.paused=YES;
-    [NSUserDefaults.standardUserDefaults setObject:self.engine.snapshot forKey:@"GummyRunSnapshot"];
+    [self saveRun];
     [NSUserDefaults.standardUserDefaults setObject:self.engine.diagnostics forKey:@"GummyLastDiagnostics"];
     [self showOverlay:NO];
 }
-- (void)backgroundPause:(NSNotification *)notification {
-    [self pauseGame];
-    if(self.engine.phase!=GDPhaseGameOver) [[NSUserDefaults standardUserDefaults] setObject:self.engine.snapshot forKey:@"GummyRunSnapshot"];
-    else [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"GummyRunSnapshot"];
-    [[NSUserDefaults standardUserDefaults] setObject:self.engine.diagnostics forKey:@"GummyLastDiagnostics"];
-}
+- (void)backgroundPause:(NSNotification *)notification { [self pauseGame]; [self saveRun]; }
 - (void)addOverlayButton:(NSString *)title name:(NSString *)name y:(CGFloat)y color:(UIColor *)color {
     CGSize size=CGSizeMake(286,57); SKNode *button=[GummyUI button:title size:size name:name color:color]; button.position=CGPointMake(600,y); [self.overlay addChild:button]; self.overlayControls[name]=[NSValue valueWithCGRect:CGRectMake(457,y-28.5,286,57)];
 }
 - (void)showOverlay:(BOOL)gameOver {
     if(self.overlay) return;
-    [GummyUI setOverlayDimmed:YES];
-    [self clearAim]; self.overlay=[SKNode node]; self.overlay.zPosition=100; [self addChild:self.overlay]; self.overlayControls=[NSMutableDictionary dictionary];
+    BOOL level=self.engine.mode==GDGameModeLevel, won=self.engine.phase==GDPhaseWon;
+    [GummyUI setOverlayDimmed:YES]; [self clearAim]; self.overlay=[SKNode node]; self.overlay.zPosition=100; [self addChild:self.overlay]; self.overlayControls=[NSMutableDictionary dictionary];
     SKShapeNode *shade=[GummyUI panel:self.size fill:GummyUI.overlayShadeColor stroke:UIColor.clearColor radius:0]; shade.position=CGPointMake(600,340); [self.overlay addChild:shade];
-    SKNode *card=[GummyUI surface:CGSizeMake(424,gameOver?390:486) color:Cream() radius:34]; card.position=CGPointMake(600,340); [self.overlay addChild:card];
-    SKLabelNode *title=[GummyUI label:gameOver?@"GAME OVER":@"PAUSED" size:35 color:Ink()]; title.position=CGPointMake(600,gameOver?487:529); [self.overlay addChild:title];
-    SKLabelNode *score=[GummyUI label:[NSString stringWithFormat:@"SCORE  %ld",(long)self.engine.score] size:24 color:Ink()]; score.position=CGPointMake(600,gameOver?433:480); [self.overlay addChild:score];
-    UIColor *blue=[UIColor colorWithRed:.64 green:.85 blue:1 alpha:1]; UIColor *pink=[UIColor colorWithRed:.97 green:.75 blue:.82 alpha:1]; UIColor *lilac=[UIColor colorWithRed:.85 green:.78 blue:.95 alpha:1];
+    SKNode *card=[GummyUI surface:CGSizeMake(454,550) color:Cream() radius:34]; card.position=CGPointMake(600,340); [self.overlay addChild:card];
+    SKLabelNode *title=[GummyUI label:gameOver?(won?@"LEVEL CLEAR":@"GAME OVER"):@"PAUSED" size:33 color:Ink()]; title.position=CGPointMake(600,560); [self.overlay addChild:title];
+    NSString *mode=level?[NSString stringWithFormat:@"LEVEL %02ld",(long)self.engine.levelID]:@"ENDLESS";
+#if DEBUG
+    if(self.qaPresentationFixture){ SKLabelNode *fixture=[GummyUI label:@"QA FIXTURE" size:12 color:Ink()]; fixture.position=CGPointMake(600,587); [self.overlay addChild:fixture]; }
+#endif
+    SKLabelNode *modeLabel=[GummyUI label:mode size:16 color:Ink()]; modeLabel.position=CGPointMake(600,520); [self.overlay addChild:modeLabel];
+    SKLabelNode *score=[GummyUI label:[NSString stringWithFormat:@"SCORE  %ld",(long)self.engine.score] size:24 color:Ink()]; score.position=CGPointMake(600,477); [self.overlay addChild:score];
+    UIColor *blue=[UIColor colorWithRed:.64 green:.85 blue:1 alpha:1], *pink=[UIColor colorWithRed:.97 green:.75 blue:.82 alpha:1], *lilac=[UIColor colorWithRed:.85 green:.78 blue:.95 alpha:1];
     if(!gameOver){
-        [self addOverlayButton:@"Resume" name:@"resume" y:407 color:blue];
-        [self addOverlayButton:@"Retry" name:@"retry" y:334 color:pink];
-        [self addOverlayButton:@"Settings" name:@"settings" y:261 color:lilac];
-        [self addOverlayButton:@"Home" name:@"home" y:188 color:[UIColor colorWithRed:1 green:.87 blue:.64 alpha:1]];
+        [self addOverlayButton:@"Resume" name:@"resume" y:407 color:blue]; [self addOverlayButton:@"Retry" name:@"retry" y:334 color:pink]; [self addOverlayButton:@"Settings" name:@"settings" y:261 color:lilac]; [self addOverlayButton:@"Home" name:@"home" y:188 color:[UIColor colorWithRed:1 green:.87 blue:.64 alpha:1]];
     } else {
-        SKLabelNode *best=[GummyUI label:[NSString stringWithFormat:@"BEST  %ld",(long)self.engine.bestScore] size:19 color:Ink()]; best.position=CGPointMake(600,393); [self.overlay addChild:best];
-        [self addOverlayButton:@"Retry" name:@"retry" y:320 color:blue]; [self addOverlayButton:@"Home" name:@"home" y:242 color:pink];
-        [GDSettings.sharedSettings playFeedback:GDFeedbackGameOver]; [NSUserDefaults.standardUserDefaults removeObjectForKey:@"GummyRunSnapshot"]; [NSUserDefaults.standardUserDefaults setObject:self.engine.diagnostics forKey:@"GummyLastDiagnostics"];
+        if(won){
+            for(NSInteger i=0;i<3;i++){ SKSpriteNode *star=[GummyUI image:@"wild_icon" size:CGSizeMake(38,38)]; if(!star) continue; star.position=CGPointMake(548+i*52,431); BOOL earned=i<self.engine.stars; star.color=earned?[UIColor colorWithRed:1 green:.69 blue:.15 alpha:1]:[UIColor colorWithRed:.59 green:.49 blue:.69 alpha:1]; star.colorBlendFactor=earned?.65:.85; star.alpha=earned?1:.60; [self.overlay addChild:star]; if(i<self.engine.stars){ star.xScale=star.yScale=.1; [star runAction:[SKAction sequence:@[[SKAction waitForDuration:i*.12],[SKAction scaleTo:1.16 duration:.15],[SKAction scaleTo:1 duration:.12]]]]; } }
+            GDLevel *levelInfo=[GDLevelCatalog levelForID:self.engine.levelID];
+            NSString *par=levelInfo.objective==GDObjectiveSurvive?[NSString stringWithFormat:@"3★: ≤%ld shots + ≥%ld points",(long)levelInfo.parShots,(long)levelInfo.parScore]:[NSString stringWithFormat:@"3★: ≤%ld shots + ≤%.0f seconds",(long)levelInfo.parShots,levelInfo.parTime];
+            SKLabelNode *criteria=[GummyUI label:par size:13 color:Ink()]; criteria.position=CGPointMake(600,404); [self.overlay addChild:criteria];
+            if([GDLevelCatalog levelForID:self.engine.levelID+1]) [self addOverlayButton:@"Next Level" name:@"nextLevel" y:367 color:blue];
+            else [self addOverlayButton:@"All Levels" name:@"allLevels" y:367 color:blue];
+            [self addOverlayButton:@"Replay" name:@"retry" y:294 color:pink]; [self addOverlayButton:@"Levels" name:@"levels" y:221 color:lilac]; [self addOverlayButton:@"Home" name:@"home" y:148 color:Cream()];
+        } else if(level){
+            SKLabelNode *goal=[GummyUI label:[NSString stringWithFormat:@"PROGRESS  %ld / %ld",(long)self.engine.objectiveCurrent,(long)self.engine.objectiveTarget] size:18 color:Ink()]; goal.position=CGPointMake(600,432); [self.overlay addChild:goal];
+            [self addOverlayButton:@"Retry" name:@"retry" y:352 color:blue]; [self addOverlayButton:@"Levels" name:@"levels" y:272 color:lilac]; [self addOverlayButton:@"Home" name:@"home" y:192 color:pink];
+        } else {
+            GDRunRecords *records=[[GDRunRecords alloc] initWithDefaults:NSUserDefaults.standardUserDefaults]; NSInteger rank=[records rankForRunID:self.engine.runID];
+            NSString *record=rank?[NSString stringWithFormat:@"LOCAL RANK  #%ld   ·   BEST %ld",(long)rank,(long)self.engine.bestScore]:[NSString stringWithFormat:@"BEST  %ld",(long)self.engine.bestScore];
+            SKLabelNode *best=[GummyUI label:record size:17 color:Ink()]; best.position=CGPointMake(600,432); [self.overlay addChild:best];
+            [self addOverlayButton:@"Retry" name:@"retry" y:352 color:blue]; [self addOverlayButton:@"Local Scores" name:@"scores" y:272 color:lilac]; [self addOverlayButton:@"Home" name:@"home" y:192 color:pink];
+        }
+        [GDSettings.sharedSettings playFeedback:won?GDFeedbackWin:GDFeedbackGameOver]; [self saveRun];
     }
 }
 - (void)goHome {
-    [self clearAim]; [self.engine cancelBlast]; [self.engine pause]; self.playfield.paused=YES;
-    if(self.engine.phase!=GDPhaseGameOver) [NSUserDefaults.standardUserDefaults setObject:self.engine.snapshot forKey:@"GummyRunSnapshot"];
-    else [NSUserDefaults.standardUserDefaults removeObjectForKey:@"GummyRunSnapshot"];
-    [NSUserDefaults.standardUserDefaults setObject:self.engine.diagnostics forKey:@"GummyLastDiagnostics"];
-    [self.view presentScene:[FrontendScene homeScene]];
+    [self clearAim]; [self.engine cancelBlast]; if(![self finished]) [self.engine pause]; self.playfield.paused=YES; [self saveRun]; [self.view presentScene:[FrontendScene homeScene]];
 }
 - (NSUInteger)newRunSeed {
 #if DEBUG
@@ -339,12 +557,17 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
 - (void)restart {
     [GummyUI setOverlayDimmed:NO];
     self.generation++; [self.playfield removeAllActions]; [self.effects removeAllChildren]; [self clearAim]; [self.overlay removeFromParent]; self.overlay=nil; self.playfield.paused=NO;
-    self.engine=[[GDEngine alloc] initWithSeed:[self newRunSeed]];
+    NSInteger levelID=self.engine.mode==GDGameModeLevel?self.engine.levelID:0;
+    self.engine=levelID?[[GDEngine alloc] initWithLevelID:levelID seed:[GDLevelCatalog levelForID:levelID].seed]:[[GDEngine alloc] initWithSeed:[self newRunSeed]];
+    self.combo=0; self.flightRemaining=self.resolutionRemaining=-1; self.displayedEnergy=[self.engine.energy copy];
+    for(SKNode *node in self.launcherNodes){ [node removeAllActions]; node.xScale=node.yScale=1; }
+    for(SKNode *node in self.skillCards){ [node removeAllActions]; node.xScale=node.yScale=1; }
+    for(SKNode *node in [self.hud.children copy]) if([node.name isEqualToString:@"feedback"]) [node removeFromParent];
 #if DEBUG
     if([NSProcessInfo.processInfo.arguments containsObject:@"-qa-ready"]) [self.engine setFixtureEnergy:@[@20,@20,@20,@20]];
 #endif
     self.yellowArmed=NO; self.renderedRevision=-1; self.lastTime=0; self.displayedCurrent=-99;
     for(SKNode *node in self.pieceNodes.allValues) [node removeFromParent]; [self.pieceNodes removeAllObjects];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"GummyRunSnapshot"]; [self syncBoard]; [self refreshHUD];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:[self snapshotKey]]; [self syncBoard]; [self refreshHUD];
 }
 @end

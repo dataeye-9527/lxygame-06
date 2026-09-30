@@ -1,0 +1,40 @@
+{
+  "playedEvents": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13
+  ],
+  "decodedClips": [
+    "blast",
+    "combo",
+    "error",
+    "fall",
+    "freeze",
+    "game_over",
+    "match",
+    "ready",
+    "shot",
+    "skill",
+    "sweep",
+    "tap",
+    "wild",
+    "win"
+  ],
+  "allPlaying": true,
+  "maxConcurrentVoices": 3,
+  "maxVolume": 0.45,
+  "offImmediatelyStops": true,
+  "offDoesNotStartNewVoice": true,
+  "settingRestored": true
+}

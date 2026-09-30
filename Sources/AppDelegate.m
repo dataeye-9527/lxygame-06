@@ -3,6 +3,9 @@
 #import "GameScene.h"
 #import "FrontendScene.h"
 #import "GummyUI.h"
+#if DEBUG
+#import "GDAudioFeedback.h"
+#endif
 @interface GDViewController : UIViewController
 @property(nonatomic) SKView *gameView;
 @property(nonatomic) NSArray<UIView *> *backgroundDimmers;
@@ -48,10 +51,14 @@
     SKScene *scene = [FrontendScene homeScene];
 #if DEBUG
     NSArray *args=NSProcessInfo.processInfo.arguments;
+    if([args containsObject:@"-qa-last-level"]) scene=[[GameScene alloc] initWithSize:CGSizeMake(1200,680) levelID:30];
     if([args containsObject:@"-qa-ready"] || [args containsObject:@"-qa-failure"] || [args containsObject:@"-qa-new"]) scene=[[GameScene alloc] initWithSize:CGSizeMake(1200,680) runSnapshot:nil];
 #endif
     scene.scaleMode = SKSceneScaleModeAspectFit;
     [view presentScene:scene];
+#if DEBUG
+    if([NSProcessInfo.processInfo.arguments containsObject:@"-qa-audio"]) [GDAudioFeedback.sharedPlayer startQAPlaybackTour];
+#endif
 }
 @end
 @implementation AppDelegate

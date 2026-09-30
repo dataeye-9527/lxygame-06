@@ -1,0 +1,44 @@
+{
+  "bestScore": 5665,
+  "records": [
+    {
+      "wave": 1,
+      "runID": "AAD733CA-937F-4425-A2DA-10D7EFD72B9E",
+      "score": 1020,
+      "elapsed": 110,
+      "seed": 136530369580445,
+      "date": 1790751788.05763
+    }
+  ],
+  "progress": {
+    "unlocked": 2,
+    "format": 1,
+    "levels": {
+      "1": {
+        "stars": 2,
+        "score": 980
+      }
+    }
+  },
+  "settings": {
+    "GummySettingsHaptics": true,
+    "GummySettingsAimGuide": true,
+    "GummySettingsSoundEffects": true
+  },
+  "resumes": {
+    "GummyRunSnapshot": {
+      "mode": 0,
+      "levelID": 0,
+      "runID": "A54799F0-1DEE-457F-B917-BC6C5483B540",
+      "score": 0,
+      "elapsed": 4.93851145831286
+    },
+    "GummyLevelRunSnapshot": {
+      "mode": 1,
+      "levelID": 2,
+      "runID": "B4E83F40-E968-49F6-B432-6C04570283D9",
+      "score": 80,
+      "elapsed": 32.70016366666823
+    }
+  }
+}

@@ -1,4 +1,7 @@
 #import "GDEngine.h"
+#import "GDLevelCatalog.h"
+#import "GDProgressStore.h"
+#import "GDRunRecords.h"
 #import <math.h>
 
 static NSString *GDKey(NSInteger row, NSInteger col) { return [NSString stringWithFormat:@"%ld:%ld", (long)row, (long)col]; }
@@ -35,7 +38,13 @@ static CGFloat GDSegmentDistance(CGPoint p, CGPoint a, CGPoint b) {
     GDPhase _phaseBeforePause;
     GDShot *_activeShot, *_lastPreview;
     NSDictionary *_flightCheckpoint;
+    GDLevel *_level;
+    NSInteger _clearedWaves, _collected, _fallenTotal;
+    BOOL _completionRecorded;
 }
+@property(nonatomic) GDGameMode mode;
+@property(nonatomic) NSInteger levelID, stars;
+@property(nonatomic, copy) NSString *runID;
 @property(nonatomic) NSInteger rowPhase, revision;
 @property(nonatomic) GDPhase phase;
 @property(nonatomic) GDColor currentColor, nextColor;
@@ -55,19 +64,39 @@ static CGFloat GDSegmentDistance(CGPoint p, CGPoint a, CGPoint b) {
 - (NSInteger)energyThreshold { return 20; }
 - (NSArray<GDCell *> *)cells { return [[_board allValues] sortedArrayUsingComparator:^NSComparisonResult(GDCell *a,GDCell *b) { if(a.row!=b.row)return a.row<b.row?NSOrderedAscending:NSOrderedDescending;return a.column<b.column?NSOrderedAscending:(a.column>b.column?NSOrderedDescending:NSOrderedSame); }]; }
 - (NSArray<NSNumber *> *)energy { return [_mutableEnergy copy]; }
-- (NSTimeInterval)pressureInterval { return fmax(6,12-floor(_difficultyTime/60)); }
+- (GDObjective)objective { return _level?_level.objective:GDObjectiveClear; }
+- (GDColor)objectiveColor { return _level?_level.objectiveColor:GDColorBlue; }
+- (NSInteger)objectiveTarget { return _level?_level.target:0; }
+- (NSInteger)totalWaves { return _level?_level.layouts.count:0; }
+- (NSInteger)objectiveCurrent { if(!_level)return 0;switch(self.objective){case GDObjectiveClear:return _clearedWaves;case GDObjectiveCollect:return _collected;case GDObjectiveFall:return _fallenTotal;case GDObjectiveSurvive:return (NSInteger)floor(self.elapsed);} }
+- (BOOL)won { return self.phase==GDPhaseWon; }
+- (NSTimeInterval)pressureInterval { if(_level)return _level.pressureInterval;return fmax(6,12-floor(_difficultyTime/60)); }
 - (NSInteger)columnsAtRow:(NSInteger)row { return ((row+self.rowPhase)&1)?17:18; }
 - (BOOL)insideRow:(NSInteger)row column:(NSInteger)col { return row>=0&&col>=0&&col<[self columnsAtRow:row]&&row<16; }
-- (CGPoint)centerOfCell:(GDCell *)cell { return CGPointMake(self.radius*(1+2*cell.column+((cell.row+self.rowPhase)&1)),self.radius+cell.row*self.radius*sqrt(3)); }
+- (CGPoint)centerOfCell:(GDCell *)cell { return [self centerOfCell:cell rowPhase:self.rowPhase]; }
+- (CGPoint)centerOfCell:(GDCell *)cell rowPhase:(NSInteger)rowPhase { return CGPointMake(self.radius*(1+2*cell.column+((cell.row+rowPhase)&1)),self.radius+cell.row*self.radius*sqrt(3)); }
 - (CGPoint)launcherPoint:(NSInteger)launcher { return CGPointMake(self.boardWidth*(launcher==0?.18:launcher==2?.82:.5),self.launchY); }
 - (uint32_t)random { _rng^=_rng>>12;_rng^=_rng<<25;_rng^=_rng>>27;return (uint32_t)((_rng*2685821657736338717ULL)>>32); }
 - (GDColor)queueColor { NSMutableIndexSet *set=[NSMutableIndexSet new]; for(GDCell *c in _board.allValues)[set addIndex:c.color];if(!set.count)return [self random]%4;NSUInteger pick=[self random]%set.count;NSUInteger color=set.firstIndex;while(pick--)color=[set indexGreaterThanIndex:color];return (GDColor)color; }
 - (void)increment:(NSString *)key by:(NSInteger)value { _stats[key]=@([_stats[key] integerValue]+value); }
 - (void)record:(NSString *)action { [_operations addObject:@{@"time":@(self.elapsed),@"action":action,@"score":@(self.score),@"revision":@(self.revision)}];if(_operations.count>12)[_operations removeObjectAtIndex:0]; }
 - (instancetype)initWithSeed:(NSUInteger)seed {
-    if((self=[super init])) { _seed=seed?:1;_rng=_seed;_board=[NSMutableDictionary new];_mutableEnergy=[@[@0,@0,@0,@0] mutableCopy];_stats=[NSMutableDictionary new];_operations=[NSMutableArray new];_heldColor=-1;_launcher=1;_wave=1;_pressureRemaining=12;_phase=GDPhaseReady;_bestScore=[[NSUserDefaults standardUserDefaults] integerForKey:@"GDPrototypeBestScore"];
+    if((self=[super init])) { _runID=NSUUID.UUID.UUIDString;_seed=seed?:1;_rng=_seed;_board=[NSMutableDictionary new];_mutableEnergy=[@[@0,@0,@0,@0] mutableCopy];_stats=[NSMutableDictionary new];_operations=[NSMutableArray new];_heldColor=-1;_launcher=1;_wave=1;_pressureRemaining=12;_phase=GDPhaseReady;_bestScore=[[NSUserDefaults standardUserDefaults] integerForKey:@"GDPrototypeBestScore"];
         [self generateWave];_currentColor=[self queueColor];_nextColor=[self queueColor];
     } return self;
+}
+- (nullable instancetype)initWithLevelID:(NSInteger)levelID seed:(NSUInteger)seed {
+    GDLevel *level=[GDLevelCatalog levelForID:levelID];if(!level)return nil;
+    if((self=[self initWithSeed:seed?:level.seed])) { _level=level;_mode=GDGameModeLevel;_levelID=levelID;_rng=_seed;[_board removeAllObjects];_mutableEnergy=[level.startingEnergy mutableCopy];self.pressureRemaining=level.pressureInterval;[self generateLevelWave];self.currentColor=[self queueColor];self.nextColor=[self queueColor]; }
+    return self;
+}
+- (void)generateLevelWave {
+    if(self.wave<1||self.wave>self.totalWaves)return;
+    // Each authored wave starts with its own canonical honeycomb phase; the old board is empty.
+    self.rowPhase=0;
+    NSArray<NSString *> *rows=_level.layouts[self.wave-1];
+    for(NSInteger r=0;r<(NSInteger)rows.count;r++)for(NSInteger c=0;c<(NSInteger)rows[r].length;c++){unichar ch=[rows[r] characterAtIndex:c];if(ch>='0'&&ch<='3'&&c<[self columnsAtRow:r]){GDCell *cell=[GDCell row:r column:c color:ch-'0'];_board[cell.key]=cell;}}
+    self.revision++;
 }
 - (void)generateRow:(NSInteger)row gaps:(BOOL)gaps {
     for(NSInteger col=0;col<[self columnsAtRow:row];col++) {
@@ -187,19 +216,34 @@ static CGFloat GDSegmentDistance(CGPoint p, CGPoint a, CGPoint b) {
 }
 - (void)checkFailure:(GDEvent *)event {
     for(GDCell *c in _board.allValues)if([self centerOfCell:c].y+self.radius>=self.dangerY-.001){self.phase=GDPhaseGameOver;event.gameOver=YES;self.blastArmed=NO;[self record:@"gameOver"];break;}
-    if(self.score>self.bestScore){self.bestScore=self.score;[[NSUserDefaults standardUserDefaults] setInteger:self.bestScore forKey:@"GDPrototypeBestScore"];}
-    if(event.gameOver)[[NSUserDefaults standardUserDefaults] setObject:[self diagnostics] forKey:@"GDPrototypeLastRun"];
+    if(self.mode==GDGameModeEndless&&self.score>self.bestScore){self.bestScore=self.score;[[NSUserDefaults standardUserDefaults] setInteger:self.bestScore forKey:@"GDPrototypeBestScore"];}
+    if(event.gameOver){[[NSUserDefaults standardUserDefaults] setObject:[self diagnostics] forKey:@"GDPrototypeLastRun"];[self persistCompletion];}
+}
+- (void)persistCompletion {
+    if(_completionRecorded)return;_completionRecorded=YES;
+    if(self.mode==GDGameModeEndless) { [[[GDRunRecords alloc] initWithDefaults:NSUserDefaults.standardUserDefaults] recordRunID:self.runID score:self.score elapsed:self.elapsed seed:self.seed wave:self.wave]; }
+    else if(self.won) { [[[GDProgressStore alloc] initWithDefaults:NSUserDefaults.standardUserDefaults] recordWinForLevel:self.levelID stars:self.stars score:self.score]; }
+}
+- (void)checkObjective:(GDEvent *)event {
+    if(!_level||self.phase==GDPhaseGameOver||self.phase==GDPhaseWon||self.objectiveCurrent<self.objectiveTarget)return;
+    NSInteger shots=[_stats[@"normalShots"] integerValue]+[_stats[@"redUses"] integerValue];
+    BOOL shotsEfficient=shots<=_level.parShots,timeEfficient=self.objective==GDObjectiveSurvive?self.score>=_level.parScore:self.elapsed<=_level.parTime;
+    self.stars=1+shotsEfficient+timeEfficient;self.phase=GDPhaseWon;self.pressurePending=NO;self.blastArmed=NO;event.won=YES;[self record:@"won"];[self persistCompletion];
 }
 - (GDEvent *)settle:(NSArray<GDCell *> *)direct source:(GDSource)source placed:(nullable GDCell *)placed {
-    GDEvent *event=[GDEvent new];event.source=source;event.placed=[placed copy];NSMutableArray *unique=[NSMutableArray new];NSMutableSet *seen=[NSMutableSet new];
+    GDEvent *event=[GDEvent new];event.rowPhase=self.rowPhase;event.source=source;event.placed=[placed copy];NSMutableArray *unique=[NSMutableArray new];NSMutableSet *seen=[NSMutableSet new];
     for(GDCell *c in direct)if(_board[c.key]&&![seen containsObject:c.key]){[seen addObject:c.key];[unique addObject:[_board[c.key] copy]];[_board removeObjectForKey:c.key];}
     event.removed=unique;event.fallen=[self unsupported];for(GDCell *c in event.fallen)[_board removeObjectForKey:c.key];
     event.points=event.removed.count*10+event.fallen.count*15;self.score+=event.points;
     [self increment:@"directRemoved" by:event.removed.count];[self increment:@"fallenRemoved" by:event.fallen.count];
     if(source==GDSourceNormal){for(GDCell *c in [event.removed arrayByAddingObjectsFromArray:event.fallen]){if(c.color==GDColorBlue&&self.freezeRemaining>0)continue;NSInteger value=MIN(self.energyThreshold,[_mutableEnergy[c.color] integerValue]+1);BOOL full=value==self.energyThreshold&&[_mutableEnergy[c.color] integerValue]<self.energyThreshold;_mutableEnergy[c.color]=@(value);if(full)[self increment:[NSString stringWithFormat:@"energy%ldFull",(long)c.color] by:1];}}
+    _fallenTotal+=event.fallen.count;for(GDCell *c in [event.removed arrayByAddingObjectsFromArray:event.fallen])if(c.color==self.objectiveColor)_collected++;
     self.revision++;self.phase=GDPhaseResolving;
-    if(_board.count==0){self.wave++;[self generateWave];event.newWave=YES;[self increment:@"wavesCleared" by:1];}
-    [self checkFailure:event];return event;
+    if(_board.count==0){_clearedWaves++;[self increment:@"wavesCleared" by:1];}
+    // All removals precede danger testing; a remaining touching cell loses even when the target is reached.
+    [self checkFailure:event];[self checkObjective:event];
+    if(!self.won&&self.phase!=GDPhaseGameOver&&_board.count==0){if(self.mode==GDGameModeEndless){self.wave++;[self generateWave];event.newWave=YES;}else if(self.wave<self.totalWaves){self.wave++;[self generateLevelWave];event.newWave=YES;[self checkFailure:event];}}
+    return event;
 }
 - (nullable GDEvent *)resolveShot {
     if(self.phase!=GDPhaseFlying||!_activeShot)return nil;GDShot *shot=_activeShot;_activeShot=nil;
@@ -219,14 +263,16 @@ static CGFloat GDSegmentDistance(CGPoint p, CGPoint a, CGPoint b) {
 }
 - (GDEvent *)pushRow {
     NSMutableDictionary *shifted=[NSMutableDictionary new];for(GDCell *c in self.cells){GDCell *copy=[c copy];copy.row++;shifted[copy.key]=copy;}_board=shifted;self.rowPhase=1-self.rowPhase;[self generateRow:0 gaps:NO];self.revision++;self.pressureRemaining+=self.pressureInterval;self.pressurePending=self.pressureRemaining<=0;self.phase=GDPhaseResolving;_lastPreview=nil;
-    GDEvent *event=[GDEvent new];event.source=GDSourcePressure;event.pushed=YES;[self increment:@"pressureRows" by:1];[self record:@"pressure"];[self checkFailure:event];return event;
+    GDEvent *event=[GDEvent new];event.rowPhase=self.rowPhase;event.source=GDSourcePressure;event.pushed=YES;[self increment:@"pressureRows" by:1];[self record:@"pressure"];[self checkFailure:event];[self checkObjective:event];return event;
 }
-- (nullable GDEvent *)finishResolution { if(self.phase!=GDPhaseResolving)return nil;if(self.pressurePending)return [self pushRow];self.phase=GDPhaseReady;return nil; }
+- (nullable GDEvent *)finishResolution { if(self.phase!=GDPhaseResolving)return nil;if(self.pressurePending)return [self pushRow];self.phase=GDPhaseReady;if(_level&&self.objectiveCurrent>=self.objectiveTarget){GDEvent *event=[GDEvent new];[self checkFailure:event];[self checkObjective:event];return event;}return nil; }
 - (nullable GDEvent *)advanceTime:(NSTimeInterval)delta {
-    if(self.phase==GDPhasePaused||self.phase==GDPhaseGameOver||delta<0||!isfinite(delta))return nil;
+    if(self.phase==GDPhasePaused||self.phase==GDPhaseGameOver||self.phase==GDPhaseWon||delta<0||!isfinite(delta))return nil;
     self.elapsed+=delta;NSTimeInterval frozen=MIN(delta,self.freezeRemaining);self.freezeRemaining=MAX(0,self.freezeRemaining-delta);NSTimeInterval active=delta-frozen;_difficultyTime+=active;self.pressureRemaining-=active;
     if(self.pressureRemaining<=0)self.pressurePending=YES;
-    if(self.pressurePending&&self.phase==GDPhaseReady)return [self pushRow];return nil;
+    if(self.pressurePending&&self.phase==GDPhaseReady)return [self pushRow];
+    if(self.phase==GDPhaseReady&&_level&&self.objective==GDObjectiveSurvive&&self.objectiveCurrent>=self.objectiveTarget){GDEvent *event=[GDEvent new];[self checkFailure:event];[self checkObjective:event];return event;}
+    return nil;
 }
 - (BOOL)activateSkill:(GDColor)color {
     if(self.phase!=GDPhaseReady||self.pressurePending||color<0||color>3)return NO;
@@ -243,32 +289,45 @@ static CGFloat GDSegmentDistance(CGPoint p, CGPoint a, CGPoint b) {
 - (NSArray<GDCell *> *)yellowTargets { NSInteger deepest=-1;for(GDCell *c in self.cells)deepest=MAX(deepest,c.row);NSMutableArray *result=[NSMutableArray new];for(GDCell *c in self.cells)if(c.row>=deepest-1)[result addObject:[c copy]];return result; }
 - (nullable GDEvent *)activateYellow { if(self.phase!=GDPhaseReady||self.pressurePending||[_mutableEnergy[GDColorYellow] integerValue]<self.energyThreshold||!_board.count)return nil;_mutableEnergy[GDColorYellow]=@0;self.blastArmed=NO;[self increment:@"yellowUses" by:1];[self record:@"yellow"];return [self settle:[self yellowTargets] source:GDSourceYellow placed:nil]; }
 - (void)cancelBlast { if(self.phase==GDPhaseReady){self.blastArmed=NO;_lastPreview=nil;} }
-- (void)pause { if(self.phase==GDPhasePaused||self.phase==GDPhaseGameOver)return;_phaseBeforePause=self.phase;self.phase=GDPhasePaused; }
+- (void)pause { if(self.phase==GDPhasePaused||self.phase==GDPhaseGameOver||self.phase==GDPhaseWon)return;_phaseBeforePause=self.phase;self.phase=GDPhasePaused; }
 - (void)resume { if(self.phase==GDPhasePaused)self.phase=_phaseBeforePause; }
 - (NSDictionary *)encodedCell:(GDCell *)c { return @{@"r":@(c.row),@"c":@(c.column),@"color":@(c.color)}; }
 - (NSDictionary *)diagnostics {
     NSMutableArray *board=[NSMutableArray new];for(GDCell *c in self.cells)[board addObject:[self encodedCell:c]];
-    return @{@"version":@"dense-v1",@"seed":@(self.seed),@"elapsed":@(self.elapsed),@"score":@(self.score),@"wave":@(self.wave),@"stats":[_stats copy],@"lastOperations":[_operations copy],@"board":board,@"energy":self.energy,@"phase":@(self.phase),@"shotsPerMinute":@(self.elapsed>0?[_stats[@"normalShots"] doubleValue]*60/self.elapsed:0)};
+    return @{@"version":@"campaign-v1",@"mode":@(self.mode),@"levelID":@(self.levelID),@"objectiveCurrent":@(self.objectiveCurrent),@"objectiveTarget":@(self.objectiveTarget),@"stars":@(self.stars),@"runID":self.runID,@"seed":@(self.seed),@"elapsed":@(self.elapsed),@"score":@(self.score),@"wave":@(self.wave),@"stats":[_stats copy],@"lastOperations":[_operations copy],@"board":board,@"energy":self.energy,@"phase":@(self.phase),@"shotsPerMinute":@(self.elapsed>0?[_stats[@"normalShots"] doubleValue]*60/self.elapsed:0)};
 }
 - (NSDictionary *)snapshot {
     GDPhase actual=self.phase==GDPhasePaused?_phaseBeforePause:self.phase;
     if(actual==GDPhaseFlying&&_flightCheckpoint)return _flightCheckpoint;
     NSMutableArray *board=[NSMutableArray new];for(GDCell *c in self.cells)[board addObject:[self encodedCell:c]];
-    return @{@"format":@1,@"seed":@(self.seed),@"rng":@(_rng),@"board":board,@"rowPhase":@(self.rowPhase),@"revision":@(self.revision),@"current":@(self.currentColor),@"next":@(self.nextColor),@"held":@(self.heldColor),@"holdUsed":@(self.holdUsed),@"launcher":@(self.launcher),@"wild":@(self.wildRemaining),@"score":@(self.score),@"wave":@(self.wave),@"pressure":@(self.pressureRemaining),@"pending":@(self.pressurePending),@"freeze":@(self.freezeRemaining),@"elapsed":@(self.elapsed),@"difficulty":@(_difficultyTime),@"energy":self.energy,@"stats":[_stats copy],@"operations":[_operations copy],@"gameOver":@(actual==GDPhaseGameOver)};
+    return @{@"format":@2,@"mode":@(self.mode),@"levelID":@(self.levelID),@"runID":self.runID,@"clearedWaves":@(_clearedWaves),@"collected":@(_collected),@"fallenTotal":@(_fallenTotal),@"won":@(actual==GDPhaseWon),@"stars":@(self.stars),@"completionRecorded":@(_completionRecorded),@"seed":@(self.seed),@"rng":@(_rng),@"board":board,@"rowPhase":@(self.rowPhase),@"revision":@(self.revision),@"current":@(self.currentColor),@"next":@(self.nextColor),@"held":@(self.heldColor),@"holdUsed":@(self.holdUsed),@"launcher":@(self.launcher),@"wild":@(self.wildRemaining),@"score":@(self.score),@"wave":@(self.wave),@"pressure":@(self.pressureRemaining),@"pending":@(self.pressurePending),@"freeze":@(self.freezeRemaining),@"elapsed":@(self.elapsed),@"difficulty":@(_difficultyTime),@"energy":self.energy,@"stats":[_stats copy],@"operations":[_operations copy],@"gameOver":@(actual==GDPhaseGameOver)};
 }
 - (nullable instancetype)initWithSnapshot:(NSDictionary *)s {
-    if(![s isKindOfClass:NSDictionary.class]||[s[@"format"] integerValue]!=1||![s[@"board"] isKindOfClass:NSArray.class]||![s[@"energy"] isKindOfClass:NSArray.class]||[s[@"energy"] count]!=4)return nil;
-    if(!(self=[self initWithSeed:[s[@"seed"] unsignedIntegerValue]]))return nil;
+    if(![s isKindOfClass:NSDictionary.class])return nil;
+    for(NSString *key in @[@"format",@"seed",@"rng",@"rowPhase",@"revision",@"current",@"next",@"held",@"holdUsed",@"launcher",@"wild",@"score",@"wave",@"pressure",@"pending",@"freeze",@"elapsed",@"difficulty",@"gameOver"])if(![s[key] isKindOfClass:NSNumber.class])return nil;
+    if([s[@"format"] integerValue]==2){for(NSString *key in @[@"mode",@"levelID",@"clearedWaves",@"collected",@"fallenTotal",@"won",@"stars",@"completionRecorded"])if(![s[key] isKindOfClass:NSNumber.class])return nil;if(![s[@"runID"] isKindOfClass:NSString.class]||![s[@"runID"] length])return nil;}
+    if(([s[@"format"] integerValue]!=1&&[s[@"format"] integerValue]!=2)||![s[@"board"] isKindOfClass:NSArray.class]||![s[@"energy"] isKindOfClass:NSArray.class]||[s[@"energy"] count]!=4)return nil;
+    NSInteger mode=[s[@"format"] integerValue]==1?GDGameModeEndless:[s[@"mode"] integerValue];if(mode!=GDGameModeEndless&&mode!=GDGameModeLevel)return nil;
+    if(mode==GDGameModeLevel){if(!(self=[self initWithLevelID:[s[@"levelID"] integerValue] seed:[s[@"seed"] unsignedIntegerValue]]))return nil;}else if(!(self=[self initWithSeed:[s[@"seed"] unsignedIntegerValue]]))return nil;
+    if([s[@"runID"] isKindOfClass:NSString.class]&&[s[@"runID"] length])self.runID=s[@"runID"];
+    _clearedWaves=[s[@"clearedWaves"] integerValue];_collected=[s[@"collected"] integerValue];_fallenTotal=[s[@"fallenTotal"] integerValue];self.stars=[s[@"stars"] integerValue];_completionRecorded=[s[@"completionRecorded"] boolValue];
+    if(_clearedWaves<0||_collected<0||_fallenTotal<0||self.stars<0||self.stars>3)return nil;
     _board=[NSMutableDictionary new];self.rowPhase=[s[@"rowPhase"] integerValue];if(self.rowPhase<0||self.rowPhase>1)return nil;
-    for(NSDictionary *data in s[@"board"]){if(![data isKindOfClass:NSDictionary.class])return nil;NSInteger row=[data[@"r"] integerValue],col=[data[@"c"] integerValue],color=[data[@"color"] integerValue];if(![self insideRow:row column:col]||color<0||color>3||_board[GDKey(row,col)])return nil;GDCell *c=[GDCell row:row column:col color:color];_board[c.key]=c;}
+    for(NSDictionary *data in s[@"board"]){if(![data isKindOfClass:NSDictionary.class]||![data[@"r"] isKindOfClass:NSNumber.class]||![data[@"c"] isKindOfClass:NSNumber.class]||![data[@"color"] isKindOfClass:NSNumber.class])return nil;NSInteger row=[data[@"r"] integerValue],col=[data[@"c"] integerValue],color=[data[@"color"] integerValue];if(![self insideRow:row column:col]||color<0||color>3||_board[GDKey(row,col)])return nil;GDCell *c=[GDCell row:row column:col color:color];_board[c.key]=c;}
     _rng=[s[@"rng"] unsignedLongLongValue];if(!_rng)return nil;
     self.currentColor=[s[@"current"] integerValue];self.nextColor=[s[@"next"] integerValue];self.heldColor=[s[@"held"] integerValue];self.launcher=[s[@"launcher"] integerValue];self.wildRemaining=[s[@"wild"] integerValue];
     if(self.currentColor<0||self.currentColor>3||self.nextColor<0||self.nextColor>3||self.heldColor< -1||self.heldColor>3||self.launcher<0||self.launcher>2||self.wildRemaining<0||self.wildRemaining>3)return nil;
     _mutableEnergy=[NSMutableArray new];for(id energy in s[@"energy"]){if(![energy isKindOfClass:NSNumber.class]||[energy integerValue]<0||[energy integerValue]>self.energyThreshold)return nil;[_mutableEnergy addObject:energy];}
     self.revision=[s[@"revision"] integerValue];self.holdUsed=[s[@"holdUsed"] boolValue];self.score=[s[@"score"] integerValue];self.wave=[s[@"wave"] integerValue];self.pressureRemaining=[s[@"pressure"] doubleValue];self.pressurePending=[s[@"pending"] boolValue];self.freezeRemaining=[s[@"freeze"] doubleValue];self.elapsed=[s[@"elapsed"] doubleValue];_difficultyTime=[s[@"difficulty"] doubleValue];
     if(!isfinite(self.pressureRemaining)||!isfinite(self.freezeRemaining)||!isfinite(self.elapsed)||!isfinite(_difficultyTime)||self.freezeRemaining<0||self.freezeRemaining>6||self.elapsed<0||_difficultyTime<0||self.score<0||self.wave<1)return nil;
+    id stats=s[@"stats"];if(stats&&![stats isKindOfClass:NSDictionary.class])return nil;for(id key in stats){id value=stats[key];if(![key isKindOfClass:NSString.class]||![value isKindOfClass:NSNumber.class]||[value doubleValue]<0||!isfinite([value doubleValue]))return nil;}
+    // Restored operations are eventually included in persisted diagnostics.
+    // Reject non-property-list values here rather than throwing on game over.
+    id operations=s[@"operations"];if(operations&&(![operations isKindOfClass:NSArray.class]||![NSPropertyListSerialization propertyList:operations isValidForFormat:NSPropertyListBinaryFormat_v1_0]))return nil;
     _stats=[s[@"stats"] isKindOfClass:NSDictionary.class]?[s[@"stats"] mutableCopy]:[NSMutableDictionary new];_operations=[s[@"operations"] isKindOfClass:NSArray.class]?[s[@"operations"] mutableCopy]:[NSMutableArray new];
-    self.phase=[s[@"gameOver"] boolValue]?GDPhaseGameOver:GDPhasePaused;_phaseBeforePause=GDPhaseReady;return self;
+    if(self.mode==GDGameModeLevel&&(self.wave>self.totalWaves||(self.objective==GDObjectiveClear&&_clearedWaves>self.totalWaves)))return nil;
+    if([s[@"won"] boolValue]&&(self.mode!=GDGameModeLevel||self.stars<1||self.objectiveCurrent<self.objectiveTarget))return nil;
+    self.phase=[s[@"won"] boolValue]?GDPhaseWon:[s[@"gameOver"] boolValue]?GDPhaseGameOver:GDPhasePaused;_phaseBeforePause=GDPhaseReady;return self;
 }
 #if DEBUG || GD_CORE_TESTS
 - (void)loadFixture:(NSArray<GDCell *> *)cells phase:(NSInteger)phase current:(GDColor)current next:(GDColor)next { _board=[NSMutableDictionary new];self.rowPhase=phase;for(GDCell *c in cells)_board[c.key]=[c copy];self.currentColor=current;self.nextColor=next;self.phase=GDPhaseReady;self.revision++;_activeShot=nil;_lastPreview=nil;self.pressurePending=NO;self.pressureRemaining=12; }

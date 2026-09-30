@@ -1,0 +1,76 @@
+2026-09-30 15:47:12.923 campaign_tests[62694:907041] PASS: terminal ordering, finite waves, stars, freeze, records and v1 migration
+2026-09-30 15:47:12.927 campaign_tests[62694:907041] IDLE L04 loses 48.0 before target 58
+2026-09-30 15:47:12.932 campaign_tests[62694:907041] IDLE L09 loses 46.0 before target 65
+2026-09-30 15:47:12.937 campaign_tests[62694:907041] IDLE L14 loses 43.0 before target 72
+2026-09-30 15:47:12.942 campaign_tests[62694:907041] IDLE L19 loses 41.0 before target 79
+2026-09-30 15:47:12.946 campaign_tests[62694:907041] IDLE L24 loses 38.0 before target 86
+2026-09-30 15:47:12.951 campaign_tests[62694:907041] IDLE L29 loses 36.0 before target 93
+2026-09-30 15:47:12.954 campaign_tests[62694:907041] L01 step=0 t=0.0 progress=0/1 cells=64
+2026-09-30 15:47:16.336 campaign_tests[62694:907041] REPLAY L01 seed=20261001 hash=2a707b8eadf8c611 won=1 objective=0 1/1 shots=10 skills=1 bounces=8 t=18.7 stars=3
+2026-09-30 15:47:16.340 campaign_tests[62694:907041] L02 step=0 t=0.0 progress=0/20 cells=68
+2026-09-30 15:47:19.754 campaign_tests[62694:907041] REPLAY L02 seed=20261002 hash=eba5c0a16299f0d9 won=1 objective=1 20/20 shots=8 skills=0 bounces=7 t=14.8 stars=3
+2026-09-30 15:47:19.756 campaign_tests[62694:907041] L03 step=0 t=0.0 progress=0/28 cells=48
+2026-09-30 15:47:21.084 campaign_tests[62694:907041] REPLAY L03 seed=20261003 hash=2defe50fd9016ce8 won=1 objective=2 31/28 shots=7 skills=0 bounces=4 t=12.4 stars=3
+2026-09-30 15:47:21.088 campaign_tests[62694:907041] L04 step=0 t=0.0 progress=0/58 cells=103
+2026-09-30 15:47:31.116 campaign_tests[62694:907041] L04 step=20 t=40.4 progress=40/58 cells=14
+2026-09-30 15:47:32.684 campaign_tests[62694:907041] REPLAY L04 seed=20261004 hash=8a661ee7559ef883 won=1 objective=3 58/58 shots=28 skills=5 bounces=22 t=58.0 stars=3
+2026-09-30 15:47:32.687 campaign_tests[62694:907041] L05 step=0 t=0.0 progress=0/1 cells=79
+2026-09-30 15:47:38.697 campaign_tests[62694:907041] REPLAY L05 seed=20261005 hash=65203e9f65d5aedb won=1 objective=0 1/1 shots=12 skills=1 bounces=10 t=24.0 stars=3
+2026-09-30 15:47:38.700 campaign_tests[62694:907041] L06 step=0 t=0.0 progress=0/1 cells=66
+2026-09-30 15:47:40.787 campaign_tests[62694:907041] REPLAY L06 seed=20261006 hash=a9901c97444b8a5b won=1 objective=0 1/1 shots=6 skills=0 bounces=4 t=10.5 stars=3
+2026-09-30 15:47:40.791 campaign_tests[62694:907041] L07 step=0 t=0.0 progress=0/25 cells=64
+2026-09-30 15:47:43.003 campaign_tests[62694:907041] REPLAY L07 seed=20261007 hash=25d9c58c2620e2c9 won=1 objective=1 26/25 shots=8 skills=0 bounces=5 t=14.4 stars=3
+2026-09-30 15:47:43.006 campaign_tests[62694:907041] L08 step=0 t=0.0 progress=0/40 cells=63
+2026-09-30 15:47:46.297 campaign_tests[62694:907041] REPLAY L08 seed=20261008 hash=10988b2b378f60b1 won=1 objective=2 44/40 shots=11 skills=0 bounces=9 t=20.7 stars=3
+2026-09-30 15:47:46.302 campaign_tests[62694:907041] L09 step=0 t=0.0 progress=0/65 cells=106
+2026-09-30 15:47:58.289 campaign_tests[62694:907041] L09 step=20 t=40.4 progress=40/65 cells=32
+2026-09-30 15:48:04.463 campaign_tests[62694:907041] REPLAY L09 seed=20261009 hash=2736ab10501a0bd2 won=1 objective=3 65/65 shots=32 skills=4 bounces=24 t=65.1 stars=3
+2026-09-30 15:48:04.467 campaign_tests[62694:907041] L10 step=0 t=0.0 progress=0/1 cells=65
+2026-09-30 15:48:07.921 campaign_tests[62694:907041] REPLAY L10 seed=20261010 hash=3920e5cd459f9281 won=1 objective=0 1/1 shots=8 skills=0 bounces=7 t=14.5 stars=3
+2026-09-30 15:48:07.928 campaign_tests[62694:907041] L11 step=0 t=0.0 progress=0/2 cells=88
+2026-09-30 15:48:13.666 campaign_tests[62694:907041] REPLAY L11 seed=20261011 hash=b3b130db3edf56c2 won=1 objective=0 2/2 shots=6 skills=2 bounces=6 t=12.4 stars=3
+2026-09-30 15:48:13.671 campaign_tests[62694:907041] L12 step=0 t=0.0 progress=0/30 cells=80
+2026-09-30 15:48:21.006 campaign_tests[62694:907041] REPLAY L12 seed=20261012 hash=f7168a6197265c3a won=1 objective=1 35/30 shots=16 skills=1 bounces=11 t=30.4 stars=3
+2026-09-30 15:48:21.010 campaign_tests[62694:907041] L13 step=0 t=0.0 progress=0/36 cells=65
+2026-09-30 15:48:25.105 campaign_tests[62694:907041] REPLAY L13 seed=20261013 hash=3245780f2733b112 won=1 objective=2 41/36 shots=10 skills=2 bounces=7 t=18.7 stars=3
+2026-09-30 15:48:25.109 campaign_tests[62694:907041] L14 step=0 t=0.0 progress=0/72 cells=94
+2026-09-30 15:48:30.529 campaign_tests[62694:907041] L14 step=20 t=40.0 progress=40/72 cells=19
+2026-09-30 15:48:34.808 campaign_tests[62694:907041] REPLAY L14 seed=20261014 hash=90b62fa0f45f495f won=1 objective=3 72/72 shots=34 skills=5 bounces=28 t=72.0 stars=3
+2026-09-30 15:48:34.813 campaign_tests[62694:907041] L15 step=0 t=0.0 progress=0/2 cells=79
+2026-09-30 15:48:39.485 campaign_tests[62694:907041] REPLAY L15 seed=20261015 hash=c3d75929e078a3fc won=1 objective=0 2/2 shots=6 skills=3 bounces=6 t=12.4 stars=3
+2026-09-30 15:48:39.490 campaign_tests[62694:907041] L16 step=0 t=0.0 progress=0/2 cells=78
+2026-09-30 15:48:44.009 campaign_tests[62694:907041] REPLAY L16 seed=20261016 hash=bbef36cc1244712d won=1 objective=0 2/2 shots=10 skills=3 bounces=10 t=20.3 stars=3
+2026-09-30 15:48:44.015 campaign_tests[62694:907041] L17 step=0 t=0.0 progress=0/35 cells=88
+2026-09-30 15:48:49.483 campaign_tests[62694:907041] REPLAY L17 seed=20261017 hash=3cc1f0cc1e231eee won=1 objective=1 42/35 shots=11 skills=1 bounces=6 t=20.8 stars=3
+2026-09-30 15:48:49.486 campaign_tests[62694:907041] L18 step=0 t=0.0 progress=0/40 cells=57
+2026-09-30 15:48:52.348 campaign_tests[62694:907041] REPLAY L18 seed=20261018 hash=b1dc92445102817f won=1 objective=2 42/40 shots=8 skills=0 bounces=4 t=14.3 stars=3
+2026-09-30 15:48:52.356 campaign_tests[62694:907041] L19 step=0 t=0.0 progress=0/79 cells=117
+2026-09-30 15:49:19.698 campaign_tests[62694:907041] L19 step=20 t=40.0 progress=40/79 cells=28
+2026-09-30 15:49:25.558 campaign_tests[62694:907041] REPLAY L19 seed=20261019 hash=d32e82bfef1333d0 won=1 objective=3 79/79 shots=38 skills=7 bounces=30 t=79.1 stars=3
+2026-09-30 15:49:25.568 campaign_tests[62694:907041] L20 step=0 t=0.0 progress=0/2 cells=81
+2026-09-30 15:49:31.950 campaign_tests[62694:907041] REPLAY L20 seed=20261020 hash=0e64967a03217e59 won=1 objective=0 2/2 shots=10 skills=2 bounces=10 t=20.0 stars=3
+2026-09-30 15:49:31.957 campaign_tests[62694:907041] L21 step=0 t=0.0 progress=0/2 cells=92
+2026-09-30 15:49:39.627 campaign_tests[62694:907041] REPLAY L21 seed=20261021 hash=fcbeebbf615ca20c won=1 objective=0 2/2 shots=13 skills=2 bounces=13 t=26.0 stars=3
+2026-09-30 15:49:39.632 campaign_tests[62694:907041] L22 step=0 t=0.0 progress=0/40 cells=90
+2026-09-30 15:49:55.307 campaign_tests[62694:907041] REPLAY L22 seed=20261022 hash=4a51712faf9bc9e0 won=1 objective=1 48/40 shots=16 skills=2 bounces=12 t=32.3 stars=3
+2026-09-30 15:49:55.314 campaign_tests[62694:907041] L23 step=0 t=0.0 progress=0/40 cells=93
+2026-09-30 15:50:08.379 campaign_tests[62694:907041] REPLAY L23 seed=20261023 hash=758f564e86caffc4 won=1 objective=2 44/40 shots=20 skills=3 bounces=16 t=39.1 stars=3
+2026-09-30 15:50:08.387 campaign_tests[62694:907041] L24 step=0 t=0.0 progress=0/86 cells=107
+2026-09-30 15:50:23.374 campaign_tests[62694:907041] L24 step=20 t=40.0 progress=40/86 cells=16
+2026-09-30 15:50:27.624 campaign_tests[62694:907041] L24 step=40 t=80.4 progress=80/86 cells=6
+2026-09-30 15:50:28.130 campaign_tests[62694:907041] REPLAY L24 seed=20261024 hash=7a18b57be506e5ef won=1 objective=3 86/86 shots=41 skills=6 bounces=35 t=86.0 stars=3
+2026-09-30 15:50:28.135 campaign_tests[62694:907041] L25 step=0 t=0.0 progress=0/2 cells=99
+2026-09-30 15:50:35.131 campaign_tests[62694:907041] REPLAY L25 seed=20261025 hash=ed8db47e5de91d80 won=1 objective=0 2/2 shots=10 skills=3 bounces=10 t=20.8 stars=3
+2026-09-30 15:50:35.136 campaign_tests[62694:907041] L26 step=0 t=0.0 progress=0/2 cells=94
+2026-09-30 15:50:41.481 campaign_tests[62694:907041] REPLAY L26 seed=20261026 hash=c3dcc4b45b942c23 won=1 objective=0 2/2 shots=8 skills=3 bounces=8 t=16.4 stars=3
+2026-09-30 15:50:41.487 campaign_tests[62694:907041] L27 step=0 t=0.0 progress=0/45 cells=92
+2026-09-30 15:50:52.959 campaign_tests[62694:907041] REPLAY L27 seed=20261027 hash=c30e1795f82e2421 won=1 objective=1 46/45 shots=18 skills=4 bounces=14 t=39.0 stars=3
+2026-09-30 15:50:52.963 campaign_tests[62694:907041] L28 step=0 t=0.0 progress=0/36 cells=78
+2026-09-30 15:51:02.094 campaign_tests[62694:907041] REPLAY L28 seed=20261028 hash=24b997fc3d6069ac won=1 objective=2 41/36 shots=18 skills=3 bounces=13 t=36.7 stars=3
+2026-09-30 15:51:02.099 campaign_tests[62694:907041] L29 step=0 t=0.0 progress=0/93 cells=93
+2026-09-30 15:51:08.630 campaign_tests[62694:907041] L29 step=20 t=40.0 progress=40/93 cells=13
+2026-09-30 15:51:13.286 campaign_tests[62694:907041] L29 step=40 t=80.4 progress=80/93 cells=18
+2026-09-30 15:51:14.493 campaign_tests[62694:907041] REPLAY L29 seed=20261029 hash=10593f51c05a0b10 won=1 objective=3 93/93 shots=45 skills=7 bounces=37 t=93.2 stars=3
+2026-09-30 15:51:14.499 campaign_tests[62694:907041] L30 step=0 t=0.0 progress=0/2 cells=93
+2026-09-30 15:51:20.834 campaign_tests[62694:907041] REPLAY L30 seed=20261030 hash=ecda35da58689965 won=1 objective=0 2/2 shots=10 skills=2 bounces=10 t=18.2 stars=3
+2026-09-30 15:51:20.844 campaign_tests[62694:907041] REPLAY COMPLETE count=30 unique=30 topology=28 assertions=8043 allWon=1

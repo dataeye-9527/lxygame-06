@@ -1,0 +1,144 @@
+{
+  "resources": [
+    {
+      "pattern": "*.wav",
+      "source": 15,
+      "bundle": 15,
+      "all_equal": true
+    },
+    {
+      "pattern": "*.png",
+      "source": 8,
+      "bundle": 8,
+      "all_equal": false,
+      "encoding": "Xcode CgBI optimized PNG",
+      "decodedPixels": [
+        {
+          "name": "menu_hero.png",
+          "size": [
+            640,
+            480
+          ],
+          "bundleSize": [
+            640,
+            480
+          ],
+          "pixelsEqual": false,
+          "maxChannelDelta": 6,
+          "alphaEqual": true,
+          "premultipliedMaxDelta": 0.9960784313725526
+        },
+        {
+          "name": "gummy_white.png",
+          "size": [
+            256,
+            256
+          ],
+          "bundleSize": [
+            256,
+            256
+          ],
+          "pixelsEqual": false,
+          "maxChannelDelta": 1,
+          "alphaEqual": true,
+          "premultipliedMaxDelta": 0.9960784313725526
+        },
+        {
+          "name": "gummy_red.png",
+          "size": [
+            256,
+            256
+          ],
+          "bundleSize": [
+            256,
+            256
+          ],
+          "pixelsEqual": false,
+          "maxChannelDelta": 1,
+          "alphaEqual": true,
+          "premultipliedMaxDelta": 0.9960784313725526
+        },
+        {
+          "name": "candy_background.png",
+          "size": [
+            1200,
+            680
+          ],
+          "bundleSize": [
+            1200,
+            680
+          ],
+          "pixelsEqual": true,
+          "maxChannelDelta": 0,
+          "alphaEqual": true,
+          "premultipliedMaxDelta": 0.0
+        },
+        {
+          "name": "cannon.png",
+          "size": [
+            320,
+            280
+          ],
+          "bundleSize": [
+            320,
+            280
+          ],
+          "pixelsEqual": false,
+          "maxChannelDelta": 2,
+          "alphaEqual": true,
+          "premultipliedMaxDelta": 0.9960784313725526
+        },
+        {
+          "name": "gummy_blue.png",
+          "size": [
+            256,
+            256
+          ],
+          "bundleSize": [
+            256,
+            256
+          ],
+          "pixelsEqual": false,
+          "maxChannelDelta": 1,
+          "alphaEqual": true,
+          "premultipliedMaxDelta": 0.9960784313725526
+        },
+        {
+          "name": "wild_icon.png",
+          "size": [
+            128,
+            128
+          ],
+          "bundleSize": [
+            128,
+            128
+          ],
+          "pixelsEqual": false,
+          "maxChannelDelta": 1,
+          "alphaEqual": true,
+          "premultipliedMaxDelta": 0.9960784313725526
+        },
+        {
+          "name": "gummy_yellow.png",
+          "size": [
+            256,
+            256
+          ],
+          "bundleSize": [
+            256,
+            256
+          ],
+          "pixelsEqual": false,
+          "maxChannelDelta": 1,
+          "alphaEqual": true,
+          "premultipliedMaxDelta": 0.9960784313725526
+        }
+      ],
+      "optimizationAccepted": true
+    }
+  ],
+  "bundleLevelsEqual": true,
+  "catalogSHA256": "ba8b12e564bd1f6e57fa08dfa42ee3d890acb949418eab2d6284a37db2f40a49",
+  "bundleWAVBytesEqual": true,
+  "configuration": "Final Debug"
+}

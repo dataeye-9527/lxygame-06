@@ -3,6 +3,9 @@
 #import "GummyUI.h"
 #import "GDEngine.h"
 #import "GDSettings.h"
+#import "GDLevelCatalog.h"
+#import "GDProgressStore.h"
+#import "GDRunRecords.h"
 
 static UIColor *MenuInk(void) { return [UIColor colorWithRed:.34 green:.26 blue:.43 alpha:1]; }
 static UIColor *MenuCream(void) { return [UIColor colorWithRed:1 green:.93 blue:.87 alpha:1]; }
@@ -11,12 +14,19 @@ static UIColor *MenuBlue(void) { return [UIColor colorWithRed:.65 green:.86 blue
 @property(nonatomic,copy) NSString *page;
 @property(nonatomic) SKScene *returnScene;
 @property(nonatomic) NSMutableDictionary<NSString *,NSValue *> *controls;
-@property(nonatomic) NSDictionary *runSnapshot;
+@property(nonatomic) NSDictionary *runSnapshot, *levelSnapshot;
+@property(nonatomic) NSInteger chapter, leaderboardPage;
 @property(nonatomic) UITouch *activeTouch;
 @property(nonatomic,copy) NSString *pressedControl;
 @end
 @implementation FrontendScene
-+ (instancetype)homeScene { FrontendScene *s=[self sceneWithSize:CGSizeMake(1200,680)]; s.page=@"home"; s.scaleMode=SKSceneScaleModeAspectFit; return s; }
++ (instancetype)homeScene { FrontendScene *s=[self sceneWithSize:CGSizeMake(1200,680)]; s.page=@"home";
+#if DEBUG
+    if([NSProcessInfo.processInfo.arguments containsObject:@"-qa-scores"] || [NSProcessInfo.processInfo.arguments containsObject:@"-qa-scores-empty"]) s.page=@"leaderboard";
+#endif
+    s.scaleMode=SKSceneScaleModeAspectFit; return s; }
++ (instancetype)levelsScene { FrontendScene *s=[self homeScene]; s.page=@"levels"; GDProgressStore *progress=[[GDProgressStore alloc] initWithDefaults:NSUserDefaults.standardUserDefaults]; s.chapter=MIN(5,(progress.unlockedLevel-1)/5); return s; }
++ (instancetype)leaderboardScene { FrontendScene *s=[self homeScene]; s.page=@"leaderboard"; return s; }
 + (instancetype)helpScene { FrontendScene *s=[self homeScene]; s.page=@"help"; return s; }
 + (instancetype)settingsSceneReturningTo:(SKScene *)scene { FrontendScene *s=[self homeScene]; s.page=@"settings"; s.returnScene=scene; return s; }
 - (void)didMoveToView:(SKView *)view { [GummyUI setOverlayDimmed:NO]; [self rebuild]; }
@@ -28,26 +38,99 @@ static UIColor *MenuBlue(void) { return [UIColor colorWithRed:.65 green:.86 blue
     [self removeAllChildren]; self.controls=[NSMutableDictionary dictionary]; [GummyUI addBackgroundTo:self];
     if([self.page isEqualToString:@"home"]) [self buildHome];
     else if([self.page isEqualToString:@"settings"]) [self buildSettings];
+    else if([self.page isEqualToString:@"levels"]) [self buildLevels];
+    else if([self.page isEqualToString:@"leaderboard"]) [self buildLeaderboard];
     else [self buildHelp];
 }
-- (void)buildHome {
-    id snapshot=[NSUserDefaults.standardUserDefaults objectForKey:@"GummyRunSnapshot"];
+- (NSDictionary *)validSnapshotForKey:(NSString *)key {
+    id snapshot=[NSUserDefaults.standardUserDefaults objectForKey:key];
     GDEngine *restored=[snapshot isKindOfClass:NSDictionary.class]?[[GDEngine alloc] initWithSnapshot:snapshot]:nil;
-    self.runSnapshot=restored && restored.phase!=GDPhaseGameOver?snapshot:nil;
-    SKNode *titleCard=[GummyUI surface:CGSizeMake(465,100) color:MenuCream() radius:40]; titleCard.position=CGPointMake(355,577); [self addChild:titleCard];
-    [self text:@"GUMMY DROP" size:48 at:CGPointMake(355,578)];
-    SKSpriteNode *hero=[GummyUI image:@"menu_hero" size:CGSizeMake(520,390)];
-    if(hero){ hero.position=CGPointMake(350,340); [self addChild:hero]; }
-    else { for(NSInteger i=0;i<4;i++){ SKNode *piece=[GummyUI piece:i diameter:120]; piece.position=CGPointMake(240+(i%2)*205,285+(i/2)*140); [self addChild:piece]; } }
-    SKNode *best=[GummyUI surface:CGSizeMake(290,60) color:MenuCream() radius:28]; best.position=CGPointMake(355,116); [self addChild:best];
-    [self text:[NSString stringWithFormat:@"BEST  %ld",(long)[NSUserDefaults.standardUserDefaults integerForKey:@"GDPrototypeBestScore"]] size:24 at:CGPointMake(355,117)];
-    SKNode *card=[GummyUI surface:CGSizeMake(384,490) color:MenuCream() radius:36]; card.position=CGPointMake(869,345); [self addChild:card];
-    [self text:@"ENDLESS" size:21 at:CGPointMake(869,548)];
-    [self button:self.runSnapshot?@"New Game":@"Play" name:@"play" center:CGPointMake(869,463) size:CGSizeMake(292,72) color:MenuBlue()];
-    if(self.runSnapshot) [self button:@"Resume" name:@"resume" center:CGPointMake(869,374) size:CGSizeMake(292,64) color:[UIColor colorWithRed:.87 green:.81 blue:.97 alpha:1]];
-    else { for(NSInteger i=0;i<4;i++){ SKNode *piece=[GummyUI piece:i diameter:30]; piece.position=CGPointMake(797+i*48,374); [self addChild:piece]; } }
-    [self button:@"Settings" name:@"settings" center:CGPointMake(869,285) size:CGSizeMake(292,64) color:[UIColor colorWithRed:.99 green:.80 blue:.85 alpha:1]];
-    [self button:@"How to Play" name:@"help" center:CGPointMake(869,196) size:CGSizeMake(292,64) color:[UIColor colorWithRed:1 green:.87 blue:.61 alpha:1]];
+    return restored && restored.phase!=GDPhaseGameOver && restored.phase!=GDPhaseWon?snapshot:nil;
+}
+- (void)buildHome {
+    self.runSnapshot=[self validSnapshotForKey:@"GummyRunSnapshot"];
+    self.levelSnapshot=[self validSnapshotForKey:@"GummyLevelRunSnapshot"];
+    SKNode *titleCard=[GummyUI surface:CGSizeMake(465,100) color:MenuCream() radius:40]; titleCard.position=CGPointMake(335,577); [self addChild:titleCard];
+    [self text:@"GUMMY DROP" size:48 at:CGPointMake(335,578)];
+    SKSpriteNode *hero=[GummyUI image:@"menu_hero" size:CGSizeMake(480,360)]; hero.position=CGPointMake(335,339); if(hero) [self addChild:hero];
+    [hero runAction:[SKAction repeatActionForever:[SKAction sequence:@[[SKAction moveByX:0 y:6 duration:2],[SKAction moveByX:0 y:-6 duration:2]]]]];
+    GDProgressStore *progress=[[GDProgressStore alloc] initWithDefaults:NSUserDefaults.standardUserDefaults];
+    [self text:[NSString stringWithFormat:@"BEST  %ld",(long)[NSUserDefaults.standardUserDefaults integerForKey:@"GDPrototypeBestScore"]] size:23 at:CGPointMake(335,128)];
+    for(NSInteger mode=0;mode<2;mode++){
+        CGFloat y=mode?280:488;
+        SKNode *card=[GummyUI surface:CGSizeMake(445,183) color:MenuCream() radius:30]; card.position=CGPointMake(865,y); [self addChild:card];
+        [self text:mode?@"LEVELS":@"ENDLESS" size:25 at:CGPointMake(865,y+56)];
+        NSString *detail=mode?[NSString stringWithFormat:@"%ld / 30 unlocked   ·   %ld ★",(long)progress.unlockedLevel,(long)progress.totalStars]:@"Play for your best score";
+        [self text:detail size:17 at:CGPointMake(865,y+21)];
+        BOOL saved=mode?self.levelSnapshot!=nil:self.runSnapshot!=nil;
+        [self button:mode?@"Select Level":(saved?@"New Game":@"Play") name:mode?@"levels":@"play" center:CGPointMake(saved?777:865,y-37) size:CGSizeMake(saved?208:350,57) color:mode?[UIColor colorWithRed:1 green:.85 blue:.58 alpha:1]:MenuBlue()];
+        if(saved){
+            NSString *resume=mode?[NSString stringWithFormat:@"Resume %ld",(long)[self.levelSnapshot[@"levelID"] integerValue]]:@"Resume";
+            [self button:resume name:mode?@"resumeLevel":@"resume" center:CGPointMake(975,y-37) size:CGSizeMake(166,57) color:[UIColor colorWithRed:.87 green:.81 blue:.97 alpha:1]];
+        }
+    }
+    [self button:@"Local Scores" name:@"leaderboard" center:CGPointMake(741,121) size:CGSizeMake(194,54) color:[UIColor colorWithRed:.87 green:.81 blue:.97 alpha:1]];
+    [self button:@"Settings" name:@"settings" center:CGPointMake(915,121) size:CGSizeMake(138,54) color:[UIColor colorWithRed:.99 green:.80 blue:.85 alpha:1]];
+    [self button:@"Help" name:@"help" center:CGPointMake(1062,121) size:CGSizeMake(124,54) color:MenuCream()];
+}
+- (NSString *)objectiveText:(GDLevel *)level {
+    switch(level.objective){
+        case GDObjectiveClear: return [NSString stringWithFormat:@"%lu wave%@",(unsigned long)level.layouts.count,level.layouts.count==1?@"":@"s"];
+        case GDObjectiveCollect: return [NSString stringWithFormat:@"%ld %@",(long)level.target,@[@"blue",@"red",@"yellow",@"white"][level.objectiveColor]];
+        case GDObjectiveFall: return [NSString stringWithFormat:@"%ld gummies",(long)level.target];
+        case GDObjectiveSurvive: return [NSString stringWithFormat:@"%ld seconds",(long)level.target];
+    }
+}
+- (void)buildLevels {
+    [self pageFrame:@"LEVELS"];
+    GDProgressStore *progress=[[GDProgressStore alloc] initWithDefaults:NSUserDefaults.standardUserDefaults];
+    for(NSInteger c=0;c<6;c++) [self button:[NSString stringWithFormat:@"%ld",(long)c+1] name:[NSString stringWithFormat:@"chapter%ld",(long)c] center:CGPointMake(350+c*100,488) size:CGSizeMake(78,44) color:c==self.chapter?MenuBlue():[UIColor colorWithRed:.91 green:.85 blue:.96 alpha:1]];
+    [self text:[NSString stringWithFormat:@"CHAPTER %ld   ·   %ld / 90 ★",(long)self.chapter+1,(long)progress.totalStars] size:16 at:CGPointMake(600,445)];
+    for(NSInteger i=0;i<5;i++){
+        NSInteger levelID=self.chapter*5+i+1; GDLevel *level=[GDLevelCatalog levelForID:levelID]; if(!level) continue;
+        BOOL unlocked=[progress isLevelUnlocked:levelID]; CGFloat x=252+i*174;
+        SKNode *tile=[GummyUI surface:CGSizeMake(160,248) color:unlocked?[UIColor colorWithRed:.97 green:.85 blue:.84 alpha:1]:[UIColor colorWithRed:.85 green:.81 blue:.89 alpha:1] radius:25]; tile.position=CGPointMake(x,286); [self addChild:tile];
+        if(levelID==progress.unlockedLevel){ SKShapeNode *rim=[GummyUI panel:CGSizeMake(155,243) fill:UIColor.clearColor stroke:MenuBlue() radius:23]; rim.position=tile.position; rim.lineWidth=4; [self addChild:rim]; }
+        [self text:[NSString stringWithFormat:@"%02ld",(long)levelID] size:34 at:CGPointMake(x,369)];
+        SKNode *piece=[GummyUI piece:level.objective==GDObjectiveCollect?level.objectiveColor:(levelID-1)%4 diameter:48]; piece.position=CGPointMake(x,315); [self addChild:piece];
+        [self text:@[@"CLEAR",@"COLLECT",@"DROP",@"SURVIVE"][level.objective] size:12 at:CGPointMake(x,277)];
+        [self text:[self objectiveText:level] size:14 at:CGPointMake(x,255)];
+        NSInteger stars=[progress bestStarsForLevel:levelID];
+        [self text:stars?[@[@"",@"★ ☆ ☆",@"★ ★ ☆",@"★ ★ ★"] objectAtIndex:stars]:@"☆ ☆ ☆" size:20 at:CGPointMake(x,231)];
+        NSString *efficiency=level.objective==GDObjectiveSurvive?[NSString stringWithFormat:@"≤%ld shots / ≥%ld pts",(long)level.parShots,(long)level.parScore]:[NSString stringWithFormat:@"≤%ld shots / ≤%.0fs",(long)level.parShots,level.parTime];
+        SKLabelNode *par=[GummyUI label:efficiency size:11.5 color:MenuInk()]; par.position=CGPointMake(x,212); while(par.frame.size.width>146 && par.fontSize>10) par.fontSize-=.5; [self addChild:par];
+        if(unlocked) [self button:@"Play" name:[NSString stringWithFormat:@"level%ld",(long)levelID] center:CGPointMake(x,181) size:CGSizeMake(124,42) color:MenuBlue()];
+        else [self text:@"LOCKED" size:16 at:CGPointMake(x,182)];
+    }
+    [self text:@"3★: complete + shot efficiency + time. Survival rewards score." size:17 at:CGPointMake(600,106)];
+}
+- (void)buildLeaderboard {
+    [self pageFrame:@"LOCAL SCORES"];
+    NSArray *records=[[[GDRunRecords alloc] initWithDefaults:NSUserDefaults.standardUserDefaults] records];
+#if DEBUG
+    NSArray *args=NSProcessInfo.processInfo.arguments;
+    if([args containsObject:@"-qa-scores"] || [args containsObject:@"-qa-scores-empty"]){
+        NSMutableArray *fixtures=[NSMutableArray array];
+        if([args containsObject:@"-qa-scores"]) for(NSInteger i=0;i<17;i++) [fixtures addObject:@{@"score":@((17-i)*495),@"elapsed":@(40+i*31),@"date":@(1790726400+i*3600)}];
+        records=fixtures;
+        [self text:@"QA FIXTURE" size:12 at:CGPointMake(930,549)];
+    }
+#endif
+    if(!records.count){ [self text:@"No scores yet" size:28 at:CGPointMake(600,351)]; [self text:@"Finish an Endless run to set your first score." size:20 at:CGPointMake(600,302)]; return; }
+    [self text:@"RANK" size:14 at:CGPointMake(245,495)]; [self text:@"SCORE" size:14 at:CGPointMake(422,495)]; [self text:@"TIME" size:14 at:CGPointMake(632,495)]; [self text:@"DATE" size:14 at:CGPointMake(876,495)];
+    NSDateFormatter *formatter=[NSDateFormatter new]; formatter.dateFormat=@"MMM d, HH:mm"; formatter.locale=[[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+    NSInteger start=self.leaderboardPage*7;
+    for(NSInteger i=start;i<MIN(start+7,(NSInteger)records.count);i++){
+        NSDictionary *record=records[i]; CGFloat y=453-(i-start)*44;
+        SKNode *row=[GummyUI surface:CGSizeMake(772,37) color:i==0?[UIColor colorWithRed:1 green:.86 blue:.57 alpha:1]:[UIColor colorWithRed:.97 green:.87 blue:.86 alpha:1] radius:14]; row.position=CGPointMake(600,y); [self addChild:row];
+        [self text:[NSString stringWithFormat:@"%ld",(long)i+1] size:18 at:CGPointMake(245,y)];
+        [self text:[record[@"score"] stringValue] size:21 at:CGPointMake(422,y)];
+        NSInteger seconds=[record[@"elapsed"] integerValue]; [self text:[NSString stringWithFormat:@"%ld:%02ld",(long)seconds/60,(long)seconds%60] size:18 at:CGPointMake(632,y)];
+        [self text:[formatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:[record[@"date"] doubleValue]]] size:16 at:CGPointMake(876,y)];
+    }
+    NSInteger pages=(records.count+6)/7; [self text:[NSString stringWithFormat:@"%ld / %ld",(long)self.leaderboardPage+1,(long)pages] size:17 at:CGPointMake(600,112)];
+    if(self.leaderboardPage>0) [self button:@"Previous" name:@"scoresPrev" center:CGPointMake(351,112) size:CGSizeMake(150,43) color:MenuBlue()];
+    if(self.leaderboardPage+1<pages) [self button:@"Next" name:@"scoresNext" center:CGPointMake(849,112) size:CGSizeMake(150,43) color:MenuBlue()];
 }
 - (void)pageFrame:(NSString *)title {
     SKNode *card=[GummyUI surface:CGSizeMake(904,546) color:MenuCream() radius:36]; card.position=CGPointMake(600,338); [self addChild:card];
@@ -97,11 +180,16 @@ static UIColor *MenuBlue(void) { return [UIColor colorWithRed:.65 green:.86 blue
 }
 - (void)activate:(NSString *)control {
     GDSettings *settings=GDSettings.sharedSettings; [settings playFeedback:GDFeedbackTap];
-    if([control isEqualToString:@"play"] || [control isEqualToString:@"resume"]){
-        NSDictionary *snapshot=[control isEqualToString:@"resume"]?self.runSnapshot:nil;
+    if([control isEqualToString:@"play"] || [control isEqualToString:@"resume"] || [control isEqualToString:@"resumeLevel"]){
+        NSDictionary *snapshot=[control isEqualToString:@"resume"]?self.runSnapshot:([control isEqualToString:@"resumeLevel"]?self.levelSnapshot:nil);
         if(!snapshot) [NSUserDefaults.standardUserDefaults removeObjectForKey:@"GummyRunSnapshot"];
         GameScene *game=[[GameScene alloc] initWithSize:self.size runSnapshot:snapshot]; game.scaleMode=SKSceneScaleModeAspectFit; [self.view presentScene:game];
-    } else if([control isEqualToString:@"settings"]) [self.view presentScene:[FrontendScene settingsSceneReturningTo:self]];
+    } else if([control isEqualToString:@"levels"]) [self.view presentScene:[FrontendScene levelsScene]];
+    else if([control isEqualToString:@"leaderboard"]) [self.view presentScene:[FrontendScene leaderboardScene]];
+    else if([control hasPrefix:@"chapter"]){ self.chapter=[[control substringFromIndex:7] integerValue]; [self rebuild]; }
+    else if([control hasPrefix:@"level"]){ NSInteger levelID=[[control substringFromIndex:5] integerValue]; if([[[GDProgressStore alloc] initWithDefaults:NSUserDefaults.standardUserDefaults] isLevelUnlocked:levelID]){ GameScene *game=[[GameScene alloc] initWithSize:self.size levelID:levelID]; game.scaleMode=SKSceneScaleModeAspectFit; [NSUserDefaults.standardUserDefaults removeObjectForKey:@"GummyLevelRunSnapshot"]; [self.view presentScene:game]; } }
+    else if([control isEqualToString:@"scoresPrev"] || [control isEqualToString:@"scoresNext"]){ self.leaderboardPage+=[control isEqualToString:@"scoresNext"]?1:-1; [self rebuild]; }
+    else if([control isEqualToString:@"settings"]) [self.view presentScene:[FrontendScene settingsSceneReturningTo:self]];
     else if([control isEqualToString:@"help"]) [self.view presentScene:[FrontendScene helpScene]];
     else if([control isEqualToString:@"back"]){ SKScene *destination=self.returnScene?:[FrontendScene homeScene]; self.returnScene=nil; [self.view presentScene:destination]; }
     else {

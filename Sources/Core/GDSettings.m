@@ -1,7 +1,7 @@
 #import "GDSettings.h"
 #if !GD_SETTINGS_TESTS
 #import <UIKit/UIKit.h>
-#import <AudioToolbox/AudioToolbox.h>
+#import "GDAudioFeedback.h"
 #endif
 
 static NSString * const GDAimKey = @"GummySettingsAimGuide";
@@ -31,30 +31,21 @@ static NSString * const GDSoundKey = @"GummySettingsSoundEffects";
 - (BOOL)soundEffectsEnabled { return [self.defaults boolForKey:GDSoundKey]; }
 - (void)setAimGuideEnabled:(BOOL)value { [self.defaults setBool:value forKey:GDAimKey]; }
 - (void)setHapticsEnabled:(BOOL)value { [self.defaults setBool:value forKey:GDHapticsKey]; }
-- (void)setSoundEffectsEnabled:(BOOL)value { [self.defaults setBool:value forKey:GDSoundKey]; }
-- (void)playFeedback:(GDFeedbackType)feedback {
+- (void)setSoundEffectsEnabled:(BOOL)value {
+    [self.defaults setBool:value forKey:GDSoundKey];
 #if !GD_SETTINGS_TESTS
-    if(feedback<GDFeedbackTap || feedback>GDFeedbackError) return;
-    if(self.soundEffectsEnabled) {
-        static SystemSoundID sounds[6];
-        static dispatch_once_t once;
-        dispatch_once(&once, ^{
-            NSArray<NSString *> *names=@[@"tap",@"shot",@"match",@"skill",@"game_over",@"error"];
-            for(NSUInteger i=0;i<names.count;i++) {
-                NSURL *url=[NSBundle.mainBundle URLForResource:names[i] withExtension:@"wav"];
-                OSStatus status=url?AudioServicesCreateSystemSoundID((__bridge CFURLRef)url, &sounds[i]):kAudioServicesSystemSoundUnspecifiedError;
-                if(status!=kAudioServicesNoError) NSLog(@"Could not load sound %@ (%d)",names[i],(int)status);
-            }
-        });
-        if(sounds[feedback]) AudioServicesPlaySystemSound(sounds[feedback]);
-#if DEBUG
-        if([NSProcessInfo.processInfo.arguments containsObject:@"-qa-feedback"]) NSLog(@"QA sound feedback=%ld id=%u",(long)feedback,(unsigned int)sounds[feedback]);
+    if(!value) [GDAudioFeedback.sharedPlayer stop];
 #endif
-    }
+}
+- (void)playFeedback:(GDFeedbackType)feedback { [self playFeedback:feedback intensity:.5]; }
+- (void)playFeedback:(GDFeedbackType)feedback intensity:(CGFloat)intensity {
+#if !GD_SETTINGS_TESTS
+    if(feedback<GDFeedbackTap || feedback>GDFeedbackWin) return;
+    if(self.soundEffectsEnabled) [GDAudioFeedback.sharedPlayer playFeedback:feedback intensity:intensity];
     if(self.hapticsEnabled) {
-        if(feedback==GDFeedbackError || feedback==GDFeedbackGameOver) {
+        if(feedback==GDFeedbackError || feedback==GDFeedbackGameOver || feedback==GDFeedbackWin) {
             UINotificationFeedbackGenerator *generator=[UINotificationFeedbackGenerator new];
-            [generator notificationOccurred:feedback==GDFeedbackError?UINotificationFeedbackTypeWarning:UINotificationFeedbackTypeError];
+            [generator notificationOccurred:feedback==GDFeedbackWin?UINotificationFeedbackTypeSuccess:(feedback==GDFeedbackError?UINotificationFeedbackTypeWarning:UINotificationFeedbackTypeError)];
         } else {
             UIImpactFeedbackGenerator *generator=[[UIImpactFeedbackGenerator alloc] initWithStyle:feedback==GDFeedbackTap?UIImpactFeedbackStyleLight:UIImpactFeedbackStyleSoft];
             [generator impactOccurred];

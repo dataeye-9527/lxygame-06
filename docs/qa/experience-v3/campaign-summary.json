@@ -1,0 +1,52 @@
+{
+  "allWon": true,
+  "levels": 30,
+  "campaignAssertions": 8043,
+  "focusedCoreAssertions": 661,
+  "uniqueOpeningColorHashes": 30,
+  "uniqueOpeningTopologies": 28,
+  "authoredWaves": 50,
+  "minimumShots": 6,
+  "maximumShots": 45,
+  "allHaveThreeStarWitness": true,
+  "levelsWithoutThreeStarWitness": [],
+  "survivalIdle": [
+    {
+      "level": 4,
+      "failureElapsed": 48.0,
+      "target": 58
+    },
+    {
+      "level": 9,
+      "failureElapsed": 46.0,
+      "target": 65
+    },
+    {
+      "level": 14,
+      "failureElapsed": 43.0,
+      "target": 72
+    },
+    {
+      "level": 19,
+      "failureElapsed": 41.0,
+      "target": 79
+    },
+    {
+      "level": 24,
+      "failureElapsed": 38.0,
+      "target": 86
+    },
+    {
+      "level": 29,
+      "failureElapsed": 36.0,
+      "target": 93
+    }
+  ],
+  "catalogSHA256": "ba8b12e564bd1f6e57fa08dfa42ee3d890acb949418eab2d6284a37db2f40a49",
+  "measurement": {
+    "projectileSpeed": 1250,
+    "resolutionSeconds": 0.38,
+    "perTurnMinimumSeconds": 2,
+    "terminalStopsClock": true
+  }
+}

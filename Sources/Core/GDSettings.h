@@ -3,7 +3,9 @@
 NS_ASSUME_NONNULL_BEGIN
 typedef NS_ENUM(NSInteger, GDFeedbackType) {
     GDFeedbackTap, GDFeedbackShot, GDFeedbackMatch,
-    GDFeedbackSkill, GDFeedbackGameOver, GDFeedbackError
+    GDFeedbackSkill, GDFeedbackGameOver, GDFeedbackError,
+    GDFeedbackFall, GDFeedbackCombo, GDFeedbackFreeze, GDFeedbackBlast,
+    GDFeedbackSweep, GDFeedbackWild, GDFeedbackReady, GDFeedbackWin
 };
 
 @interface GDSettings : NSObject
@@ -13,5 +15,6 @@ typedef NS_ENUM(NSInteger, GDFeedbackType) {
 + (instancetype)sharedSettings;
 - (instancetype)initWithDefaults:(NSUserDefaults *)defaults;
 - (void)playFeedback:(GDFeedbackType)feedback;
+- (void)playFeedback:(GDFeedbackType)feedback intensity:(CGFloat)intensity;
 @end
 NS_ASSUME_NONNULL_END

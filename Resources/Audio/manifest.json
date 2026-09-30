@@ -1,0 +1,98 @@
+{
+  "sampleRate": 44100,
+  "channels": 1,
+  "bits": 16,
+  "originalSynthesis": true,
+  "effects": {
+    "tap": {
+      "duration": 0.16,
+      "peak": 0.29599,
+      "rms": 0.06071,
+      "clippedSamples": 0
+    },
+    "shot": {
+      "duration": 0.24,
+      "peak": 0.39075,
+      "rms": 0.08059,
+      "clippedSamples": 0
+    },
+    "match": {
+      "duration": 0.34,
+      "peak": 0.52893,
+      "rms": 0.10883,
+      "clippedSamples": 0
+    },
+    "match_alt": {
+      "duration": 0.34,
+      "peak": 0.54028,
+      "rms": 0.11079,
+      "clippedSamples": 0
+    },
+    "fall": {
+      "duration": 0.46,
+      "peak": 0.55801,
+      "rms": 0.08726,
+      "clippedSamples": 0
+    },
+    "combo": {
+      "duration": 0.47,
+      "peak": 0.50854,
+      "rms": 0.10744,
+      "clippedSamples": 0
+    },
+    "freeze": {
+      "duration": 0.54,
+      "peak": 0.41687,
+      "rms": 0.07224,
+      "clippedSamples": 0
+    },
+    "blast": {
+      "duration": 0.48,
+      "peak": 0.67999,
+      "rms": 0.09027,
+      "clippedSamples": 0
+    },
+    "sweep": {
+      "duration": 0.47,
+      "peak": 0.67999,
+      "rms": 0.10331,
+      "clippedSamples": 0
+    },
+    "wild": {
+      "duration": 0.6,
+      "peak": 0.45087,
+      "rms": 0.09481,
+      "clippedSamples": 0
+    },
+    "ready": {
+      "duration": 0.42,
+      "peak": 0.31924,
+      "rms": 0.0692,
+      "clippedSamples": 0
+    },
+    "win": {
+      "duration": 0.83,
+      "peak": 0.42004,
+      "rms": 0.09189,
+      "clippedSamples": 0
+    },
+    "game_over": {
+      "duration": 0.61,
+      "peak": 0.30679,
+      "rms": 0.07578,
+      "clippedSamples": 0
+    },
+    "error": {
+      "duration": 0.18,
+      "peak": 0.22214,
+      "rms": 0.04679,
+      "clippedSamples": 0
+    },
+    "skill": {
+      "duration": 0.48,
+      "peak": 0.31747,
+      "rms": 0.07619,
+      "clippedSamples": 0
+    }
+  }
+}

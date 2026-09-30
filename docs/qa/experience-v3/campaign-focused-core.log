@@ -1,0 +1,5 @@
+2026-09-30 15:51:28.159 core_tests[62960:910358] Dense angle sweep valid=453/453 direct=318 targets L/C/R=17/21/20
+2026-09-30 15:51:29.297 core_tests[62960:910358] PASS: geometry, density, prediction and bounce fixtures
+2026-09-30 15:51:29.336 core_tests[62960:910358] PASS: matching, support, energy and four skills fixtures
+2026-09-30 15:51:29.374 core_tests[62960:910358] PASS: queue, pressure priority, pause and cold-restore fixtures
+2026-09-30 15:51:29.374 core_tests[62960:910358] PASS: focused core validation (661 assertions)
