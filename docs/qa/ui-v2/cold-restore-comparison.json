@@ -1,0 +1,21 @@
+{
+  "seed": true,
+  "rng": true,
+  "board": true,
+  "rowPhase": true,
+  "current": true,
+  "next": true,
+  "held": true,
+  "holdUsed": true,
+  "launcher": true,
+  "wild": true,
+  "score": true,
+  "energy": true,
+  "pressure": true,
+  "pending": true,
+  "freeze": true,
+  "elapsed": true,
+  "difficulty": true,
+  "stats": true,
+  "operations": true
+}

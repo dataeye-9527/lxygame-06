@@ -1,0 +1,11 @@
+Debug
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project GummyDrop.xcodeproj -scheme GummyDrop -configuration Debug -sdk iphonesimulator -destination "generic/platform=iOS Simulator" -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO build
+** BUILD SUCCEEDED **
+
+Release
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project GummyDrop.xcodeproj -scheme GummyDrop -configuration Release -sdk iphonesimulator -destination "generic/platform=iOS Simulator" -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO build
+/Users/edy/Documents/ChatGPT/lxygame-06/Sources/UI/GameScene.m:43:14: warning: unused variable 'args' [-Wunused-variable]
+/Users/edy/Documents/ChatGPT/lxygame-06/Sources/UI/GameScene.m:43:14: warning: unused variable 'args' [-Wunused-variable]
+** BUILD SUCCEEDED **

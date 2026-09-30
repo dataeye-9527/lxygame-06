@@ -1,0 +1,266 @@
+{
+  "generator": "built-in image_gen",
+  "styleReference": "docs/art/gummy-gameplay-v1.png",
+  "assets": [
+    {
+      "id": "gummy_blue",
+      "source": "docs/art/generated-sources/gummy_blue-source.png",
+      "file": "Resources/Images/gummy_blue.png",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "trimBox": [
+        71,
+        80,
+        1183,
+        1189
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "opaqueBounds": [
+        13,
+        13,
+        243,
+        242
+      ],
+      "alphaMinMax": [
+        0,
+        255
+      ],
+      "sha256": "a8c86368bfdf2da2319856e03615c71b5748bdc2cb36e92dc539e5c76f92a2c1",
+      "mode": "RGBA",
+      "alphaZeroPixels": 23465,
+      "alphaFullPixels": 519,
+      "alphaPartialPixels": 41552,
+      "byteSize": 75297
+    },
+    {
+      "id": "gummy_red",
+      "source": "docs/art/generated-sources/gummy_red-source.png",
+      "file": "Resources/Images/gummy_red.png",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "trimBox": [
+        80,
+        87,
+        1168,
+        1172
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "opaqueBounds": [
+        13,
+        13,
+        243,
+        242
+      ],
+      "alphaMinMax": [
+        0,
+        255
+      ],
+      "sha256": "830a0d8fec2195f701706a7a30e1471ad6ebacfd647847b1dc5ef8af035ef92e",
+      "mode": "RGBA",
+      "alphaZeroPixels": 23546,
+      "alphaFullPixels": 525,
+      "alphaPartialPixels": 41465,
+      "byteSize": 69083
+    },
+    {
+      "id": "gummy_yellow",
+      "source": "docs/art/generated-sources/gummy_yellow-source.png",
+      "file": "Resources/Images/gummy_yellow.png",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "trimBox": [
+        66,
+        65,
+        1184,
+        1185
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "opaqueBounds": [
+        13,
+        13,
+        243,
+        243
+      ],
+      "alphaMinMax": [
+        0,
+        255
+      ],
+      "sha256": "487272b30c04656b4342f03aa419b47c4e128a3faa0e162d86ac34ce0cdadcb7",
+      "mode": "RGBA",
+      "alphaZeroPixels": 23453,
+      "alphaFullPixels": 522,
+      "alphaPartialPixels": 41561,
+      "byteSize": 68685
+    },
+    {
+      "id": "gummy_white",
+      "source": "docs/art/generated-sources/gummy_white-source.png",
+      "file": "Resources/Images/gummy_white.png",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "trimBox": [
+        79,
+        82,
+        1173,
+        1176
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "opaqueBounds": [
+        13,
+        13,
+        243,
+        243
+      ],
+      "alphaMinMax": [
+        0,
+        255
+      ],
+      "sha256": "89d250faeb796e1d51ae06c35571269aa2fe1f2aba69d4b60904db95c69ece87",
+      "mode": "RGBA",
+      "alphaZeroPixels": 23313,
+      "alphaFullPixels": 531,
+      "alphaPartialPixels": 41692,
+      "byteSize": 56938
+    },
+    {
+      "id": "wild_icon",
+      "source": "docs/art/generated-sources/wild_icon-source.png",
+      "file": "Resources/Images/wild_icon.png",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "trimBox": [
+        88,
+        126,
+        1166,
+        1132
+      ],
+      "size": [
+        128,
+        128
+      ],
+      "alphaMinMax": [
+        0,
+        255
+      ],
+      "sha256": "5c9426147afbd6e3010f0c6ed06ba98e89dedf0d44e1ff9d6a7a100f5aa9b5e2",
+      "mode": "RGBA",
+      "alphaZeroPixels": 9413,
+      "alphaFullPixels": 248,
+      "alphaPartialPixels": 6723,
+      "byteSize": 13013
+    },
+    {
+      "id": "candy_background",
+      "source": "docs/art/generated-sources/candy_background-source.png",
+      "file": "Resources/Images/candy_background.png",
+      "sourceSize": [
+        1665,
+        944
+      ],
+      "trimBox": null,
+      "size": [
+        1200,
+        680
+      ],
+      "alphaMinMax": [
+        255,
+        255
+      ],
+      "sha256": "d4e0e80d0c0a0e12894b6409570d262b821a1bf5af1a0261643fcc264eb4cdca",
+      "mode": "RGBA",
+      "alphaZeroPixels": 0,
+      "alphaFullPixels": 816000,
+      "alphaPartialPixels": 0,
+      "byteSize": 763203
+    },
+    {
+      "id": "cannon",
+      "source": "docs/art/generated-sources/cannon-source.png",
+      "file": "Resources/Images/cannon.png",
+      "sourceSize": [
+        1363,
+        1154
+      ],
+      "trimBox": [
+        99,
+        167,
+        1261,
+        1019
+      ],
+      "size": [
+        320,
+        280
+      ],
+      "opaqueBounds": [
+        16,
+        34,
+        304,
+        245
+      ],
+      "alphaMinMax": [
+        0,
+        255
+      ],
+      "sha256": "824fbeb2064ec926844bb4618d6e617fa3a09d1c3c548a4015ab636fbfc8d510",
+      "mode": "RGBA",
+      "alphaZeroPixels": 44548,
+      "alphaFullPixels": 683,
+      "alphaPartialPixels": 44369,
+      "byteSize": 64389
+    },
+    {
+      "id": "menu_hero",
+      "source": "docs/art/generated-sources/menu_hero-source.png",
+      "file": "Resources/Images/menu_hero.png",
+      "sourceSize": [
+        1448,
+        1086
+      ],
+      "trimBox": null,
+      "size": [
+        640,
+        480
+      ],
+      "opaqueBounds": [
+        118,
+        29,
+        520,
+        461
+      ],
+      "alphaMinMax": [
+        0,
+        255
+      ],
+      "sha256": "cd0cb8cea55e9c987ab991e02f3cc7c0599c7f9ea81c9818f65b3904bee4c0dd",
+      "mode": "RGBA",
+      "alphaZeroPixels": 200107,
+      "alphaFullPixels": 1443,
+      "alphaPartialPixels": 105650,
+      "byteSize": 194961,
+      "usage": "Home focal illustration; no baked UI; horizontal canvas with tall compact composition",
+      "export": "Uniform full-canvas LANCZOS downscale; original alpha preserved"
+    }
+  ]
+}

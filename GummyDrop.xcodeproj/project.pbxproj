@@ -1,0 +1,482 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0269E9F53FD478CA96A57AC7 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 905025C4FEBBFCB841184C93 /* CoreGraphics.framework */; };
+		0BF2195AAFD706A3E026C715 /* skill.wav in Resources */ = {isa = PBXBuildFile; fileRef = 33D86336EED43E49D733888B /* skill.wav */; };
+		19F376E80C39FC5FD05C23A4 /* SpriteKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25FFFF186C73E95F1040EF1F /* SpriteKit.framework */; };
+		1CA56B1A2725E928201141BF /* GameScene.m in Sources */ = {isa = PBXBuildFile; fileRef = EC7BB04664622FFF5AA15840 /* GameScene.m */; };
+		1F95B57C42B332C44E136562 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B40EB94ABAB55D0E0F431C7D /* UIKit.framework */; };
+		22B5955043DF5B53384096B3 /* tap.wav in Resources */ = {isa = PBXBuildFile; fileRef = 89CA24DCC01955D7ABF7561F /* tap.wav */; };
+		2A882A02CDF7CD9B76F367E9 /* cannon.png in Resources */ = {isa = PBXBuildFile; fileRef = CD599F0572A5C0DC81566AAC /* cannon.png */; };
+		409A72FE72C70DAA04F634A3 /* candy_background.png in Resources */ = {isa = PBXBuildFile; fileRef = 45E16096C3E3255B8380DA48 /* candy_background.png */; };
+		48CD53EF0A738D54630195B0 /* menu_hero.png in Resources */ = {isa = PBXBuildFile; fileRef = 2437D292004EF37F05D7648A /* menu_hero.png */; };
+		6AB8CCB970174F0A0DEA142D /* shot.wav in Resources */ = {isa = PBXBuildFile; fileRef = 782A2B01D3DA2BBC0877CCD7 /* shot.wav */; };
+		872658176964791DC007DE73 /* game_over.wav in Resources */ = {isa = PBXBuildFile; fileRef = 61109488FB96A3B351A03920 /* game_over.wav */; };
+		9AC2977B62862F4B7F361E93 /* wild_icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 539372B81C89FDFC996C0C45 /* wild_icon.png */; };
+		9E5374FE4D8B3C91E2C1E654 /* match.wav in Resources */ = {isa = PBXBuildFile; fileRef = 4D027C79FE5BA7105A8F092D /* match.wav */; };
+		A24BA7A082D39BB680B1A1F2 /* GummyUI.m in Sources */ = {isa = PBXBuildFile; fileRef = 80C19E204A7E5BD7601E3F27 /* GummyUI.m */; };
+		A84031A3D5EE4C4BA9471806 /* GDEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = AF6639D30BE5211B884C355C /* GDEngine.m */; };
+		AAD281235EDD3B8A8C006130 /* gummy_white.png in Resources */ = {isa = PBXBuildFile; fileRef = 37FCE4549BECC6409A28CE39 /* gummy_white.png */; };
+		B40192562720142421662CF4 /* gummy_red.png in Resources */ = {isa = PBXBuildFile; fileRef = D72F14DCD0D60E92605BEF1D /* gummy_red.png */; };
+		C7D9ABC40AFF2DDC82E146A2 /* gummy_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = EC38EA19EA9A429851876C1E /* gummy_blue.png */; };
+		CAC41297E9AF04EDE0CC35C7 /* GDSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = E838D7D21BBEF2D8D86B2CAA /* GDSettings.m */; };
+		CC19F4F43EB24C6FBFDECF3C /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 89B4AB1508199764BAAE9035 /* AppDelegate.m */; };
+		CE89D5045C5EA6EFAD5BFAD1 /* FrontendScene.m in Sources */ = {isa = PBXBuildFile; fileRef = 72B0AA38080E279633E794D5 /* FrontendScene.m */; };
+		DC66992829FF71A3C9978E6D /* gummy_yellow.png in Resources */ = {isa = PBXBuildFile; fileRef = D3D21F3B1CB155CF2E6FCA5C /* gummy_yellow.png */; };
+		EF4C38E5F80D247F56662AFA /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D06F0BB4AA7B142D9005BBE1 /* AudioToolbox.framework */; };
+		EF7C5A17B22BD8AD8BEB3D2C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FA4195A577DBC1107376CEE1 /* main.m */; };
+		F8D645FE52D3B5157A890477 /* error.wav in Resources */ = {isa = PBXBuildFile; fileRef = D49D9D946030B60D52CBCC2C /* error.wav */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1C275140B8FC3FA6529D4956 /* GummyDrop.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = GummyDrop.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2437D292004EF37F05D7648A /* menu_hero.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_hero.png; sourceTree = "<group>"; };
+		25FFFF186C73E95F1040EF1F /* SpriteKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SpriteKit.framework; path = System/Library/Frameworks/SpriteKit.framework; sourceTree = SDKROOT; };
+		30FA82514F83FD4FB0BD666F /* GameScene.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GameScene.h; sourceTree = "<group>"; };
+		33D86336EED43E49D733888B /* skill.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = skill.wav; sourceTree = "<group>"; };
+		37FCE4549BECC6409A28CE39 /* gummy_white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = gummy_white.png; sourceTree = "<group>"; };
+		3B816389930A59956E92D792 /* GummyUI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GummyUI.h; sourceTree = "<group>"; };
+		45E16096C3E3255B8380DA48 /* candy_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = candy_background.png; sourceTree = "<group>"; };
+		4D027C79FE5BA7105A8F092D /* match.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = match.wav; sourceTree = "<group>"; };
+		539372B81C89FDFC996C0C45 /* wild_icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = wild_icon.png; sourceTree = "<group>"; };
+		5A28AB58ED4155C2CC91FA8C /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		61109488FB96A3B351A03920 /* game_over.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = game_over.wav; sourceTree = "<group>"; };
+		72B0AA38080E279633E794D5 /* FrontendScene.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FrontendScene.m; sourceTree = "<group>"; };
+		74C183E99AE580D8352A2811 /* GDEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GDEngine.h; sourceTree = "<group>"; };
+		782A2B01D3DA2BBC0877CCD7 /* shot.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = shot.wav; sourceTree = "<group>"; };
+		78572DC3C066FB6E345D5B5A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		80C19E204A7E5BD7601E3F27 /* GummyUI.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GummyUI.m; sourceTree = "<group>"; };
+		89B4AB1508199764BAAE9035 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		89CA24DCC01955D7ABF7561F /* tap.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = tap.wav; sourceTree = "<group>"; };
+		905025C4FEBBFCB841184C93 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		9940739B8D4FADE2A31A5E01 /* FrontendScene.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FrontendScene.h; sourceTree = "<group>"; };
+		AD53D748C9A7C4A35EBB0645 /* GDSettings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GDSettings.h; sourceTree = "<group>"; };
+		AF6639D30BE5211B884C355C /* GDEngine.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GDEngine.m; sourceTree = "<group>"; };
+		B40EB94ABAB55D0E0F431C7D /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		CD599F0572A5C0DC81566AAC /* cannon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cannon.png; sourceTree = "<group>"; };
+		D06F0BB4AA7B142D9005BBE1 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		D3D21F3B1CB155CF2E6FCA5C /* gummy_yellow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = gummy_yellow.png; sourceTree = "<group>"; };
+		D49D9D946030B60D52CBCC2C /* error.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = error.wav; sourceTree = "<group>"; };
+		D72F14DCD0D60E92605BEF1D /* gummy_red.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = gummy_red.png; sourceTree = "<group>"; };
+		E838D7D21BBEF2D8D86B2CAA /* GDSettings.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GDSettings.m; sourceTree = "<group>"; };
+		EC38EA19EA9A429851876C1E /* gummy_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = gummy_blue.png; sourceTree = "<group>"; };
+		EC7BB04664622FFF5AA15840 /* GameScene.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GameScene.m; sourceTree = "<group>"; };
+		FA4195A577DBC1107376CEE1 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4CB6F6E1B4BD39AF7120EE58 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				19F376E80C39FC5FD05C23A4 /* SpriteKit.framework in Frameworks */,
+				1F95B57C42B332C44E136562 /* UIKit.framework in Frameworks */,
+				0269E9F53FD478CA96A57AC7 /* CoreGraphics.framework in Frameworks */,
+				EF4C38E5F80D247F56662AFA /* AudioToolbox.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		041145BA92CDD5DBE06F9A85 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				74C183E99AE580D8352A2811 /* GDEngine.h */,
+				AF6639D30BE5211B884C355C /* GDEngine.m */,
+				AD53D748C9A7C4A35EBB0645 /* GDSettings.h */,
+				E838D7D21BBEF2D8D86B2CAA /* GDSettings.m */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		13139B67B72417489B663A08 /* Audio */ = {
+			isa = PBXGroup;
+			children = (
+				D49D9D946030B60D52CBCC2C /* error.wav */,
+				61109488FB96A3B351A03920 /* game_over.wav */,
+				4D027C79FE5BA7105A8F092D /* match.wav */,
+				782A2B01D3DA2BBC0877CCD7 /* shot.wav */,
+				33D86336EED43E49D733888B /* skill.wav */,
+				89CA24DCC01955D7ABF7561F /* tap.wav */,
+			);
+			path = Audio;
+			sourceTree = "<group>";
+		};
+		2F34DDD5C40639313DC77C74 /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				45E16096C3E3255B8380DA48 /* candy_background.png */,
+				CD599F0572A5C0DC81566AAC /* cannon.png */,
+				EC38EA19EA9A429851876C1E /* gummy_blue.png */,
+				D72F14DCD0D60E92605BEF1D /* gummy_red.png */,
+				37FCE4549BECC6409A28CE39 /* gummy_white.png */,
+				D3D21F3B1CB155CF2E6FCA5C /* gummy_yellow.png */,
+				2437D292004EF37F05D7648A /* menu_hero.png */,
+				539372B81C89FDFC996C0C45 /* wild_icon.png */,
+			);
+			path = Images;
+			sourceTree = "<group>";
+		};
+		4D54974C53CB8303248D069D /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				9940739B8D4FADE2A31A5E01 /* FrontendScene.h */,
+				72B0AA38080E279633E794D5 /* FrontendScene.m */,
+				30FA82514F83FD4FB0BD666F /* GameScene.h */,
+				EC7BB04664622FFF5AA15840 /* GameScene.m */,
+				3B816389930A59956E92D792 /* GummyUI.h */,
+				80C19E204A7E5BD7601E3F27 /* GummyUI.m */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		A0FF068E74536EE2A1C045D6 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				5A28AB58ED4155C2CC91FA8C /* AppDelegate.h */,
+				89B4AB1508199764BAAE9035 /* AppDelegate.m */,
+				78572DC3C066FB6E345D5B5A /* Info.plist */,
+				FA4195A577DBC1107376CEE1 /* main.m */,
+				041145BA92CDD5DBE06F9A85 /* Core */,
+				4D54974C53CB8303248D069D /* UI */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		AE1C08C27330943E5F8EFFD4 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				13139B67B72417489B663A08 /* Audio */,
+				2F34DDD5C40639313DC77C74 /* Images */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		C4E472A11CD9122F5A645EB5 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1C275140B8FC3FA6529D4956 /* GummyDrop.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C872D2A04DAA02A51CE0101B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D06F0BB4AA7B142D9005BBE1 /* AudioToolbox.framework */,
+				905025C4FEBBFCB841184C93 /* CoreGraphics.framework */,
+				25FFFF186C73E95F1040EF1F /* SpriteKit.framework */,
+				B40EB94ABAB55D0E0F431C7D /* UIKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		EC343FACF6E6C8CDCAA3FFFA = {
+			isa = PBXGroup;
+			children = (
+				AE1C08C27330943E5F8EFFD4 /* Resources */,
+				A0FF068E74536EE2A1C045D6 /* Sources */,
+				C872D2A04DAA02A51CE0101B /* Frameworks */,
+				C4E472A11CD9122F5A645EB5 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6A278DA53FA0DFF6A872039F /* GummyDrop */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D21BB5F49F560D514D6AFC7E /* Build configuration list for PBXNativeTarget "GummyDrop" */;
+			buildPhases = (
+				1E287AFFD835C9F5DCEA8102 /* Sources */,
+				7F4720506B1A8393D8D2EE0E /* Resources */,
+				4CB6F6E1B4BD39AF7120EE58 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = GummyDrop;
+			packageProductDependencies = (
+			);
+			productName = GummyDrop;
+			productReference = 1C275140B8FC3FA6529D4956 /* GummyDrop.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		61986D5119EB7BD2D471DA48 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					6A278DA53FA0DFF6A872039F = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 8ADF8FBD9A813E62C84E46C8 /* Build configuration list for PBXProject "GummyDrop" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = EC343FACF6E6C8CDCAA3FFFA;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = C4E472A11CD9122F5A645EB5 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6A278DA53FA0DFF6A872039F /* GummyDrop */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		7F4720506B1A8393D8D2EE0E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				409A72FE72C70DAA04F634A3 /* candy_background.png in Resources */,
+				2A882A02CDF7CD9B76F367E9 /* cannon.png in Resources */,
+				F8D645FE52D3B5157A890477 /* error.wav in Resources */,
+				872658176964791DC007DE73 /* game_over.wav in Resources */,
+				C7D9ABC40AFF2DDC82E146A2 /* gummy_blue.png in Resources */,
+				B40192562720142421662CF4 /* gummy_red.png in Resources */,
+				AAD281235EDD3B8A8C006130 /* gummy_white.png in Resources */,
+				DC66992829FF71A3C9978E6D /* gummy_yellow.png in Resources */,
+				9E5374FE4D8B3C91E2C1E654 /* match.wav in Resources */,
+				48CD53EF0A738D54630195B0 /* menu_hero.png in Resources */,
+				6AB8CCB970174F0A0DEA142D /* shot.wav in Resources */,
+				0BF2195AAFD706A3E026C715 /* skill.wav in Resources */,
+				22B5955043DF5B53384096B3 /* tap.wav in Resources */,
+				9AC2977B62862F4B7F361E93 /* wild_icon.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1E287AFFD835C9F5DCEA8102 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CC19F4F43EB24C6FBFDECF3C /* AppDelegate.m in Sources */,
+				CE89D5045C5EA6EFAD5BFAD1 /* FrontendScene.m in Sources */,
+				A84031A3D5EE4C4BA9471806 /* GDEngine.m in Sources */,
+				CAC41297E9AF04EDE0CC35C7 /* GDSettings.m in Sources */,
+				1CA56B1A2725E928201141BF /* GameScene.m in Sources */,
+				A24BA7A082D39BB680B1A1F2 /* GummyUI.m in Sources */,
+				EF7C5A17B22BD8AD8BEB3D2C /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		33D842FE94CE6D6F691CDF7B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/Sources/Core $(SRCROOT)/Sources/UI";
+				INFOPLIST_FILE = Sources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		4168219A5A539BE29CE470D2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Sources/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lxygame.gummydrop.prototype;
+				PRODUCT_NAME = GummyDrop;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BFB2070BD260116786DB9290 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Sources/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lxygame.gummydrop.prototype;
+				PRODUCT_NAME = GummyDrop;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		BFF9D3192D7966C0A7EB918E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/Sources/Core $(SRCROOT)/Sources/UI";
+				INFOPLIST_FILE = Sources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		8ADF8FBD9A813E62C84E46C8 /* Build configuration list for PBXProject "GummyDrop" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4168219A5A539BE29CE470D2 /* Debug */,
+				BFB2070BD260116786DB9290 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D21BB5F49F560D514D6AFC7E /* Build configuration list for PBXNativeTarget "GummyDrop" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BFF9D3192D7966C0A7EB918E /* Debug */,
+				33D842FE94CE6D6F691CDF7B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 61986D5119EB7BD2D471DA48 /* Project object */;
+}

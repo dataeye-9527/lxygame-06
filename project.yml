@@ -1,0 +1,37 @@
+name: GummyDrop
+options:
+  bundleIdPrefix: com.lxygame
+  deploymentTarget:
+    iOS: '15.0'
+settings:
+  base:
+    CLANG_ENABLE_MODULES: YES
+    CLANG_ENABLE_OBJC_ARC: YES
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: ''
+    TARGETED_DEVICE_FAMILY: '1,2'
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    GENERATE_INFOPLIST_FILE: NO
+    INFOPLIST_FILE: Sources/Info.plist
+    PRODUCT_BUNDLE_IDENTIFIER: com.lxygame.gummydrop.prototype
+    PRODUCT_NAME: GummyDrop
+    MARKETING_VERSION: '0.1.0'
+    CURRENT_PROJECT_VERSION: '1'
+targets:
+  GummyDrop:
+    type: application
+    platform: iOS
+    sources:
+      - Sources
+      - path: Resources
+        buildPhase: resources
+    settings:
+      base:
+        HEADER_SEARCH_PATHS: '$(SRCROOT)/Sources/Core $(SRCROOT)/Sources/UI'
+    dependencies:
+      - sdk: SpriteKit.framework
+      - sdk: UIKit.framework
+      - sdk: CoreGraphics.framework
+      - sdk: AudioToolbox.framework
+    scheme:
+      gatherCoverageData: false
