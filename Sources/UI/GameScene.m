@@ -174,22 +174,22 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     } else self.objectiveLabel.text=[NSString stringWithFormat:@"WAVE %ld",(long)self.engine.wave];
     self.timerLabel.fontColor=frozen?[UIColor colorWithRed:.05 green:.45 blue:.73 alpha:1]:Ink();
     for(NSInteger i=0;i<4;i++){
-        NSInteger energy=self.engine.energy[i].integerValue; CGFloat amount=MAX(0,MIN(1,(CGFloat)energy/self.engine.energyThreshold));
+        NSInteger energy=self.engine.energy[i].integerValue, threshold=[self.engine energyThresholdForColor:i]; CGFloat amount=MAX(0,MIN(1,(CGFloat)energy/threshold));
         CGPathRef path=CGPathCreateWithRoundedRect(CGRectMake(0,-5.5,MAX(1,106*amount),11),5,5,NULL); self.energyFills[i].path=path; CGPathRelease(path);
-        self.energyLabels[i].text=energy>=self.engine.energyThreshold?@"READY":[NSString stringWithFormat:@"%ld/%ld",(long)energy,(long)self.engine.energyThreshold];
+        self.energyLabels[i].text=energy>=threshold?@"READY":[NSString stringWithFormat:@"%ld/%ld",(long)energy,(long)threshold];
         self.energyLabels[i].fontColor=Ink();
         NSInteger previous=self.displayedEnergy[i].integerValue;
         if(energy>previous){
             [self pulse:self.energyFills[i] amount:1.13];
             [self floatingText:[NSString stringWithFormat:@"+%ld",(long)(energy-previous)] at:CGPointMake(126,552-i*146-11) color:[GummyUI color:i] size:17 layer:self.hud];
         }
-        if(energy>=self.engine.energyThreshold && previous<self.engine.energyThreshold){ [self pulse:self.skillCards[i] amount:1.06]; [GDSettings.sharedSettings playFeedback:GDFeedbackReady]; }
+        if(energy>=threshold && previous<threshold){ [self pulse:self.skillCards[i] amount:1.06]; [GDSettings.sharedSettings playFeedback:GDFeedbackReady]; }
         if(i==GDColorBlue && frozen) self.energyLabels[i].text=[NSString stringWithFormat:@"%.0fs",ceil(self.engine.freezeRemaining)];
         if(i==GDColorRed && self.engine.blastArmed) self.energyLabels[i].text=@"AIM";
         if(i==GDColorWhite && self.engine.wildRemaining>0) self.energyLabels[i].text=[NSString stringWithFormat:@"%ld SHOTS",(long)self.engine.wildRemaining];
         SKNode *ready=[self.skillCards[i] childNodeWithName:@"readyOutline"];
-        if(energy>=self.engine.energyThreshold && !ready){ SKShapeNode *outline=[GummyUI panel:CGSizeMake(126,134) fill:UIColor.clearColor stroke:[GummyUI color:i] radius:19]; outline.name=@"readyOutline"; outline.lineWidth=3; outline.zPosition=3; [self.skillCards[i] addChild:outline]; }
-        else if(energy<self.engine.energyThreshold) [ready removeFromParent];
+        if(energy>=threshold && !ready){ SKShapeNode *outline=[GummyUI panel:CGSizeMake(126,134) fill:UIColor.clearColor stroke:[GummyUI color:i] radius:19]; outline.name=@"readyOutline"; outline.lineWidth=3; outline.zPosition=3; [self.skillCards[i] addChild:outline]; }
+        else if(energy<threshold) [ready removeFromParent];
         self.skillCards[i].alpha=self.engine.phase==GDPhaseReady?1:.7;
     }
     self.displayedEnergy=[self.engine.energy copy];
@@ -247,7 +247,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
         NSInteger i=[[control substringFromIndex:5] integerValue];
         if(i==GDColorYellow){
             if(self.yellowArmed){ self.yellowArmed=NO; GDEvent *event=[self.engine activateYellow]; if(event){ [GDSettings.sharedSettings playFeedback:GDFeedbackSweep]; [self animateEvent:event]; } }
-            else if(self.engine.energy[GDColorYellow].integerValue>=self.engine.energyThreshold){ self.yellowArmed=YES; [self highlightCells:[self.engine yellowTargets] color:[GummyUI color:GDColorYellow]]; }
+            else if(self.engine.energy[GDColorYellow].integerValue>=[self.engine energyThresholdForColor:GDColorYellow]){ self.yellowArmed=YES; [self highlightCells:[self.engine yellowTargets] color:[GummyUI color:GDColorYellow]]; }
         } else { self.yellowArmed=NO; if([self.engine activateSkill:i]){ [GDSettings.sharedSettings playFeedback:i==GDColorBlue?GDFeedbackFreeze:(i==GDColorRed?GDFeedbackTap:GDFeedbackWild)]; [self skillEffect:i]; } }
     }
     [self refreshHUD];
@@ -317,7 +317,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
         [self highlightCells:self.preview.expectedMatches color:color];
         self.statusLabel.text=self.engine.wildRemaining>0?[NSString stringWithFormat:@"WILD  ·  %ld match",(long)self.preview.expectedMatches.count]:@"";
     } else if(self.preview.valid && self.preview.hitCell){
-        CGPoint p=ScenePoint([self.engine centerOfCell:self.preview.hitCell]); SKShapeNode *blast=[SKShapeNode shapeNodeWithCircleOfRadius:65]; blast.position=p; blast.strokeColor=[GummyUI color:GDColorRed]; blast.fillColor=[[GummyUI color:GDColorRed] colorWithAlphaComponent:.14]; blast.lineWidth=2; [self.aimLayer addChild:blast]; self.statusLabel.text=@"BLAST";
+        CGPoint p=ScenePoint([self.engine centerOfCell:self.preview.hitCell]); SKShapeNode *blast=[SKShapeNode shapeNodeWithCircleOfRadius:self.engine.blastRadius+self.engine.radius]; blast.position=p; blast.strokeColor=[GummyUI color:GDColorRed]; blast.fillColor=[[GummyUI color:GDColorRed] colorWithAlphaComponent:.14]; blast.lineWidth=2; [self.aimLayer addChild:blast]; [self highlightCells:self.preview.expectedMatches color:[GummyUI color:GDColorRed]]; self.statusLabel.text=@"BLAST";
     } else self.statusLabel.text=@"Drag up to aim  ·  Release below cannons to cancel";
 #if DEBUG
     if([NSProcessInfo.processInfo.arguments containsObject:@"-qa-feedback"]) NSLog(@"QA aim guide enabled=1 nodes=%lu valid=%d",(unsigned long)self.aimLayer.children.count,self.preview.valid);
@@ -370,7 +370,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
         [rim runAction:[SKAction sequence:@[[SKAction fadeAlphaTo:.3 duration:.18],[SKAction fadeAlphaTo:.8 duration:.12],[SKAction fadeOutWithDuration:.32],[SKAction removeFromParent]]]];
         [self burstAt:CGPointMake(604,645) radius:28 color:[GummyUI color:color]];
     } else if(color==GDColorWhite){
-        for(NSInteger i=0;i<3;i++){ SKNode *star=[GummyUI image:@"wild_icon" size:CGSizeMake(18,18)]; if(!star) continue; star.position=CGPointMake(self.currentPiece.position.x+(i-1)*27,self.currentPiece.position.y+40); [self.effects addChild:star]; [star runAction:[SKAction sequence:@[[SKAction group:@[[SKAction moveByX:0 y:24 duration:.5],[SKAction fadeOutWithDuration:.5]]],[SKAction removeFromParent]]]]; }
+        for(NSInteger i=0;i<self.engine.wildRemaining;i++){ SKNode *star=[GummyUI image:@"wild_icon" size:CGSizeMake(18,18)]; if(!star) continue; star.position=CGPointMake(self.currentPiece.position.x+(i-(self.engine.wildRemaining-1)/2.0)*27,self.currentPiece.position.y+40); [self.effects addChild:star]; [star runAction:[SKAction sequence:@[[SKAction group:@[[SKAction moveByX:0 y:24 duration:.5],[SKAction fadeOutWithDuration:.5]]],[SKAction removeFromParent]]]]; }
     } else if(color==GDColorRed && self.engine.blastArmed) [self burstAt:self.currentPiece.position radius:31 color:[GummyUI color:color]];
 }
 - (void)animateEvent:(GDEvent *)event {
@@ -387,7 +387,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
 
     CGPoint center=CGPointZero;
     for(GDCell *cell in event.removed){ CGPoint p=ScenePoint([self.engine centerOfCell:cell rowPhase:event.rowPhase]); center.x+=p.x; center.y+=p.y; }
-    if(event.removed.count){ center.x/=event.removed.count; center.y/=event.removed.count; [self burstAt:center radius:event.source==GDSourceBlast?45:24 color:event.source==GDSourceBlast?[GummyUI color:GDColorRed]:Cream()]; }
+    if(event.removed.count){ center.x/=event.removed.count; center.y/=event.removed.count; [self burstAt:center radius:event.source==GDSourceBlast?self.engine.blastRadius:24 color:event.source==GDSourceBlast?[GummyUI color:GDColorRed]:Cream()]; }
     if(event.source==GDSourceYellow && event.removed.count){
         CGFloat minY=680,maxY=0; for(GDCell *cell in event.removed){ CGFloat y=ScenePoint([self.engine centerOfCell:cell rowPhase:event.rowPhase]).y; minY=MIN(minY,y); maxY=MAX(maxY,y); }
         SKShapeNode *sweep=[GummyUI panel:CGSizeMake(808,maxY-minY+46) fill:[[GummyUI color:GDColorYellow] colorWithAlphaComponent:.10] stroke:[GummyUI color:GDColorYellow] radius:15]; sweep.position=CGPointMake(588,(minY+maxY)/2); sweep.lineWidth=3; [self.effects addChild:sweep];
@@ -481,7 +481,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     GameScene *probe=[self clockProbe]; BOOL shot=[self probeStartShot:probe]; [probe advanceGameClock:probe.flightRemaining/2];
     NSTimeInterval flight=probe.flightRemaining; NSDictionary *before=probe.engine.snapshot; [probe.engine pause]; [probe advanceGameClock:2]; BOOL flightPause=[before isEqual:probe.engine.snapshot] && probe.flightRemaining==flight; [probe.engine resume];
     [probe advanceGameClock:probe.flightRemaining+.05]; NSTimeInterval resolution=probe.resolutionRemaining; before=probe.engine.snapshot; [probe.engine pause]; [probe advanceGameClock:2]; BOOL resolutionPause=resolution>0 && [before isEqual:probe.engine.snapshot] && probe.resolutionRemaining==resolution; [probe.engine resume];
-    GameScene *refund=[self clockProbe]; [refund.engine setFixtureEnergy:@[@20,@20,@20,@20]]; [refund.engine activateSkill:GDColorWhite]; [self probeStartShot:refund]; GDEngine *cold=[[GDEngine alloc] initWithSnapshot:refund.engine.snapshot]; [cold resume]; BOOL wildRefund=cold.phase==GDPhaseReady && cold.wildRemaining==3 && cold.score==0;
+    GameScene *refund=[self clockProbe]; [refund.engine setFixtureEnergy:@[@20,@20,@20,@20]]; [refund.engine activateSkill:GDColorWhite]; [self probeStartShot:refund]; GDEngine *cold=[[GDEngine alloc] initWithSnapshot:refund.engine.snapshot]; [cold resume]; BOOL wildRefund=cold.phase==GDPhaseReady && cold.wildRemaining==5 && cold.score==0;
     refund=[self clockProbe]; [refund.engine setFixtureEnergy:@[@20,@20,@20,@20]]; [refund.engine activateSkill:GDColorRed]; [self probeStartShot:refund]; cold=[[GDEngine alloc] initWithSnapshot:refund.engine.snapshot]; [cold resume]; BOOL blastRefund=cold.phase==GDPhaseReady && cold.energy[GDColorRed].integerValue==20 && !cold.blastArmed;
     for(NSString *key in preferenceKeys){ id saved=originalPreferences[key]; if(saved==NSNull.null) [NSUserDefaults.standardUserDefaults removeObjectForKey:key]; else [NSUserDefaults.standardUserDefaults setObject:saved forKey:key]; }
     NSLog(@"QA clock sixty120Jitter=%d shot=%d flightPause=%d resolutionPause=%d coldWildRefund=%d coldBlastRefund=%d elapsed=%.9f pressure=%.9f",equal,shot,flightPause,resolutionPause,wildRefund,blastRefund,[sixty[@"elapsed"] doubleValue],[sixty[@"pressure"] doubleValue]);

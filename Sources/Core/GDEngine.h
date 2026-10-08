@@ -41,6 +41,7 @@ typedef NS_ENUM(NSInteger, GDSource) { GDSourceNormal, GDSourceWild, GDSourceBla
 @property(nonatomic, readonly) NSString *runID;
 @property(nonatomic, readonly) BOOL won;
 @property(nonatomic, readonly) CGFloat radius, boardWidth, dangerY, launchY;
+@property(nonatomic, readonly) CGFloat blastRadius; // maximum target-center distance from the first hit
 @property(nonatomic, readonly) NSInteger longColumns, initialRows, rowPhase, revision;
 @property(nonatomic, readonly) NSArray<GDCell *> *cells;
 @property(nonatomic, readonly) GDPhase phase;
@@ -51,7 +52,7 @@ typedef NS_ENUM(NSInteger, GDSource) { GDSourceNormal, GDSourceWild, GDSourceBla
 @property(nonatomic, readonly) NSUInteger seed;
 @property(nonatomic, readonly) NSTimeInterval pressureRemaining, pressureInterval, freezeRemaining, elapsed;
 @property(nonatomic, readonly) NSArray<NSNumber *> *energy;
-@property(nonatomic, readonly) NSInteger energyThreshold;
+- (NSInteger)energyThresholdForColor:(GDColor)color; // endless: 20 + successful uses of this color, capped at 50; levels: 20
 - (nullable instancetype)initWithLevelID:(NSInteger)levelID seed:(NSUInteger)seed;
 - (instancetype)initWithSeed:(NSUInteger)seed;
 - (nullable instancetype)initWithSnapshot:(NSDictionary *)snapshot;

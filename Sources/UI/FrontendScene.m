@@ -180,8 +180,8 @@ static UIColor *MenuBlue(void) { return [UIColor colorWithRed:.65 green:.86 blue
     [self text:@"Hold swaps your gummy once per normal shot." size:20 at:CGPointMake(600,354)];
     [self text:@"Keep gummies above the danger line." size:20 at:CGPointMake(600,315)];
     NSArray *labels=@[@"FREEZE",@"BLAST",@"SWEEP",@"WILD"];
-    NSArray *first=@[@"Stops rows",@"Aim, then fire",@"Clears bottom",@"Next 3 shots"];
-    NSArray *second=@[@"for 6 seconds",@"at first hit",@"2 rows",@"auto-match a color"];
+    NSArray *first=@[@"Stops rows",@"Aim, then fire",@"Clears bottom",@"Next 5 shots"];
+    NSArray *second=@[@"for 30 seconds",@"within 2 rings",@"4 rows",@"auto-match a color"];
     for(NSInteger i=0;i<4;i++){
         CGFloat x=300+i*200;
         SKNode *tile=[GummyUI surface:CGSizeMake(180,138) color:[UIColor colorWithRed:.99 green:.89 blue:.90 alpha:1] radius:22]; tile.position=CGPointMake(x,219); [self addChild:tile];
@@ -189,7 +189,8 @@ static UIColor *MenuBlue(void) { return [UIColor colorWithRed:.65 green:.86 blue
         if(i==3){ [piece removeFromParent]; SKNode *star=[GummyUI image:@"wild_icon" size:CGSizeMake(45,45)]; star.position=CGPointMake(x,252); if(star) [self addChild:star]; }
         [self text:labels[i] size:17 at:CGPointMake(x,214)]; [self text:first[i] size:15 at:CGPointMake(x,184)]; [self text:second[i] size:15 at:CGPointMake(x,160)];
     }
-    [self text:@"Fill each color meter, then tap its skill." size:18 at:CGPointMake(600,109)];
+    [self text:@"Fill each color meter, then tap its skill." size:18 at:CGPointMake(600,116)];
+    [self text:@"Endless: each skill costs +1 per use, up to 50." size:15 at:CGPointMake(600,88)];
 }
 - (NSString *)controlAt:(CGPoint)p { for(NSString *key in self.controls) if(CGRectContainsPoint(self.controls[key].CGRectValue,p)) return key; return nil; }
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
