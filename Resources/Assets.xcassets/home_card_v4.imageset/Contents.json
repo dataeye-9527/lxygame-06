@@ -1,0 +1,13 @@
+{
+  "images": [
+    {
+      "filename": "home_card_v4.png",
+      "idiom": "universal",
+      "scale": "1x"
+    }
+  ],
+  "info": {
+    "author": "xcode",
+    "version": 1
+  }
+}

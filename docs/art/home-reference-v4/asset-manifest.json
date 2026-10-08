@@ -1,0 +1,90 @@
+[
+  {
+    "asset": "home_background_v4",
+    "path": "Resources/Assets.xcassets/home_background_v4.imageset/home_background_v4.png",
+    "width": 1672,
+    "height": 941,
+    "mode": "RGB",
+    "sha256": "7e581f95b96aeb2c4220b416914020a20e606da98fbf33e6e3d9407fffe49b6e",
+    "bytes": 1826192,
+    "alpha_extrema": null
+  },
+  {
+    "asset": "home_buttons_v4",
+    "path": "Resources/Assets.xcassets/home_buttons_v4.imageset/home_buttons_v4.png",
+    "width": 1254,
+    "height": 1254,
+    "mode": "RGBA",
+    "sha256": "300e432afad8d64df57725b48f07072d4185d701fde7c6eb1539704867342fa1",
+    "bytes": 1238915,
+    "alpha_extrema": [
+      0,
+      255
+    ]
+  },
+  {
+    "asset": "home_card_v4",
+    "path": "Resources/Assets.xcassets/home_card_v4.imageset/home_card_v4.png",
+    "width": 1983,
+    "height": 793,
+    "mode": "RGBA",
+    "sha256": "2bd2aea0725407074f336cd4335456a83cc0453cbfde3bda0ed61906207b7cdd",
+    "bytes": 1676221,
+    "alpha_extrema": [
+      0,
+      255
+    ]
+  },
+  {
+    "asset": "home_footer_v4",
+    "path": "Resources/Assets.xcassets/home_footer_v4.imageset/home_footer_v4.png",
+    "width": 1254,
+    "height": 1254,
+    "mode": "RGBA",
+    "sha256": "e4de8dd39a2136b7043ef740ca5a7ca2df3a31d2ea025f4ce0775fd0ceda0c36",
+    "bytes": 1186463,
+    "alpha_extrema": [
+      0,
+      255
+    ]
+  },
+  {
+    "asset": "home_hero_v4",
+    "path": "Resources/Assets.xcassets/home_hero_v4.imageset/home_hero_v4.png",
+    "width": 1254,
+    "height": 1254,
+    "mode": "RGBA",
+    "sha256": "07aa2a88ccf8b2cba09e99f9144ef8df9b8199ad1bbc30677daf396b757a9c9a",
+    "bytes": 1327785,
+    "alpha_extrema": [
+      0,
+      255
+    ]
+  },
+  {
+    "asset": "home_logo_v4",
+    "path": "Resources/Assets.xcassets/home_logo_v4.imageset/home_logo_v4.png",
+    "width": 1774,
+    "height": 887,
+    "mode": "RGBA",
+    "sha256": "21350404a2090b03195b017c1069b977108fa07095c98a2f851102623a874062",
+    "bytes": 1715317,
+    "alpha_extrema": [
+      0,
+      255
+    ]
+  },
+  {
+    "asset": "candy_panel_v4",
+    "path": "Resources/Assets.xcassets/candy_panel_v4.imageset/candy_panel_v4.png",
+    "width": 1254,
+    "height": 1254,
+    "mode": "RGBA",
+    "sha256": "70760788ea322a9ad2c526b1a3241aae505fca420b1ca363747f5a8a8c5f1cac",
+    "bytes": 1658513,
+    "alpha_extrema": [
+      0,
+      255
+    ]
+  }
+]

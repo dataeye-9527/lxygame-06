@@ -7,7 +7,7 @@
 #import "GDRunRecords.h"
 #import <UIKit/UIKit.h>
 
-static UIColor *Ink(void) { return [UIColor colorWithRed:.34 green:.26 blue:.43 alpha:1]; }
+static UIColor *Ink(void) { return [UIColor colorWithRed:.35 green:.14 blue:.48 alpha:1]; }
 static UIColor *Cream(void) { return [UIColor colorWithRed:1 green:.92 blue:.85 alpha:1]; }
 static CGPoint ScenePoint(CGPoint p) { return CGPointMake(174+p.x,603-p.y); }
 static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
@@ -88,9 +88,9 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
 - (void)buildLayout {
     [GummyUI addBackgroundTo:self];
     SKNode *boardFrame=[GummyUI surface:CGSizeMake(856,582) color:[UIColor colorWithRed:.73 green:.62 blue:.82 alpha:1] radius:25]; boardFrame.position=CGPointMake(588,326); [self addChild:boardFrame];
-    SKShapeNode *inner=[GummyUI panel:CGSizeMake(828,555) fill:[UIColor colorWithRed:.25 green:.24 blue:.43 alpha:1] stroke:[UIColor colorWithRed:.48 green:.39 blue:.60 alpha:1] radius:15]; inner.position=CGPointMake(588,324); inner.lineWidth=2; [self addChild:inner];
+    SKShapeNode *inner=[GummyUI panel:CGSizeMake(828,555) fill:[UIColor colorWithRed:.30 green:.22 blue:.47 alpha:1] stroke:[UIColor colorWithRed:.76 green:.52 blue:.84 alpha:1] radius:15]; inner.position=CGPointMake(588,324); inner.lineWidth=2; [self addChild:inner];
     SKCropNode *clip=[SKCropNode node]; clip.position=inner.position; clip.maskNode=[GummyUI panel:CGSizeMake(824,551) fill:UIColor.whiteColor stroke:UIColor.clearColor radius:13];
-    SKSpriteNode *gradient=[GummyUI gradient:CGSizeMake(824,551) top:[UIColor colorWithRed:.25 green:.25 blue:.43 alpha:1] bottom:[UIColor colorWithRed:.40 green:.35 blue:.58 alpha:1]]; [clip addChild:gradient]; [self addChild:clip];
+    SKSpriteNode *gradient=[GummyUI gradient:CGSizeMake(824,551) top:[UIColor colorWithRed:.33 green:.26 blue:.51 alpha:1] bottom:[UIColor colorWithRed:.47 green:.34 blue:.65 alpha:1]]; [clip addChild:gradient]; [self addChild:clip];
     SKShapeNode *floor=[GummyUI panel:CGSizeMake(822,61) fill:[UIColor colorWithRed:.65 green:.53 blue:.76 alpha:.24] stroke:UIColor.clearColor radius:11]; floor.position=CGPointMake(588,78); [self addChild:floor];
     self.playfield=[SKNode node]; self.playfield.zPosition=5; [self addChild:self.playfield];
     self.boardPieces=[SKNode node]; [self.playfield addChild:self.boardPieces];
@@ -101,9 +101,10 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     SKNode *score=[GummyUI surface:CGSizeMake(222,44) color:Cream() radius:22]; score.position=CGPointMake(294,645); [self.hud addChild:score];
     SKLabelNode *scoreTitle=[GummyUI label:@"SCORE" size:17 color:Ink()]; scoreTitle.position=CGPointMake(230,645); [self.hud addChild:scoreTitle];
     self.scoreLabel=[GummyUI label:@"0" size:29 color:Ink()]; self.scoreLabel.position=CGPointMake(325,645); [self.hud addChild:self.scoreLabel];
-    SKNode *timer=[GummyUI surface:CGSizeMake(146,54) color:[UIColor colorWithRed:.94 green:.42 blue:.59 alpha:1] radius:25]; timer.position=CGPointMake(604,645); [self.hud addChild:timer];
-    self.timerTitle=[GummyUI label:@"NEW ROW" size:13 color:UIColor.whiteColor]; self.timerTitle.position=CGPointMake(604,658); [self.hud addChild:self.timerTitle];
-    self.timerLabel=[GummyUI label:@"00:12" size:25 color:UIColor.whiteColor]; self.timerLabel.position=CGPointMake(604,636); [self.hud addChild:self.timerLabel];
+    SKNode *timer=[GummyUI surface:CGSizeMake(146,54) color:[UIColor colorWithRed:1 green:.68 blue:.82 alpha:1] radius:25]; timer.position=CGPointMake(604,645); [self.hud addChild:timer];
+    self.timerTitle=[GummyUI label:@"NEW ROW" size:13 color:Ink()]; self.timerTitle.position=CGPointMake(604,658); [self.hud addChild:self.timerTitle];
+    self.timerLabel=[GummyUI label:@"00:12" size:25 color:Ink()]; self.timerLabel.position=CGPointMake(604,636); [self.hud addChild:self.timerLabel];
+    SKNode *modeCard=[GummyUI surface:CGSizeMake(282,54) color:Cream() radius:25]; modeCard.position=CGPointMake(871,645); [self.hud addChild:modeCard];
     self.modeLabel=[GummyUI label:@"ENDLESS" size:18 color:Ink()]; self.modeLabel.position=CGPointMake(871,658); [self.hud addChild:self.modeLabel];
     self.objectiveLabel=[GummyUI label:@"" size:13 color:Ink()]; self.objectiveLabel.position=CGPointMake(871,635); [self.hud addChild:self.objectiveLabel];
     SKNode *pause=[GummyUI button:@"Ⅱ" size:CGSizeMake(55,52) name:@"pause" color:Cream()]; pause.position=CGPointMake(1133,643); [self.hud addChild:pause];
@@ -126,7 +127,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     SKNode *rightInner=[GummyUI surface:CGSizeMake(130,337) color:Cream() radius:22]; rightInner.position=right.position; [self.hud addChild:rightInner];
     SKLabelNode *next=[GummyUI label:@"NEXT" size:21 color:Ink()]; next.position=CGPointMake(1110,550); [self.hud addChild:next];
     self.holdLabel=[GummyUI label:@"HOLD" size:21 color:Ink()]; self.holdLabel.position=CGPointMake(1110,392); [self.hud addChild:self.holdLabel];
-    for(NSInteger i=0;i<2;i++){ SKNode *slot=[GummyUI panel:CGSizeMake(109,108) fill:[UIColor colorWithRed:.85 green:.72 blue:.73 alpha:1] stroke:[UIColor colorWithRed:.94 green:.79 blue:.76 alpha:1] radius:21]; slot.position=CGPointMake(1110,i?317:477); slot.name=i?@"hold":@"next"; [self.hud addChild:slot]; }
+    for(NSInteger i=0;i<2;i++){ SKNode *slot=[GummyUI surface:CGSizeMake(109,108) color:[UIColor colorWithRed:.81 green:.70 blue:.86 alpha:1] radius:21]; slot.position=CGPointMake(1110,i?317:477); slot.name=i?@"hold":@"next"; [self.hud addChild:slot]; }
     self.nextPiece=[SKNode node]; self.nextPiece.position=CGPointMake(1110,477); [self.hud addChild:self.nextPiece];
     self.heldPiece=[SKNode node]; self.heldPiece.position=CGPointMake(1110,317); self.heldPiece.name=@"hold"; [self.hud addChild:self.heldPiece];
     for(NSInteger i=0;i<3;i++){
@@ -171,7 +172,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
         if(self.engine.objective==GDObjectiveCollect) kind=[NSString stringWithFormat:@"%@ %@",kind,@[@"BLUE",@"RED",@"YELLOW",@"WHITE"][self.engine.objectiveColor]];
         self.objectiveLabel.text=[NSString stringWithFormat:@"%@  %ld / %ld%@   ·   WAVE %ld/%ld",kind,(long)self.engine.objectiveCurrent,(long)self.engine.objectiveTarget,self.engine.objective==GDObjectiveSurvive?@"s":@"",(long)self.engine.wave,(long)self.engine.totalWaves];
     } else self.objectiveLabel.text=[NSString stringWithFormat:@"WAVE %ld",(long)self.engine.wave];
-    self.timerLabel.fontColor=frozen?[UIColor colorWithRed:.73 green:.96 blue:1 alpha:1]:UIColor.whiteColor;
+    self.timerLabel.fontColor=frozen?[UIColor colorWithRed:.05 green:.45 blue:.73 alpha:1]:Ink();
     for(NSInteger i=0;i<4;i++){
         NSInteger energy=self.engine.energy[i].integerValue; CGFloat amount=MAX(0,MIN(1,(CGFloat)energy/self.engine.energyThreshold));
         CGPathRef path=CGPathCreateWithRoundedRect(CGRectMake(0,-5.5,MAX(1,106*amount),11),5,5,NULL); self.energyFills[i].path=path; CGPathRelease(path);
@@ -525,7 +526,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
         [self addOverlayButton:@"Resume" name:@"resume" y:407 color:blue]; [self addOverlayButton:@"Retry" name:@"retry" y:334 color:pink]; [self addOverlayButton:@"Settings" name:@"settings" y:261 color:lilac]; [self addOverlayButton:@"Home" name:@"home" y:188 color:[UIColor colorWithRed:1 green:.87 blue:.64 alpha:1]];
     } else {
         if(won){
-            for(NSInteger i=0;i<3;i++){ SKSpriteNode *star=[GummyUI image:@"wild_icon" size:CGSizeMake(38,38)]; if(!star) continue; star.position=CGPointMake(548+i*52,431); BOOL earned=i<self.engine.stars; star.color=earned?[UIColor colorWithRed:1 green:.69 blue:.15 alpha:1]:[UIColor colorWithRed:.59 green:.49 blue:.69 alpha:1]; star.colorBlendFactor=earned?.65:.85; star.alpha=earned?1:.60; [self.overlay addChild:star]; if(i<self.engine.stars){ star.xScale=star.yScale=.1; [star runAction:[SKAction sequence:@[[SKAction waitForDuration:i*.12],[SKAction scaleTo:1.16 duration:.15],[SKAction scaleTo:1 duration:.12]]]]; } }
+            for(NSInteger i=0;i<3;i++){ SKSpriteNode *star=[GummyUI star:38]; star.position=CGPointMake(548+i*52,431); BOOL earned=i<self.engine.stars; star.color=[UIColor colorWithRed:.59 green:.49 blue:.69 alpha:1]; star.colorBlendFactor=earned?0:.85; star.alpha=earned?1:.60; [self.overlay addChild:star]; if(earned){ star.xScale=star.yScale=.1; [star runAction:[SKAction sequence:@[[SKAction waitForDuration:i*.12],[SKAction scaleTo:1.16 duration:.15],[SKAction scaleTo:1 duration:.12]]]]; } }
             GDLevel *levelInfo=[GDLevelCatalog levelForID:self.engine.levelID];
             NSString *par=levelInfo.objective==GDObjectiveSurvive?[NSString stringWithFormat:@"3★: ≤%ld shots + ≥%ld points",(long)levelInfo.parShots,(long)levelInfo.parScore]:[NSString stringWithFormat:@"3★: ≤%ld shots + ≤%.0f seconds",(long)levelInfo.parShots,levelInfo.parTime];
             SKLabelNode *criteria=[GummyUI label:par size:13 color:Ink()]; criteria.position=CGPointMake(600,404); [self.overlay addChild:criteria];

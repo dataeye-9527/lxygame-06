@@ -35,9 +35,8 @@
 - (void)dealloc { [NSNotificationCenter.defaultCenter removeObserver:self]; }
 - (void)viewDidLoad {
     [super viewDidLoad];
-    NSString *backgroundPath=[[NSBundle mainBundle] pathForResource:@"candy_background" ofType:@"png"];
     UIImageView *background=[[UIImageView alloc] initWithFrame:self.view.bounds];
-    background.image=[UIImage imageWithContentsOfFile:backgroundPath]; background.contentMode=UIViewContentModeScaleAspectFill;
+    background.image=[UIImage imageNamed:@"home_background_v4"]; background.contentMode=UIViewContentModeScaleAspectFill;
     background.autoresizingMask=UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight; [self.view addSubview:background];
     NSMutableArray *dimmers=[NSMutableArray array];
     for(NSInteger i=0;i<4;i++){ UIView *strip=[UIView new]; strip.backgroundColor=GummyUI.overlayShadeColor; strip.userInteractionEnabled=NO; strip.hidden=YES; [self.view addSubview:strip]; [dimmers addObject:strip]; }

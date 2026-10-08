@@ -1,0 +1,10 @@
+2026-10-08: final shared candy UI verification
+
+debug-unified-build.log:
+** BUILD SUCCEEDED **
+
+release-unified-build.log:
+** BUILD SUCCEEDED **
+
+settings-tests.log:
+2026-10-08 10:51:21.722 settings_tests[8736:129493] PASS: 4 persistent settings checks

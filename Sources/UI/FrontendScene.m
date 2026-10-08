@@ -7,7 +7,7 @@
 #import "GDProgressStore.h"
 #import "GDRunRecords.h"
 
-static UIColor *MenuInk(void) { return [UIColor colorWithRed:.34 green:.26 blue:.43 alpha:1]; }
+static UIColor *MenuInk(void) { return [UIColor colorWithRed:.35 green:.14 blue:.48 alpha:1]; }
 static UIColor *MenuCream(void) { return [UIColor colorWithRed:1 green:.93 blue:.87 alpha:1]; }
 static UIColor *MenuBlue(void) { return [UIColor colorWithRed:.65 green:.86 blue:1 alpha:1]; }
 @interface FrontendScene ()
@@ -47,31 +47,50 @@ static UIColor *MenuBlue(void) { return [UIColor colorWithRed:.65 green:.86 blue
     GDEngine *restored=[snapshot isKindOfClass:NSDictionary.class]?[[GDEngine alloc] initWithSnapshot:snapshot]:nil;
     return restored && restored.phase!=GDPhaseGameOver && restored.phase!=GDPhaseWon?snapshot:nil;
 }
+- (SKLabelNode *)homeLabel:(NSString *)text size:(CGFloat)size color:(UIColor *)color at:(CGPoint)position parent:(SKNode *)parent {
+    SKLabelNode *label=[GummyUI label:text size:size color:color];
+    label.position=position; label.zPosition=parent==self?4:2; [parent addChild:label]; return label;
+}
+- (void)homeButton:(NSString *)title name:(NSString *)name atlas:(NSString *)atlas row:(NSInteger)row icon:(NSString *)icon center:(CGPoint)position size:(CGSize)size fontSize:(CGFloat)fontSize color:(UIColor *)color enabled:(BOOL)enabled {
+    SKNode *root=[GummyUI candyButton:title size:size name:name atlas:atlas row:row icon:icon fontSize:fontSize color:color enabled:enabled];
+    root.position=position; root.zPosition=5; [self addChild:root];
+    CGFloat touchHeight=[atlas isEqualToString:@"home_footer_v4"]?MAX(74,size.height):size.height;
+    if(enabled) self.controls[name]=[NSValue valueWithCGRect:CGRectMake(position.x-size.width/2,position.y-touchHeight/2,size.width,touchHeight)];
+}
 - (void)buildHome {
     self.runSnapshot=[self validSnapshotForKey:@"GummyRunSnapshot"];
     self.levelSnapshot=[self validSnapshotForKey:@"GummyLevelRunSnapshot"];
-    SKNode *titleCard=[GummyUI surface:CGSizeMake(465,100) color:MenuCream() radius:40]; titleCard.position=CGPointMake(335,577); [self addChild:titleCard];
-    [self text:@"GUMMY RICOCHET" size:38 at:CGPointMake(335,578)];
-    SKSpriteNode *hero=[GummyUI image:@"menu_hero" size:CGSizeMake(480,360)]; hero.position=CGPointMake(335,339); if(hero) [self addChild:hero];
-    [hero runAction:[SKAction repeatActionForever:[SKAction sequence:@[[SKAction moveByX:0 y:6 duration:2],[SKAction moveByX:0 y:-6 duration:2]]]]];
+    SKSpriteNode *title=[GummyUI image:@"home_logo_v4" size:CGSizeMake(506,242)]; title.position=CGPointMake(383,548); title.zPosition=4;
+    title.isAccessibilityElement=YES; title.accessibilityLabel=@"Gummy Ricochet"; [self addChild:title];
+    SKSpriteNode *hero=[GummyUI image:@"home_hero_v4" size:CGSizeMake(470,470)]; hero.position=CGPointMake(365,248); hero.zPosition=2; [self addChild:hero];
     GDProgressStore *progress=[[GDProgressStore alloc] initWithDefaults:NSUserDefaults.standardUserDefaults];
-    [self text:[NSString stringWithFormat:@"BEST  %ld",(long)[NSUserDefaults.standardUserDefaults integerForKey:@"GDPrototypeBestScore"]] size:23 at:CGPointMake(335,128)];
-    for(NSInteger mode=0;mode<2;mode++){
-        CGFloat y=mode?280:488;
-        SKNode *card=[GummyUI surface:CGSizeMake(445,183) color:MenuCream() radius:30]; card.position=CGPointMake(865,y); [self addChild:card];
-        [self text:mode?@"LEVELS":@"ENDLESS" size:25 at:CGPointMake(865,y+56)];
-        NSString *detail=mode?[NSString stringWithFormat:@"%ld / 30 unlocked   ·   %ld ★",(long)progress.unlockedLevel,(long)progress.totalStars]:@"Play for your best score";
-        [self text:detail size:17 at:CGPointMake(865,y+21)];
-        BOOL saved=mode?self.levelSnapshot!=nil:self.runSnapshot!=nil;
-        [self button:mode?@"Select Level":(saved?@"New Game":@"Play") name:mode?@"levels":@"play" center:CGPointMake(saved?777:865,y-37) size:CGSizeMake(saved?208:350,57) color:mode?[UIColor colorWithRed:1 green:.85 blue:.58 alpha:1]:MenuBlue()];
-        if(saved){
-            NSString *resume=mode?[NSString stringWithFormat:@"Resume %ld",(long)[self.levelSnapshot[@"levelID"] integerValue]]:@"Resume";
-            [self button:resume name:mode?@"resumeLevel":@"resume" center:CGPointMake(975,y-37) size:CGSizeMake(166,57) color:[UIColor colorWithRed:.87 green:.81 blue:.97 alpha:1]];
+    UIColor *purple=[UIColor colorWithRed:.35 green:.14 blue:.48 alpha:1];
+    SKNode *score=[SKNode node]; score.zPosition=4; [self addChild:score];
+    [self homeLabel:@"BEST" size:21 color:[UIColor colorWithRed:.47 green:.32 blue:.55 alpha:1] at:CGPointMake(339,96) parent:score];
+    SKLabelNode *best=[self homeLabel:[NSString stringWithFormat:@"%ld",(long)[NSUserDefaults.standardUserDefaults integerForKey:@"GDPrototypeBestScore"]] size:33 color:[UIColor colorWithRed:.76 green:.09 blue:.34 alpha:1] at:CGPointMake(429,96) parent:score];
+    SKSpriteNode *bestFace=(SKSpriteNode *)[best childNodeWithName:@"textFace"];
+    while(bestFace.size.width-2>100 && best.fontSize>18) best.fontSize-=1;
+    for(NSInteger i=0;i<2;i++){
+        CGFloat y=i?257:474;
+        SKSpriteNode *card=[GummyUI image:@"home_card_v4" size:CGSizeMake(510,i?200:212)]; card.position=CGPointMake(882,y); card.zPosition=3; [self addChild:card];
+        CGFloat headerY=i?322:538;
+        [self homeLabel:i?@"LEVELS":@"ENDLESS" size:40 color:purple at:CGPointMake(882,headerY) parent:self];
+        for(NSInteger side=-1;side<=1;side+=2){
+            SKTexture *starTexture=[SKTexture textureWithRect:CGRectMake(883/1254.0,1-264/1254.0,95/1254.0,89/1254.0) inTexture:hero.texture];
+            SKNode *star=[SKSpriteNode spriteNodeWithTexture:starTexture size:CGSizeMake(35,33)];
+            star.position=CGPointMake(882+side*(i?108:122),headerY); star.zPosition=4; [self addChild:star];
         }
     }
-    [self button:@"Local Scores" name:@"leaderboard" center:CGPointMake(741,121) size:CGSizeMake(194,54) color:[UIColor colorWithRed:.87 green:.81 blue:.97 alpha:1]];
-    [self button:@"Settings" name:@"settings" center:CGPointMake(915,121) size:CGSizeMake(138,54) color:[UIColor colorWithRed:.99 green:.80 blue:.85 alpha:1]];
-    [self button:@"Help" name:@"help" center:CGPointMake(1062,121) size:CGSizeMake(124,54) color:MenuCream()];
+    [self homeLabel:@"Play for your best score" size:19 color:[UIColor colorWithRed:.48 green:.32 blue:.55 alpha:1] at:CGPointMake(882,501) parent:self];
+    NSString *detail=[NSString stringWithFormat:@"%ld / 30 unlocked  •  %ld ★",(long)progress.unlockedLevel,(long)progress.totalStars];
+    [self homeLabel:detail size:19 color:[UIColor colorWithRed:.48 green:.32 blue:.55 alpha:1] at:CGPointMake(882,284) parent:self];
+    [self homeButton:@"New Game" name:@"play" atlas:@"home_buttons_v4" row:0 icon:@"play.fill" center:CGPointMake(774,443) size:CGSizeMake(251,76) fontSize:30 color:UIColor.whiteColor enabled:YES];
+    [self homeButton:@"Resume" name:@"resume" atlas:@"home_buttons_v4" row:1 icon:@"pause.fill" center:CGPointMake(1010,443) size:CGSizeMake(210,76) fontSize:30 color:UIColor.whiteColor enabled:self.runSnapshot!=nil];
+    [self homeButton:@"Select Level" name:@"levels" atlas:@"home_buttons_v4" row:2 icon:@"square.grid.2x2.fill" center:CGPointMake(self.levelSnapshot?783:882,219) size:CGSizeMake(self.levelSnapshot?253:451,82) fontSize:self.levelSnapshot?26:34 color:[UIColor colorWithRed:.52 green:.15 blue:.17 alpha:1] enabled:YES];
+    if(self.levelSnapshot) [self homeButton:[NSString stringWithFormat:@"Resume %ld",(long)[self.levelSnapshot[@"levelID"] integerValue]] name:@"resumeLevel" atlas:@"home_buttons_v4" row:1 icon:@"play.fill" center:CGPointMake(1020,219) size:CGSizeMake(174,82) fontSize:20 color:UIColor.whiteColor enabled:YES];
+    [self homeButton:@"Local Scores" name:@"leaderboard" atlas:@"home_footer_v4" row:0 icon:@"trophy.fill" center:CGPointMake(716,109) size:CGSizeMake(181,58) fontSize:19 color:purple enabled:YES];
+    [self homeButton:@"Settings" name:@"settings" atlas:@"home_footer_v4" row:1 icon:@"gearshape.fill" center:CGPointMake(890,109) size:CGSizeMake(162,58) fontSize:19 color:purple enabled:YES];
+    [self homeButton:@"Help" name:@"help" atlas:@"home_footer_v4" row:2 icon:@"questionmark.circle.fill" center:CGPointMake(1051,109) size:CGSizeMake(151,58) fontSize:19 color:purple enabled:YES];
 }
 - (NSString *)objectiveText:(GDLevel *)level {
     switch(level.objective){
@@ -134,7 +153,9 @@ static UIColor *MenuBlue(void) { return [UIColor colorWithRed:.65 green:.86 blue
 }
 - (void)pageFrame:(NSString *)title {
     SKNode *card=[GummyUI surface:CGSizeMake(904,546) color:MenuCream() radius:36]; card.position=CGPointMake(600,338); [self addChild:card];
-    [self text:title size:37 at:CGPointMake(600,548)];
+    SKLabelNode *heading=[GummyUI label:title size:37 color:MenuInk()]; heading.position=CGPointMake(600,548); [self addChild:heading];
+    CGFloat offset=((SKSpriteNode *)[heading childNodeWithName:@"textFace"]).size.width/2+35;
+    for(NSInteger side=-1;side<=1;side+=2){ SKNode *star=[GummyUI star:31]; star.position=CGPointMake(600+side*offset,548); [self addChild:star]; }
     [self button:@"Back" name:@"back" center:CGPointMake(228,615) size:CGSizeMake(150,52) color:MenuCream()];
 }
 - (void)buildSettings {
@@ -146,7 +167,8 @@ static UIColor *MenuBlue(void) { return [UIColor colorWithRed:.65 green:.86 blue
     for(NSInteger i=0;i<3;i++){
         CGFloat y=438-i*112;
         SKNode *row=[GummyUI surface:CGSizeMake(760,86) color:[UIColor colorWithRed:.98 green:.88 blue:.86 alpha:1] radius:24]; row.position=CGPointMake(600,y); [self addChild:row];
-        SKLabelNode *label=[GummyUI label:titles[i] size:27 color:MenuInk()]; label.horizontalAlignmentMode=SKLabelHorizontalAlignmentModeLeft; label.position=CGPointMake(262,y); [self addChild:label];
+        SKNode *icon=[GummyUI symbol:@[@"speaker.wave.2.fill",@"hand.tap.fill",@"scope"][i] size:32 color:MenuInk()]; icon.position=CGPointMake(273,y); [self addChild:icon];
+        SKLabelNode *label=[GummyUI label:titles[i] size:27 color:MenuInk()]; label.horizontalAlignmentMode=SKLabelHorizontalAlignmentModeLeft; label.position=CGPointMake(315,y); [self addChild:label];
         [self button:[values[i] boolValue]?@"On":@"Off" name:keys[i] center:CGPointMake(860,y) size:CGSizeMake(140,56) color:[values[i] boolValue]?MenuBlue():[UIColor colorWithRed:.81 green:.77 blue:.86 alpha:1]];
     }
 }
@@ -161,7 +183,9 @@ static UIColor *MenuBlue(void) { return [UIColor colorWithRed:.65 green:.86 blue
     NSArray *first=@[@"Stops rows",@"Aim, then fire",@"Clears bottom",@"Next 3 shots"];
     NSArray *second=@[@"for 6 seconds",@"at first hit",@"2 rows",@"auto-match a color"];
     for(NSInteger i=0;i<4;i++){
-        CGFloat x=300+i*200; SKNode *piece=[GummyUI piece:i diameter:40]; piece.position=CGPointMake(x,252); [self addChild:piece];
+        CGFloat x=300+i*200;
+        SKNode *tile=[GummyUI surface:CGSizeMake(180,138) color:[UIColor colorWithRed:.99 green:.89 blue:.90 alpha:1] radius:22]; tile.position=CGPointMake(x,219); [self addChild:tile];
+        SKNode *piece=[GummyUI piece:i diameter:40]; piece.position=CGPointMake(x,252); [self addChild:piece];
         if(i==3){ [piece removeFromParent]; SKNode *star=[GummyUI image:@"wild_icon" size:CGSizeMake(45,45)]; star.position=CGPointMake(x,252); if(star) [self addChild:star]; }
         [self text:labels[i] size:17 at:CGPointMake(x,214)]; [self text:first[i] size:15 at:CGPointMake(x,184)]; [self text:second[i] size:15 at:CGPointMake(x,160)];
     }
