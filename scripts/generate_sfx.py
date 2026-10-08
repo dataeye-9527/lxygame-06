@@ -41,6 +41,19 @@ def air(out, start, duration, gain, seed, lowpass=.08, decay=2):
         index = round(start*RATE)+i
         if index < len(out): out[index] += smooth * gain * envelope
 
+def ice_crack(out, start, duration, gain, seed):
+    """A dry, brittle transient rather than the rounded noise in candy pops."""
+    rng = random.Random(seed)
+    smooth = 0
+    count = round(duration * RATE)
+    for i in range(count):
+        t = i / RATE
+        noise = rng.uniform(-1, 1)
+        smooth += .09 * (noise - smooth)
+        envelope = min(1, t / .002) * math.exp(-8 * i/count) * min(1, (duration-t)/.008)
+        index = round(start*RATE)+i
+        if index < len(out): out[index] += (noise-smooth) * gain * envelope
+
 def pop(out, start, base, gain=1):
     # Two falling resonances make the impact rounded; an airy tail gives squish.
     resonator(out,start,.17,base,base*.42,.52*gain,5,.17)
@@ -66,8 +79,18 @@ for name,base in [("match",680),("match_alt",750)]:
 s=make("fall",.46); air(s,0,.38,1.5,90,.045,1.4)
 for start,hz in [(0,430),(.064,355),(.13,270),(.205,210)]: pop(s,start,hz,.47)
 s=make("combo",.47); bells(s,[(0,660),(.058,880),(.12,1046),(.182,1320)],.28); pop(s,0,590,.65)
-s=make("freeze",.54); air(s,0,.28,.55,130,.1,2); bells(s,[(0,1046),(.054,1568),(.105,2093)],.24)
-s=make("blast",.48); pop(s,0,190,1); resonator(s,0,.42,125,48,.6,4,.13); air(s,0,.34,1.7,143,.05,3)
+# FREEZE: an expanding cold hiss, brittle ice fractures, and irregular crystal tails.
+s=make("freeze",.90); air(s,0,.73,.8,130,.045,1.5)
+for i,(start,hz) in enumerate([(0,1187),(.038,2039),(.10,1511),(.19,2683),(.30,1789),(.44,2243),(.57,1301)]):
+    ice_crack(s,start,.055,.30*(1-i*.065),130+i)
+    resonator(s,start,.24,hz,gain=.16*(1-i*.07),decay=6,harmonics=.025)
+    resonator(s,start,.13,hz*2.71,gain=.026,decay=8,harmonics=0)
+# BLAST: a sharp attack, a low pressure thump, and a dissipating noisy rumble.
+s=make("blast",.82); air(s,0,.14,2.2,143,.52,4)
+resonator(s,0,.64,96,31,.72,2.8,.32)
+resonator(s,.012,.24,210,75,.38,4,.38)
+air(s,.025,.70,1.5,141,.085,1.5)
+for i,start in enumerate([0,.042,.10,.17]): air(s,start,.055,.65,150+i,.36,4)
 s=make("sweep",.47); air(s,0,.39,2.1,159,.08,1.1); resonator(s,.015,.3,720,190,.25,2,.06)
 for start,hz in [(.11,570),(.19,420),(.26,310)]: pop(s,start,hz,.28)
 s=make("wild",.6); bells(s,[(0,784),(.048,988),(.096,1175),(.145,1568)],.3); air(s,.06,.3,.35,169,.04,2)
@@ -92,8 +115,10 @@ for color,base,air_gain,harmonics in [
     for start,hz,gain in [(0,base,.85),(.045,base*1.25,.55),(.095,base*1.5,.40)]:
         pop(s,start,hz,gain)
     bells(s,[(.06,base*2),(.13,base*2.5)],.14 if color=="white" else .09)
-s=make("blast_ready",.32)
-resonator(s,0,.23,196,392,.32,2,.18); bells(s,[(.11,587)],.15)
+s=make("blast_ready",.36)
+resonator(s,0,.32,72,110,.22,2,.22)
+for i,start in enumerate([0,.045,.105,.17]): ice_crack(s,start,.045,.20,260+i)
+air(s,.04,.26,.55,270,.12,2)
 
 manifest={"sampleRate":RATE,"channels":1,"bits":16,"originalSynthesis":True,"effects":{}}
 for name,samples in sounds.items():

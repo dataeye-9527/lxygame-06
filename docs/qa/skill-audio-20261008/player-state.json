@@ -1,0 +1,23 @@
+{
+  "levelProgressBestAndRecordsPreserved": true,
+  "musicEnabled": true,
+  "soundEffectsEnabled": true,
+  "settingsToggleRestored": true,
+  "artQASnapshotComparison": {
+    "missingKey": "GummyRunSnapshot",
+    "cause": "unconfirmed",
+    "beforeFingerprint": "b19e0c96f7efb1a689e2d79ce185074ecd3972d0f62f988f3f83b695b64bad4e"
+  },
+  "fingerprints": {
+    "GummyLevelRunSnapshot": "6b7c7800d7b386a455e6137f23b6f13ae734167ee785077f14ba38256a74f9d1",
+    "GDEndlessRecords": "11953e90a1fef307863c8b9e45fca4e2cc87d35308ca79040bc0b6f1d26b9a92",
+    "GDPrototypeBestScore": "a288403a28bae669ae3e0face3416fae6b627c58c60dc52d2b00168e28a62979",
+    "GDCampaignProgress": "2eec42e76233df8592e28d550ca893ccfcc37ca3931c7c0c1b953ec1e88dfaa6"
+  },
+  "finalExistingSimulatorChecks": {
+    "freeze": true,
+    "blast": true,
+    "normal-home": true
+  },
+  "finalExistingSimulatorPreferencesPreserved": true
+}

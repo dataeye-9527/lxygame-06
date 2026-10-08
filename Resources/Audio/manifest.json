@@ -41,15 +41,15 @@
       "clippedSamples": 0
     },
     "freeze": {
-      "duration": 0.54,
-      "peak": 0.41687,
-      "rms": 0.07224,
+      "duration": 0.9,
+      "peak": 0.37473,
+      "rms": 0.04893,
       "clippedSamples": 0
     },
     "blast": {
-      "duration": 0.48,
+      "duration": 0.82,
       "peak": 0.67999,
-      "rms": 0.09027,
+      "rms": 0.08836,
       "clippedSamples": 0
     },
     "sweep": {
@@ -143,9 +143,9 @@
       "clippedSamples": 0
     },
     "blast_ready": {
-      "duration": 0.32,
-      "peak": 0.3266,
-      "rms": 0.09974,
+      "duration": 0.36,
+      "peak": 0.31528,
+      "rms": 0.07837,
       "clippedSamples": 0
     }
   }

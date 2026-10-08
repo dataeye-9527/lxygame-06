@@ -36,6 +36,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
 @property(nonatomic) CGPoint aimTouchStart;
 @property(nonatomic) BOOL aiming, yellowArmed, renderedGameOver;
 @property(nonatomic) BOOL musicDanger;
+@property(nonatomic) CGPoint blastImpactPoint;
 @property(nonatomic) NSTimeInterval lastTime;
 @property(nonatomic) NSInteger renderedRevision, displayedNext, displayedHeld, displayedCurrent, generation;
 @end
@@ -70,7 +71,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
         fixture[@"clearedWaves"]=@(fixtureEngine.objectiveTarget); fixture[@"collected"]=@(fixtureEngine.objectiveTarget); fixture[@"fallenTotal"]=@(fixtureEngine.objectiveTarget); fixture[@"elapsed"]=@(MAX(fixtureEngine.objectiveTarget,1));
         self.engine=[[GDEngine alloc] initWithSnapshot:fixture]; self.qaPresentationFixture=YES;
     }
-    if(!saved && [args containsObject:@"-qa-ready"]) [self.engine setFixtureEnergy:@[@20,@20,@20,@20]];
+    if(!saved && ([args containsObject:@"-qa-ready"] || [args containsObject:@"-qa-freeze-art"] || [args containsObject:@"-qa-blast-art"])) [self.engine setFixtureEnergy:@[@20,@20,@20,@20]];
     if(!saved && [args containsObject:@"-qa-failure"]){
         NSMutableArray *cells=[self.engine.cells mutableCopy];
         for(NSInteger row=6;row<12;row++) [cells addObject:[GDCell row:row column:8 color:GDColorRed]];
@@ -85,6 +86,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
 #if DEBUG
     if([args containsObject:@"-qa-clock"]) [self validatePresentationClock];
     if([args containsObject:@"-qa-music"]) dispatch_after(dispatch_time(DISPATCH_TIME_NOW,NSEC_PER_SEC),dispatch_get_main_queue(),^{ [self validateMusicTransitions]; });
+    if([args containsObject:@"-qa-freeze-art"] || [args containsObject:@"-qa-blast-art"]) dispatch_after(dispatch_time(DISPATCH_TIME_NOW,NSEC_PER_SEC),dispatch_get_main_queue(),^{ [self captureSkillArt]; });
     if(saved && [args containsObject:@"-qa-feedback"]){ NSData *data=[NSJSONSerialization dataWithJSONObject:self.engine.snapshot options:0 error:nil]; NSLog(@"QA restored snapshot=%@",[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]); }
 #endif
 }
@@ -167,6 +169,12 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
 - (void)refreshHUD {
     self.scoreLabel.text=[NSString stringWithFormat:@"%ld",(long)self.engine.score];
     BOOL frozen=self.engine.freezeRemaining>0;
+    SKNode *frost=[self.playfield childNodeWithName:@"frozenBoardRim"];
+    if(frozen && !frost){
+        SKShapeNode *rim=[GummyUI panel:CGSizeMake(822,546) fill:[UIColor colorWithRed:.62 green:.90 blue:1 alpha:.035] stroke:[UIColor colorWithRed:.70 green:.96 blue:1 alpha:.85] radius:15];
+        rim.name=@"frozenBoardRim"; rim.position=CGPointMake(588,324); rim.lineWidth=3; rim.glowWidth=3; rim.zPosition=12; [self.playfield addChild:rim];
+        [rim runAction:[SKAction repeatActionForever:[SKAction sequence:@[[SKAction fadeAlphaTo:.55 duration:1.2],[SKAction fadeAlphaTo:.9 duration:1.2]]]]];
+    } else if(!frozen) [frost removeFromParent];
     self.timerTitle.text=frozen?@"FROZEN":@"NEW ROW";
     NSTimeInterval remaining=frozen?self.engine.freezeRemaining:self.engine.pressureRemaining;
     NSInteger seconds=(NSInteger)ceil(MAX(0,remaining)); self.timerLabel.text=[NSString stringWithFormat:@"%02ld:%02ld",(long)(seconds/60),(long)(seconds%60)];
@@ -332,6 +340,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     for(GDCell *cell in cells){ SKShapeNode *ring=[SKShapeNode shapeNodeWithCircleOfRadius:24]; ring.position=ScenePoint([self.engine centerOfCell:cell]); ring.strokeColor=color; ring.fillColor=[color colorWithAlphaComponent:.12]; ring.lineWidth=2.5; [self.aimLayer addChild:ring]; }
 }
 - (void)flyShot:(GDShot *)shot {
+    if(shot.blast) self.blastImpactPoint=shot.hitCell?ScenePoint([self.engine centerOfCell:shot.hitCell]):ScenePoint(shot.points.lastObject.CGPointValue);
     [GDSettings.sharedSettings playFeedback:GDFeedbackShot intensity:.5 color:shot.blast?GDColorRed:self.engine.currentColor];
     SKNode *projectile=[GummyUI piece:shot.blast?GDColorRed:self.engine.currentColor diameter:45]; projectile.position=ScenePoint(shot.points.firstObject.CGPointValue); [self.effects addChild:projectile];
     NSMutableArray *actions=[NSMutableArray array];
@@ -368,20 +377,76 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     [launcher runAction:[SKAction sequence:@[[SKAction group:@[[SKAction scaleXTo:1.12 duration:.06],[SKAction scaleYTo:.86 duration:.06]]],[SKAction group:@[[SKAction scaleXTo:.97 duration:.12],[SKAction scaleYTo:1.06 duration:.12]]],[SKAction scaleTo:1 duration:.13]]] withKey:@"recoil"];
     [self burstAt:self.currentPiece.position radius:25 color:Cream()];
 }
+- (SKNode *)iceCrystal:(CGFloat)size {
+    CGMutablePathRef path=CGPathCreateMutable();
+    for(NSInteger arm=0;arm<6;arm++){
+        CGFloat angle=arm*M_PI/3, x=cos(angle), y=sin(angle);
+        CGPathMoveToPoint(path,NULL,0,0); CGPathAddLineToPoint(path,NULL,x*size,y*size);
+        for(NSInteger side=-1;side<=1;side+=2){
+            CGPathMoveToPoint(path,NULL,x*size*.55,y*size*.55);
+            CGPathAddLineToPoint(path,NULL,x*size*.55+cos(angle+side*M_PI/3)*size*.31,y*size*.55+sin(angle+side*M_PI/3)*size*.31);
+        }
+    }
+    SKShapeNode *crystal=[SKShapeNode shapeNodeWithPath:path]; CGPathRelease(path);
+    crystal.strokeColor=[UIColor colorWithRed:.85 green:.99 blue:1 alpha:1]; crystal.lineWidth=1.8; crystal.glowWidth=1.5;
+    return crystal;
+}
+- (void)explodeAt:(CGPoint)point radius:(CGFloat)radius {
+    CGFloat reach=radius+self.engine.radius;
+    SKShapeNode *flash=[SKShapeNode shapeNodeWithCircleOfRadius:radius*.48]; flash.position=point;
+    flash.fillColor=[UIColor colorWithRed:1 green:.88 blue:.39 alpha:.9]; flash.strokeColor=[UIColor colorWithRed:1 green:.48 blue:.15 alpha:1]; flash.glowWidth=8;
+    flash.xScale=flash.yScale=.2; flash.zPosition=4; [self.effects addChild:flash];
+    [flash runAction:[SKAction sequence:@[[SKAction scaleTo:1 duration:.055],[SKAction group:@[[SKAction scaleTo:1.3 duration:.16],[SKAction fadeOutWithDuration:.16]]],[SKAction removeFromParent]]]];
+    for(NSInteger wave=0;wave<2;wave++){
+        SKShapeNode *shock=[SKShapeNode shapeNodeWithCircleOfRadius:reach]; shock.position=point;
+        shock.strokeColor=wave?[GummyUI color:GDColorRed]:[UIColor colorWithRed:1 green:.69 blue:.19 alpha:1]; shock.fillColor=UIColor.clearColor;
+        shock.lineWidth=wave?3:6; shock.glowWidth=3; shock.xScale=shock.yScale=.15; shock.alpha=0; [self.effects addChild:shock];
+        SKAction *expand=[SKAction scaleTo:1 duration:.30]; expand.timingMode=SKActionTimingEaseOut;
+        [shock runAction:[SKAction sequence:@[[SKAction waitForDuration:wave*.045],[SKAction fadeAlphaTo:.95 duration:.015],[SKAction group:@[expand,[SKAction fadeOutWithDuration:.30]]],[SKAction removeFromParent]]]];
+    }
+    for(NSInteger i=0;i<16;i++){
+        CGFloat angle=i*2*M_PI/16+.13, distance=reach*(.55+(i%4)*.11);
+        SKShapeNode *spark=[GummyUI panel:CGSizeMake(10+(i%3)*3,3.5) fill:[UIColor colorWithRed:1 green:.70+(i%2)*.15 blue:.25 alpha:1] stroke:UIColor.clearColor radius:1.7];
+        spark.position=point; spark.zRotation=angle; spark.glowWidth=2; [self.effects addChild:spark];
+        SKAction *eject=[SKAction moveByX:cos(angle)*distance y:sin(angle)*distance duration:.38]; eject.timingMode=SKActionTimingEaseOut;
+        [spark runAction:[SKAction sequence:@[[SKAction group:@[eject,[SKAction scaleTo:.15 duration:.38],[SKAction sequence:@[[SKAction waitForDuration:.10],[SKAction fadeOutWithDuration:.28]]]]],[SKAction removeFromParent]]]];
+    }
+    for(NSInteger i=0;i<6;i++){
+        CGFloat angle=i*M_PI/3;
+        SKShapeNode *smoke=[SKShapeNode shapeNodeWithCircleOfRadius:radius*.18]; smoke.position=point;
+        smoke.fillColor=[UIColor colorWithRed:.73 green:.28 blue:.24 alpha:.24]; smoke.strokeColor=UIColor.clearColor; smoke.zPosition=-1; [self.effects addChild:smoke];
+        [smoke runAction:[SKAction sequence:@[[SKAction group:@[[SKAction moveByX:cos(angle)*radius*.55 y:sin(angle)*radius*.55 duration:.50],[SKAction scaleTo:2 duration:.50],[SKAction fadeOutWithDuration:.50]]],[SKAction removeFromParent]]]];
+    }
+}
 - (void)skillEffect:(NSInteger)color {
     [self pulse:self.skillCards[color] amount:1.07];
     if(color==GDColorBlue){
-        SKShapeNode *rim=[GummyUI panel:CGSizeMake(822,546) fill:UIColor.clearColor stroke:[GummyUI color:color] radius:15]; rim.position=CGPointMake(588,324); rim.lineWidth=5; [self.effects addChild:rim];
-        [rim runAction:[SKAction sequence:@[[SKAction fadeAlphaTo:.3 duration:.18],[SKAction fadeAlphaTo:.8 duration:.12],[SKAction fadeOutWithDuration:.32],[SKAction removeFromParent]]]];
-        [self burstAt:CGPointMake(604,645) radius:28 color:[GummyUI color:color]];
+        SKShapeNode *mist=[GummyUI panel:CGSizeMake(822,546) fill:[UIColor colorWithRed:.57 green:.88 blue:1 alpha:.16] stroke:[UIColor colorWithRed:.79 green:.98 blue:1 alpha:.9] radius:15];
+        mist.position=CGPointMake(588,324); mist.lineWidth=5; mist.glowWidth=3; [self.effects addChild:mist];
+        [mist runAction:[SKAction sequence:@[[SKAction fadeAlphaTo:.9 duration:.08],[SKAction fadeOutWithDuration:.65],[SKAction removeFromParent]]]];
+        NSArray<GDCell *> *cells=self.engine.cells; NSInteger stride=MAX(1,(cells.count+35)/36);
+        for(NSInteger i=0;i<cells.count;i+=stride){
+            CGPoint point=ScenePoint([self.engine centerOfCell:cells[i]]); SKNode *crystal=[self iceCrystal:12+(i%3)*2]; crystal.position=point;
+            crystal.alpha=0; crystal.xScale=crystal.yScale=.25; [self.effects addChild:crystal];
+            NSTimeInterval delay=MAX(0,(point.x-174)/828)*.12;
+            [crystal runAction:[SKAction sequence:@[[SKAction waitForDuration:delay],[SKAction group:@[[SKAction fadeAlphaTo:1 duration:.04],[SKAction scaleTo:1.05 duration:.18]]],[SKAction group:@[[SKAction moveByX:0 y:10 duration:.45],[SKAction fadeOutWithDuration:.45]]],[SKAction removeFromParent]]]];
+        }
     } else if(color==GDColorWhite){
         for(NSInteger i=0;i<self.engine.wildRemaining;i++){ SKNode *star=[GummyUI image:@"wild_icon" size:CGSizeMake(18,18)]; if(!star) continue; star.position=CGPointMake(self.currentPiece.position.x+(i-(self.engine.wildRemaining-1)/2.0)*27,self.currentPiece.position.y+40); [self.effects addChild:star]; [star runAction:[SKAction sequence:@[[SKAction group:@[[SKAction moveByX:0 y:24 duration:.5],[SKAction fadeOutWithDuration:.5]]],[SKAction removeFromParent]]]]; }
-    } else if(color==GDColorRed && self.engine.blastArmed) [self burstAt:self.currentPiece.position radius:31 color:[GummyUI color:color]];
+    } else if(color==GDColorRed && self.engine.blastArmed){
+        [self burstAt:self.currentPiece.position radius:31 color:[UIColor colorWithRed:1 green:.63 blue:.18 alpha:1]];
+        for(NSInteger i=0;i<5;i++){
+            SKShapeNode *spark=[SKShapeNode shapeNodeWithCircleOfRadius:2.8]; spark.fillColor=[UIColor colorWithRed:1 green:.79 blue:.24 alpha:1]; spark.strokeColor=UIColor.clearColor;
+            spark.position=CGPointMake(self.currentPiece.position.x,self.currentPiece.position.y+24); [self.effects addChild:spark];
+            [spark runAction:[SKAction sequence:@[[SKAction group:@[[SKAction moveByX:(i-2)*13 y:24+(i%3)*8 duration:.28],[SKAction fadeOutWithDuration:.28]]],[SKAction removeFromParent]]]];
+        }
+    }
 }
 - (void)animateEvent:(GDEvent *)event {
 #if DEBUG
     if(self.clockValidation){ self.resolutionRemaining=.38; return; }
     if([NSProcessInfo.processInfo.arguments containsObject:@"-qa-feedback"]) NSLog(@"QA event source=%ld removed=%lu fallen=%lu points=%ld score=%ld objective=%ld/%ld phase=%ld",(long)event.source,(unsigned long)event.removed.count,(unsigned long)event.fallen.count,(long)event.points,(long)self.engine.score,(long)self.engine.objectiveCurrent,(long)self.engine.objectiveTarget,(long)self.engine.phase);
+    if(event.source==GDSourceBlast && [NSProcessInfo.processInfo.arguments containsObject:@"-qa-blast-art"]) dispatch_after(dispatch_time(DISPATCH_TIME_NOW,(int64_t)(.10*NSEC_PER_SEC)),dispatch_get_main_queue(),^{ self.paused=YES; NSLog(@"QA skill blast captured impact=(%.1f,%.1f) radius=%.1f removed=%lu",self.blastImpactPoint.x,self.blastImpactPoint.y,self.engine.blastRadius,(unsigned long)event.removed.count); });
 #endif
     [self clearAim]; self.yellowArmed=NO;
     NSInteger count=event.removed.count+event.fallen.count;
@@ -400,7 +465,8 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
 
     CGPoint center=CGPointZero;
     for(GDCell *cell in event.removed){ CGPoint p=ScenePoint([self.engine centerOfCell:cell rowPhase:event.rowPhase]); center.x+=p.x; center.y+=p.y; }
-    if(event.removed.count){ center.x/=event.removed.count; center.y/=event.removed.count; [self burstAt:center radius:event.source==GDSourceBlast?self.engine.blastRadius:24 color:event.source==GDSourceBlast?[GummyUI color:GDColorRed]:Cream()]; }
+    if(event.source==GDSourceBlast) [self explodeAt:self.blastImpactPoint radius:self.engine.blastRadius];
+    else if(event.removed.count){ center.x/=event.removed.count; center.y/=event.removed.count; [self burstAt:center radius:24 color:Cream()]; }
     if(event.source==GDSourceYellow && event.removed.count){
         CGFloat minY=680,maxY=0; for(GDCell *cell in event.removed){ CGFloat y=ScenePoint([self.engine centerOfCell:cell rowPhase:event.rowPhase]).y; minY=MIN(minY,y); maxY=MAX(maxY,y); }
         SKShapeNode *sweep=[GummyUI panel:CGSizeMake(808,maxY-minY+46) fill:[[GummyUI color:GDColorYellow] colorWithAlphaComponent:.10] stroke:[GummyUI color:GDColorYellow] radius:15]; sweep.position=CGPointMake(588,(minY+maxY)/2); sweep.lineWidth=3; [self.effects addChild:sweep];
@@ -472,6 +538,26 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     }
 }
 #if DEBUG
+- (void)captureSkillArt {
+    BOOL freeze=[NSProcessInfo.processInfo.arguments containsObject:@"-qa-freeze-art"];
+    [self handleControl:freeze?@"skill0":@"skill1"];
+    self.qaPresentationFixture=YES; // This render fixture must never overwrite a player's run.
+    if(freeze){
+        NSAssert(self.engine.freezeRemaining>0,@"Freeze art must come from a real skill activation");
+        [self.engine pause];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW,(int64_t)(.18*NSEC_PER_SEC)),dispatch_get_main_queue(),^{
+            self.paused=YES; NSAssert([self.playfield childNodeWithName:@"frozenBoardRim"],@"Frozen board must retain its frost rim");
+            NSLog(@"QA skill freeze captured remaining=%.1f",self.engine.freezeRemaining);
+        });
+    } else {
+        GDShot *best=nil; CGPoint bestTarget=CGPointZero;
+        for(CGFloat x=20;x<self.engine.boardWidth;x+=20){ GDShot *shot=[self.engine previewToward:CGPointMake(x,0)]; if(shot.valid && shot.hitCell && (!best || shot.expectedMatches.count>best.expectedMatches.count)){ best=shot; bestTarget=CGPointMake(x,0); } }
+        // beginShot accepts only the latest preview, so refresh the selected target.
+        best=[self.engine previewToward:bestTarget];
+        NSAssert(best.blast && [self.engine beginShot:best],@"Blast art must use a real, valid blast shot");
+        [self flyShot:best];
+    }
+}
 - (void)validateMusicTransitions {
     GDEngine *original=self.engine; BOOL originalDanger=self.musicDanger;
     self.engine=[[GDEngine alloc] initWithSeed:20261008];
@@ -548,7 +634,8 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
 - (BOOL)finished { return self.engine.phase==GDPhaseGameOver || self.engine.phase==GDPhaseWon; }
 - (void)saveRun {
 #if DEBUG
-    if(self.qaPresentationFixture || [NSProcessInfo.processInfo.arguments containsObject:@"-qa-music"]) return;
+    NSArray *args=NSProcessInfo.processInfo.arguments;
+    if(self.qaPresentationFixture || [args containsObject:@"-qa-music"] || [args containsObject:@"-qa-freeze-art"] || [args containsObject:@"-qa-blast-art"]) return;
 #endif
     if([self finished]) [NSUserDefaults.standardUserDefaults removeObjectForKey:[self snapshotKey]];
     else [NSUserDefaults.standardUserDefaults setObject:self.engine.snapshot forKey:[self snapshotKey]];
@@ -609,7 +696,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
 - (NSUInteger)newRunSeed {
 #if DEBUG
     NSArray *args=NSProcessInfo.processInfo.arguments;
-    if([args containsObject:@"-qa-ready"] || [args containsObject:@"-qa-failure"] || [args containsObject:@"-qa-new"]) return 20260930;
+    if([args containsObject:@"-qa-ready"] || [args containsObject:@"-qa-failure"] || [args containsObject:@"-qa-new"] || [args containsObject:@"-qa-freeze-art"] || [args containsObject:@"-qa-blast-art"]) return 20260930;
 #endif
     return ((NSUInteger)arc4random()<<16)^arc4random();
 }

@@ -1,0 +1,10 @@
+PASS: 24 effects, 2 seamless music loops, distinct color waveforms, all app resources match source
+PASS: 24 effects, 2 seamless music loops, distinct color waveforms, all app resources match source
+2026-10-08 15:29:58.268 core_tests[41391:507145] Dense angle sweep valid=453/453 direct=318 targets L/C/R=17/21/20
+2026-10-08 15:29:59.017 core_tests[41391:507145] PASS: geometry, density, prediction and bounce fixtures
+2026-10-08 15:29:59.039 core_tests[41391:507145] PASS: matching, support, energy and four skills fixtures
+2026-10-08 15:29:59.079 core_tests[41391:507145] PASS: five wild shots, per-color endless costs, charging, cancellation, cap and restore
+2026-10-08 15:29:59.100 core_tests[41391:507145] PASS: queue, pressure priority, pause and cold-restore fixtures
+2026-10-08 15:29:59.100 core_tests[41391:507145] PASS: focused core validation (816 assertions)
+build-debug.log: BUILD SUCCEEDED
+build-release.log: BUILD SUCCEEDED

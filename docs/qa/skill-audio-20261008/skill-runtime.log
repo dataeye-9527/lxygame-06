@@ -1,0 +1,17 @@
+2026-10-08 15:54:12.209 GummyRicochet[44520:546187] QA music mode=1 playing=1 time=0.000 duration=43.636 loops=-1
+2026-10-08 15:54:12.412 GummyRicochet[44520:546187] QA sound clip=tap feedback=0 playing=1 volume=0.40 rate=1.00 voices=1
+2026-10-08 15:54:12.486 GummyRicochet[44520:546187] QA sound clip=freeze feedback=8 playing=1 volume=0.40 rate=1.00 voices=1
+2026-10-08 15:54:12.899 GummyRicochet[44520:546187] QA skill freeze captured remaining=30.0
+2026-10-08 15:55:00.921 GummyRicochet[44656:547481] QA music mode=1 playing=1 time=0.000 duration=43.636 loops=-1
+2026-10-08 15:55:01.047 GummyRicochet[44656:547481] QA sound clip=tap feedback=0 playing=1 volume=0.40 rate=1.00 voices=1
+2026-10-08 15:55:01.111 GummyRicochet[44656:547481] QA sound clip=blast_ready feedback=14 playing=1 volume=0.40 rate=1.00 voices=1
+2026-10-08 15:55:01.155 GummyRicochet[44656:547481] QA sound clip=shot_red feedback=1 playing=1 volume=0.40 rate=1.02 voices=2
+2026-10-08 15:55:01.253 GummyRicochet[44656:547481] QA event source=2 removed=14 fallen=0 points=140 score=140 objective=0/0 phase=2
+2026-10-08 15:55:01.293 GummyRicochet[44656:547481] QA sound clip=blast feedback=9 playing=1 volume=0.40 rate=1.00 voices=3
+2026-10-08 15:55:01.423 GummyRicochet[44656:547481] QA skill blast captured impact=(565.0,420.7) radius=92.0 removed=14
+2026-10-08 15:38:37.280 GummyRicochet[42184:518278] QA music mode=1 playing=1 time=0.000 duration=43.636 loops=-1
+2026-10-08 15:38:46.027 GummyRicochet[42184:518278] QA sound clip=tap feedback=0 playing=1 volume=0.40 rate=1.00 voices=1
+2026-10-08 15:39:02.110 GummyRicochet[42184:518278] QA sound clip=tap feedback=0 playing=1 volume=0.40 rate=1.00 voices=1
+2026-10-08 15:39:18.451 GummyRicochet[42184:518278] QA sound clip=tap feedback=0 playing=1 volume=0.40 rate=1.00 voices=1
+2026-10-08 15:39:18.461 GummyRicochet[42184:518278] QA music mode=1 playing=1 time=24.838 duration=43.636 loops=-1
+2026-10-08 15:43:07.088 GummyRicochet[42184:518278] QA sound clip=tap feedback=0 playing=1 volume=0.40 rate=1.00 voices=1

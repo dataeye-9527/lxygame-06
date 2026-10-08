@@ -165,7 +165,7 @@ static UIImage *TrimmedSymbol(UIImage *image) {
     else if(b>r){ row=0; }
     NSDictionary *icons=@{@"back":@"chevron.left",@"resume":@"play.fill",@"retry":@"arrow.clockwise",@"settings":@"gearshape.fill",@"home":@"house.fill",@"nextLevel":@"arrow.right",@"allLevels":@"square.grid.2x2.fill",@"levels":@"square.grid.2x2.fill",@"scores":@"trophy.fill",@"privacy":@"doc.text.fill",@"scoresPrev":@"chevron.left",@"scoresNext":@"chevron.right",@"pause":@"pause.fill"};
     NSString *icon=icons[name]; if([name hasPrefix:@"level"] && ![name isEqualToString:@"levels"]) icon=@"play.fill";
-    if([name isEqualToString:@"sound"] || [name isEqualToString:@"haptics"] || [name isEqualToString:@"guide"]) icon=[title isEqualToString:@"On"]?@"checkmark":@"xmark";
+    if([name isEqualToString:@"music"] || [name isEqualToString:@"sound"] || [name isEqualToString:@"haptics"] || [name isEqualToString:@"guide"]) icon=[title isEqualToString:@"On"]?@"checkmark":@"xmark";
     return [self candyButton:[name isEqualToString:@"pause"]?@"":title size:size name:name atlas:atlas row:row icon:icon fontSize:MIN(23,size.height*.40) color:ink enabled:YES];
 }
 @end

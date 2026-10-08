@@ -51,7 +51,7 @@
 #if DEBUG
     NSArray *args=NSProcessInfo.processInfo.arguments;
     if([args containsObject:@"-qa-last-level"]) scene=[[GameScene alloc] initWithSize:CGSizeMake(1200,680) levelID:30];
-    if([args containsObject:@"-qa-ready"] || [args containsObject:@"-qa-failure"] || [args containsObject:@"-qa-new"] || [args containsObject:@"-qa-music"]) scene=[[GameScene alloc] initWithSize:CGSizeMake(1200,680) runSnapshot:nil];
+    if([args containsObject:@"-qa-ready"] || [args containsObject:@"-qa-failure"] || [args containsObject:@"-qa-new"] || [args containsObject:@"-qa-music"] || [args containsObject:@"-qa-freeze-art"] || [args containsObject:@"-qa-blast-art"]) scene=[[GameScene alloc] initWithSize:CGSizeMake(1200,680) runSnapshot:nil];
 #endif
     scene.scaleMode = SKSceneScaleModeAspectFit;
     [view presentScene:scene];
