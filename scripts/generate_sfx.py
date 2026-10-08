@@ -78,6 +78,23 @@ s=make("error",.18); pop(s,0,240,.42)
 # Legacy generic skill is kept for existing call sites, but dedicated skills have their own identity.
 s=make("skill",.48); bells(s,[(0,659),(.07,880),(.14,1175)],.25)
 
+# Each candy keeps a recognizable timbre as well as its pitch on launch and match.
+for color,base,air_gain,harmonics in [
+    ("blue",622,.30,.05), ("red",392,.62,.22),
+    ("yellow",784,.40,.13), ("white",988,.22,.03),
+]:
+    s=make(f"shot_{color}",.26)
+    air(s,0,.19,air_gain,round(base),.08,1.8)
+    resonator(s,.008,.20,base*.45,base,.32,3,harmonics)
+    if color in ("blue","white"):
+        bells(s,[(.035,base*2)],.10)
+    s=make(f"match_{color}",.40)
+    for start,hz,gain in [(0,base,.85),(.045,base*1.25,.55),(.095,base*1.5,.40)]:
+        pop(s,start,hz,gain)
+    bells(s,[(.06,base*2),(.13,base*2.5)],.14 if color=="white" else .09)
+s=make("blast_ready",.32)
+resonator(s,0,.23,196,392,.32,2,.18); bells(s,[(.11,587)],.15)
+
 manifest={"sampleRate":RATE,"channels":1,"bits":16,"originalSynthesis":True,"effects":{}}
 for name,samples in sounds.items():
     peak=max(abs(x) for x in samples)

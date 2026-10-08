@@ -1,0 +1,73 @@
+2026-10-08 15:15:26.585 GummyRicochet[39516:488067] QA audio tour begin
+2026-10-08 15:15:28.065 GummyRicochet[39516:488067] QA music mode=1 playing=1 time=0.000 duration=43.636 loops=-1
+2026-10-08 15:15:28.278 GummyRicochet[39516:488067] QA sound clip=tap feedback=0 playing=1 volume=0.40 rate=1.00 voices=1
+objc[39516]: Class UIAccessibilityLoaderWebShared is implemented in both /Library/Developer/CoreSimulator/Volumes/iOS_23E254a/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.4.simruntime/Contents/Resources/RuntimeRoot/System/Library/AccessibilityBundles/WebKit.axbundle/WebKit (0x104fc4398) and /Library/Developer/CoreSimulator/Volumes/iOS_23E254a/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.4.simruntime/Contents/Resources/RuntimeRoot/System/Library/AccessibilityBundles/WebCore.axbundle/WebCore (0x10be74310). This may cause spurious casting failures and mysterious crashes. One of the duplicates must be removed or renamed.
+2026-10-08 15:15:28.737 GummyRicochet[39516:488067] QA sound clip=shot feedback=1 playing=1 volume=0.43 rate=1.00 voices=1
+2026-10-08 15:15:29.409 GummyRicochet[39516:488067] QA sound clip=match feedback=2 playing=1 volume=0.43 rate=1.02 voices=1
+2026-10-08 15:15:30.486 GummyRicochet[39516:488067] QA sound clip=skill feedback=3 playing=1 volume=0.43 rate=1.00 voices=1
+2026-10-08 15:15:31.424 GummyRicochet[39516:488067] QA sound clip=game_over feedback=4 playing=1 volume=0.43 rate=1.00 voices=1
+2026-10-08 15:15:32.374 GummyRicochet[39516:488067] QA sound clip=error feedback=5 playing=1 volume=0.43 rate=1.00 voices=1
+2026-10-08 15:15:33.323 GummyRicochet[39516:488067] QA sound clip=fall feedback=6 playing=1 volume=0.43 rate=1.00 voices=1
+2026-10-08 15:15:34.261 GummyRicochet[39516:488067] QA sound clip=combo feedback=7 playing=1 volume=0.43 rate=1.00 voices=1
+2026-10-08 15:15:35.211 GummyRicochet[39516:488067] QA sound clip=freeze feedback=8 playing=1 volume=0.43 rate=1.00 voices=1
+2026-10-08 15:15:36.160 GummyRicochet[39516:488067] QA sound clip=blast feedback=9 playing=1 volume=0.43 rate=1.00 voices=1
+2026-10-08 15:15:37.098 GummyRicochet[39516:488067] QA sound clip=sweep feedback=10 playing=1 volume=0.43 rate=1.00 voices=1
+2026-10-08 15:15:38.037 GummyRicochet[39516:488067] QA sound clip=wild feedback=11 playing=1 volume=0.43 rate=1.00 voices=1
+2026-10-08 15:15:38.986 GummyRicochet[39516:488067] QA sound clip=ready feedback=12 playing=1 volume=0.43 rate=1.00 voices=1
+2026-10-08 15:15:39.936 GummyRicochet[39516:488067] QA sound clip=win feedback=13 playing=1 volume=0.43 rate=1.00 voices=1
+2026-10-08 15:15:40.885 GummyRicochet[39516:488067] QA sound clip=blast_ready feedback=14 playing=1 volume=0.43 rate=1.00 voices=1
+2026-10-08 15:15:41.813 GummyRicochet[39516:488067] QA sound clip=shot_blue feedback=1 playing=1 volume=0.43 rate=0.98 voices=1
+2026-10-08 15:15:41.823 GummyRicochet[39516:488067] QA sound clip=match_blue feedback=2 playing=1 volume=0.43 rate=1.00 voices=2
+2026-10-08 15:15:42.975 GummyRicochet[39516:488067] QA sound clip=shot_red feedback=1 playing=1 volume=0.43 rate=1.02 voices=1
+2026-10-08 15:15:42.986 GummyRicochet[39516:488067] QA sound clip=match_red feedback=2 playing=1 volume=0.43 rate=1.04 voices=2
+2026-10-08 15:15:44.127 GummyRicochet[39516:488067] QA sound clip=shot_yellow feedback=1 playing=1 volume=0.43 rate=0.96 voices=1
+2026-10-08 15:15:44.138 GummyRicochet[39516:488067] QA sound clip=match_yellow feedback=2 playing=1 volume=0.43 rate=0.98 voices=2
+2026-10-08 15:15:45.290 GummyRicochet[39516:488067] QA sound clip=shot_white feedback=1 playing=1 volume=0.43 rate=1.00 voices=1
+2026-10-08 15:15:45.300 GummyRicochet[39516:488067] QA sound clip=match_white feedback=2 playing=1 volume=0.43 rate=1.02 voices=2
+2026-10-08 15:15:46.442 GummyRicochet[39516:488067] QA sound clip=fall feedback=6 playing=1 volume=0.45 rate=1.00 voices=1
+2026-10-08 15:15:46.452 GummyRicochet[39516:488067] QA sound clip=combo feedback=7 playing=1 volume=0.45 rate=1.00 voices=2
+2026-10-08 15:15:46.463 GummyRicochet[39516:488067] QA sound clip=freeze feedback=8 playing=1 volume=0.45 rate=1.00 voices=3
+2026-10-08 15:15:46.484 GummyRicochet[39516:488067] QA sound clip=blast feedback=9 playing=1 volume=0.45 rate=1.00 voices=3
+2026-10-08 15:15:46.506 GummyRicochet[39516:488067] QA sound clip=sweep feedback=10 playing=1 volume=0.45 rate=1.00 voices=3
+2026-10-08 15:15:46.527 GummyRicochet[39516:488067] QA sound clip=wild feedback=11 playing=1 volume=0.45 rate=1.00 voices=3
+2026-10-08 15:15:46.548 GummyRicochet[39516:488067] QA sound clip=combo feedback=7 playing=1 volume=0.45 rate=1.00 voices=3
+2026-10-08 15:15:46.570 GummyRicochet[39516:488067] QA sound clip=freeze feedback=8 playing=1 volume=0.45 rate=1.00 voices=3
+2026-10-08 15:15:46.591 GummyRicochet[39516:488067] QA sound clip=blast feedback=9 playing=1 volume=0.45 rate=1.00 voices=3
+2026-10-08 15:15:46.623 GummyRicochet[39516:488067] QA sound clip=sweep feedback=10 playing=1 volume=0.45 rate=1.00 voices=3
+2026-10-08 15:15:46.644 GummyRicochet[39516:488067] QA sound clip=wild feedback=11 playing=1 volume=0.45 rate=1.00 voices=3
+2026-10-08 15:15:46.666 GummyRicochet[39516:488067] QA sound clip=combo feedback=7 playing=1 volume=0.45 rate=1.00 voices=3
+2026-10-08 15:15:46.687 GummyRicochet[39516:488067] QA sound clip=freeze feedback=8 playing=1 volume=0.45 rate=1.00 voices=3
+2026-10-08 15:15:46.708 GummyRicochet[39516:488067] QA sound clip=blast feedback=9 playing=1 volume=0.45 rate=1.00 voices=3
+2026-10-08 15:15:46.741 GummyRicochet[39516:488067] QA audio disabled voices=0
+2026-10-08 15:15:46.742 GummyRicochet[39516:488067] QA audio disabled request voices=0
+2026-10-08 15:15:46.742 GummyRicochet[39516:488067] QA audio independent effectsOff={
+    fading = 0;
+    mode = 1;
+    playing = 1;
+    suspended = 0;
+    voices = 0;
+}
+2026-10-08 15:15:46.783 GummyRicochet[39516:488067] QA sound clip=wild feedback=11 playing=1 volume=0.40 rate=1.00 voices=1
+2026-10-08 15:15:46.783 GummyRicochet[39516:488067] QA audio independent musicOff={
+    fading = 0;
+    mode = 1;
+    playing = 0;
+    suspended = 0;
+    voices = 1;
+}
+2026-10-08 15:15:46.794 GummyRicochet[39516:488067] QA music mode=1 playing=1 time=18.673 duration=43.636 loops=-1
+2026-10-08 15:15:46.815 GummyRicochet[39516:488067] QA music mode=2 playing=1 time=12.455 duration=29.091 loops=-1
+2026-10-08 15:15:47.543 GummyRicochet[39516:488067] QA audio danger={
+    fading = 0;
+    mode = 2;
+    playing = 1;
+    suspended = 0;
+    voices = 1;
+}
+2026-10-08 15:15:47.584 GummyRicochet[39516:488067] QA music mode=2 playing=1 time=13.176 duration=29.091 loops=-1
+2026-10-08 15:15:47.626 GummyRicochet[39516:488067] QA music mode=2 playing=1 time=13.195 duration=29.091 loops=-1
+2026-10-08 15:15:47.669 GummyRicochet[39516:488067] QA music mode=2 playing=1 time=13.215 duration=29.091 loops=-1
+2026-10-08 15:15:47.711 GummyRicochet[39516:488067] QA music mode=2 playing=1 time=13.234 duration=29.091 loops=-1
+2026-10-08 15:15:47.743 GummyRicochet[39516:488067] QA audio lifecycle PASS
+2026-10-08 15:15:47.765 GummyRicochet[39516:488067] QA music mode=1 playing=1 time=19.869 duration=43.636 loops=-1
+2026-10-08 15:15:47.765 GummyRicochet[39516:488067] QA audio tour end restoredSound=1 restoredMusic=1

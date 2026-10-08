@@ -1,0 +1,28 @@
+{
+  "originalComposition": true,
+  "sampleRate": 44100,
+  "channels": 2,
+  "bits": 16,
+  "bars": 16,
+  "key": "C major",
+  "tracks": {
+    "music_relaxed": {
+      "bpm": 88,
+      "duration": 43.636371882086166,
+      "peak": 0.37445068359375,
+      "rms": 0.06406123422159303,
+      "clippedSamples": 0,
+      "loopBoundaryStep": 0.000579833984375,
+      "score": "shared 16-bar melody and harmony"
+    },
+    "music_danger": {
+      "bpm": 132,
+      "duration": 29.09090702947846,
+      "peak": 0.4813232421875,
+      "rms": 0.09176169211037785,
+      "clippedSamples": 0,
+      "loopBoundaryStep": 0.0008544921875,
+      "score": "shared 16-bar melody and harmony"
+    }
+  }
+}

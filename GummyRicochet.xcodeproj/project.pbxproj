@@ -7,6 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8CB6C530817C02AA8A8FD5E1 /* shot_yellow.wav in Resources */ = {isa = PBXBuildFile; fileRef = C2A8E94F0A560C0303D1415C /* shot_yellow.wav */; };
+		ACEAFF1380EF6117480D40DA /* shot_white.wav in Resources */ = {isa = PBXBuildFile; fileRef = 9F6A02DE62EBA9C765975868 /* shot_white.wav */; };
+		F9A1A2765BC3CB4242BCBCA1 /* shot_red.wav in Resources */ = {isa = PBXBuildFile; fileRef = FC0BF9A253191E4043376182 /* shot_red.wav */; };
+		E3F894FDDF51607289BAB1BD /* shot_blue.wav in Resources */ = {isa = PBXBuildFile; fileRef = 399EF3D6F0B54DB0BE17F55C /* shot_blue.wav */; };
+		63FF158DA66AA6E028354116 /* music_relaxed.wav in Resources */ = {isa = PBXBuildFile; fileRef = EAA15B0A90C25B9761360334 /* music_relaxed.wav */; };
+		F5C60D1D02444FC1D9A0C8BB /* music_manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B0206885600497934E664F8 /* music_manifest.json */; };
+		EFAC59207D1F3E2B5354C929 /* music_danger.wav in Resources */ = {isa = PBXBuildFile; fileRef = 106E2CB40DE878B4431C0ECC /* music_danger.wav */; };
+		7D512AAA63BCA77C37952487 /* match_yellow.wav in Resources */ = {isa = PBXBuildFile; fileRef = DF4AF735D1CBDE92E2EB5D53 /* match_yellow.wav */; };
+		2541368664C552F6B57A0DA6 /* match_white.wav in Resources */ = {isa = PBXBuildFile; fileRef = DB6048C19F3BFE337C8CFA04 /* match_white.wav */; };
+		45FA0B76ECA162959A116667 /* match_red.wav in Resources */ = {isa = PBXBuildFile; fileRef = F258F97E01C6975EA90B23A2 /* match_red.wav */; };
+		34B4D7FD308A19BD25BE4AE8 /* match_blue.wav in Resources */ = {isa = PBXBuildFile; fileRef = 29B449A8583826124B5C181E /* match_blue.wav */; };
+		CDA6166A33FAE2CC80A67FA0 /* blast_ready.wav in Resources */ = {isa = PBXBuildFile; fileRef = 9D5456274631D74050DF1A87 /* blast_ready.wav */; };
 		81C986E75AD259FEA3F1322D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E2A8B359923463C4A316AFE8 /* Assets.xcassets */; };
 		0269E9F53FD478CA96A57AC7 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 905025C4FEBBFCB841184C93 /* CoreGraphics.framework */; };
 		02AF86FF0874E931B85D022D /* wild.wav in Resources */ = {isa = PBXBuildFile; fileRef = 7CFC7C61AE8CE7DFBA5152AA /* wild.wav */; };
@@ -52,6 +64,18 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		C2A8E94F0A560C0303D1415C /* shot_yellow.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = shot_yellow.wav; sourceTree = "<group>"; };
+		9F6A02DE62EBA9C765975868 /* shot_white.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = shot_white.wav; sourceTree = "<group>"; };
+		FC0BF9A253191E4043376182 /* shot_red.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = shot_red.wav; sourceTree = "<group>"; };
+		399EF3D6F0B54DB0BE17F55C /* shot_blue.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = shot_blue.wav; sourceTree = "<group>"; };
+		EAA15B0A90C25B9761360334 /* music_relaxed.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = music_relaxed.wav; sourceTree = "<group>"; };
+		4B0206885600497934E664F8 /* music_manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = music_manifest.json; sourceTree = "<group>"; };
+		106E2CB40DE878B4431C0ECC /* music_danger.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = music_danger.wav; sourceTree = "<group>"; };
+		DF4AF735D1CBDE92E2EB5D53 /* match_yellow.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = match_yellow.wav; sourceTree = "<group>"; };
+		DB6048C19F3BFE337C8CFA04 /* match_white.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = match_white.wav; sourceTree = "<group>"; };
+		F258F97E01C6975EA90B23A2 /* match_red.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = match_red.wav; sourceTree = "<group>"; };
+		29B449A8583826124B5C181E /* match_blue.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = match_blue.wav; sourceTree = "<group>"; };
+		9D5456274631D74050DF1A87 /* blast_ready.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = blast_ready.wav; sourceTree = "<group>"; };
 		E2A8B359923463C4A316AFE8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1664F5ABD078B354451DD8E3 /* GDProgressStore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GDProgressStore.h; sourceTree = "<group>"; };
 		1963FB029408FEA6E3CBDC66 /* GDLevelCatalog.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GDLevelCatalog.h; sourceTree = "<group>"; };
@@ -146,6 +170,18 @@
 		13139B67B72417489B663A08 /* Audio */ = {
 			isa = PBXGroup;
 			children = (
+				C2A8E94F0A560C0303D1415C /* shot_yellow.wav */,
+				9F6A02DE62EBA9C765975868 /* shot_white.wav */,
+				FC0BF9A253191E4043376182 /* shot_red.wav */,
+				399EF3D6F0B54DB0BE17F55C /* shot_blue.wav */,
+				EAA15B0A90C25B9761360334 /* music_relaxed.wav */,
+				4B0206885600497934E664F8 /* music_manifest.json */,
+				106E2CB40DE878B4431C0ECC /* music_danger.wav */,
+				DF4AF735D1CBDE92E2EB5D53 /* match_yellow.wav */,
+				DB6048C19F3BFE337C8CFA04 /* match_white.wav */,
+				F258F97E01C6975EA90B23A2 /* match_red.wav */,
+				29B449A8583826124B5C181E /* match_blue.wav */,
+				9D5456274631D74050DF1A87 /* blast_ready.wav */,
 				3A85F55E66B1719A5F44EE1F /* blast.wav */,
 				B80728B761C800BFE479AC51 /* combo.wav */,
 				D49D9D946030B60D52CBCC2C /* error.wav */,
@@ -316,6 +352,18 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8CB6C530817C02AA8A8FD5E1 /* shot_yellow.wav in Resources */,
+				ACEAFF1380EF6117480D40DA /* shot_white.wav in Resources */,
+				F9A1A2765BC3CB4242BCBCA1 /* shot_red.wav in Resources */,
+				E3F894FDDF51607289BAB1BD /* shot_blue.wav in Resources */,
+				63FF158DA66AA6E028354116 /* music_relaxed.wav in Resources */,
+				F5C60D1D02444FC1D9A0C8BB /* music_manifest.json in Resources */,
+				EFAC59207D1F3E2B5354C929 /* music_danger.wav in Resources */,
+				7D512AAA63BCA77C37952487 /* match_yellow.wav in Resources */,
+				2541368664C552F6B57A0DA6 /* match_white.wav in Resources */,
+				45FA0B76ECA162959A116667 /* match_red.wav in Resources */,
+				34B4D7FD308A19BD25BE4AE8 /* match_blue.wav in Resources */,
+				CDA6166A33FAE2CC80A67FA0 /* blast_ready.wav in Resources */,
 				81C986E75AD259FEA3F1322D /* Assets.xcassets in Resources */,
 				E622D62694DCAFBEB9008D30 /* GDLevelsData.inc in Resources */,
 				4FB760F7981B54AE7574DAA7 /* blast.wav in Resources */,

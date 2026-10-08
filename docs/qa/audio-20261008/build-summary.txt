@@ -1,0 +1,6 @@
+2026-10-08
+Debug iOS Simulator: BUILD SUCCEEDED
+Release iOS Simulator: BUILD SUCCEEDED
+Existing warning: GDEngine.m unused function GDReadPoint
+PASS: 24 effects, 2 seamless music loops, distinct color waveforms
+2026-10-08 15:05:27.912 settings_tests[37768:473526] PASS: 5 persistent settings checks

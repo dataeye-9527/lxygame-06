@@ -7,6 +7,7 @@
 static NSString * const GDAimKey = @"GummySettingsAimGuide";
 static NSString * const GDHapticsKey = @"GummySettingsHaptics";
 static NSString * const GDSoundKey = @"GummySettingsSoundEffects";
+static NSString * const GDMusicKey = @"GummySettingsMusic";
 
 @interface GDSettings ()
 @property(nonatomic) NSUserDefaults *defaults;
@@ -22,26 +23,37 @@ static NSString * const GDSoundKey = @"GummySettingsSoundEffects";
 - (instancetype)initWithDefaults:(NSUserDefaults *)defaults {
     if((self=[super init])) {
         _defaults=defaults;
-        [defaults registerDefaults:@{GDAimKey:@YES, GDHapticsKey:@YES, GDSoundKey:@YES}];
+        [defaults registerDefaults:@{GDAimKey:@YES, GDHapticsKey:@YES, GDSoundKey:@YES, GDMusicKey:@YES}];
     }
     return self;
 }
 - (BOOL)aimGuideEnabled { return [self.defaults boolForKey:GDAimKey]; }
 - (BOOL)hapticsEnabled { return [self.defaults boolForKey:GDHapticsKey]; }
 - (BOOL)soundEffectsEnabled { return [self.defaults boolForKey:GDSoundKey]; }
+- (BOOL)musicEnabled { return [self.defaults boolForKey:GDMusicKey]; }
 - (void)setAimGuideEnabled:(BOOL)value { [self.defaults setBool:value forKey:GDAimKey]; }
 - (void)setHapticsEnabled:(BOOL)value { [self.defaults setBool:value forKey:GDHapticsKey]; }
 - (void)setSoundEffectsEnabled:(BOOL)value {
     [self.defaults setBool:value forKey:GDSoundKey];
 #if !GD_SETTINGS_TESTS
-    if(!value) [GDAudioFeedback.sharedPlayer stop];
+    if(!value) [GDAudioFeedback.sharedPlayer stopEffects];
+#endif
+}
+- (void)setMusicEnabled:(BOOL)value {
+    [self.defaults setBool:value forKey:GDMusicKey];
+#if !GD_SETTINGS_TESTS
+    if(value) [GDAudioFeedback.sharedPlayer resumeMusic];
+    else [GDAudioFeedback.sharedPlayer refreshMusicPreference];
 #endif
 }
 - (void)playFeedback:(GDFeedbackType)feedback { [self playFeedback:feedback intensity:.5]; }
 - (void)playFeedback:(GDFeedbackType)feedback intensity:(CGFloat)intensity {
+    [self playFeedback:feedback intensity:intensity color:-1];
+}
+- (void)playFeedback:(GDFeedbackType)feedback intensity:(CGFloat)intensity color:(NSInteger)color {
 #if !GD_SETTINGS_TESTS
-    if(feedback<GDFeedbackTap || feedback>GDFeedbackWin) return;
-    if(self.soundEffectsEnabled) [GDAudioFeedback.sharedPlayer playFeedback:feedback intensity:intensity];
+    if(feedback<GDFeedbackTap || feedback>GDFeedbackBlastReady) return;
+    if(self.soundEffectsEnabled) [GDAudioFeedback.sharedPlayer playFeedback:feedback intensity:intensity color:color];
     if(self.hapticsEnabled) {
         if(feedback==GDFeedbackError || feedback==GDFeedbackGameOver || feedback==GDFeedbackWin) {
             UINotificationFeedbackGenerator *generator=[UINotificationFeedbackGenerator new];

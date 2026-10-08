@@ -1,0 +1,12 @@
+{
+  "relaunchPreservedPlayerData": true,
+  "musicEnabled": true,
+  "soundEffectsEnabled": true,
+  "fingerprints": {
+    "GummyLevelRunSnapshot": "6b7c7800d7b386a455e6137f23b6f13ae734167ee785077f14ba38256a74f9d1",
+    "GDEndlessRecords": "89fe3cb9e75adebdaff56a652de4fc32c5b4667ab5f8d6c9e245fb32eaa72853",
+    "GDPrototypeBestScore": "a288403a28bae669ae3e0face3416fae6b627c58c60dc52d2b00168e28a62979",
+    "GummyRunSnapshot": "20f189a4b97c8c0f5bab85fb5e1df4e1ae40bd77665d463219581a85e637de63",
+    "GDCampaignProgress": "2eec42e76233df8592e28d550ca893ccfcc37ca3931c7c0c1b953ec1e88dfaa6"
+  }
+}

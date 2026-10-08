@@ -3,6 +3,7 @@
 #import "GDEngine.h"
 #import "FrontendScene.h"
 #import "GDSettings.h"
+#import "GDAudioFeedback.h"
 #import "GDLevelCatalog.h"
 #import "GDRunRecords.h"
 #import <UIKit/UIKit.h>
@@ -34,6 +35,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
 @property(nonatomic) UITouch *aimTouch;
 @property(nonatomic) CGPoint aimTouchStart;
 @property(nonatomic) BOOL aiming, yellowArmed, renderedGameOver;
+@property(nonatomic) BOOL musicDanger;
 @property(nonatomic) NSTimeInterval lastTime;
 @property(nonatomic) NSInteger renderedRevision, displayedNext, displayedHeld, displayedCurrent, generation;
 @end
@@ -47,7 +49,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     [GummyUI setOverlayDimmed:self.overlay!=nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillResignActiveNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(backgroundPause:) name:UIApplicationWillResignActiveNotification object:nil];
-    if(self.engine){ self.lastTime=0; [self refreshHUD]; return; }
+    if(self.engine){ self.lastTime=0; [self refreshHUD]; [self refreshMusic]; if(self.engine.phase!=GDPhasePaused) [GDAudioFeedback.sharedPlayer resumeMusic]; return; }
     self.anchorPoint=CGPointZero;
     self.pieceNodes=[NSMutableDictionary dictionary]; self.skillCards=[NSMutableArray array]; self.launcherNodes=[NSMutableArray array]; self.energyFills=[NSMutableArray array]; self.energyLabels=[NSMutableArray array];
     self.displayedNext=self.displayedHeld=self.displayedCurrent=-99; self.renderedRevision=-1;
@@ -78,8 +80,11 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     self.displayedEnergy=[self.engine.energy copy];
     [self buildLayout]; [self syncBoard]; [self refreshHUD];
     if(self.engine.phase==GDPhasePaused) [self.engine resume];
+    [self refreshMusic];
+    [GDAudioFeedback.sharedPlayer resumeMusic];
 #if DEBUG
     if([args containsObject:@"-qa-clock"]) [self validatePresentationClock];
+    if([args containsObject:@"-qa-music"]) dispatch_after(dispatch_time(DISPATCH_TIME_NOW,NSEC_PER_SEC),dispatch_get_main_queue(),^{ [self validateMusicTransitions]; });
     if(saved && [args containsObject:@"-qa-feedback"]){ NSData *data=[NSJSONSerialization dataWithJSONObject:self.engine.snapshot options:0 error:nil]; NSLog(@"QA restored snapshot=%@",[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]); }
 #endif
 }
@@ -232,7 +237,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
 #endif
     if(![control isEqualToString:@"overlay"] && ![control isEqualToString:@"next"]) [GDSettings.sharedSettings playFeedback:GDFeedbackTap];
     if([control isEqualToString:@"pause"]){ [self pauseGame]; return; }
-    if([control isEqualToString:@"resume"]){ [self.overlay removeFromParent]; self.overlay=nil; [GummyUI setOverlayDimmed:NO]; self.playfield.paused=NO; [self.engine resume]; self.lastTime=0; return; }
+    if([control isEqualToString:@"resume"]){ [self.overlay removeFromParent]; self.overlay=nil; [GummyUI setOverlayDimmed:NO]; self.playfield.paused=NO; [self.engine resume]; self.lastTime=0; [self refreshMusic]; [GDAudioFeedback.sharedPlayer resumeMusic]; return; }
     if([control isEqualToString:@"levels"] || [control isEqualToString:@"allLevels"]){ [self saveRun]; [self.view presentScene:[FrontendScene levelsScene]]; return; }
     if([control isEqualToString:@"scores"]){ [self.view presentScene:[FrontendScene leaderboardScene]]; return; }
     if([control isEqualToString:@"nextLevel"]){ NSInteger next=self.engine.levelID+1; if([GDLevelCatalog levelForID:next]){ GameScene *scene=[[GameScene alloc] initWithSize:self.size levelID:next]; scene.scaleMode=self.scaleMode; [self.view presentScene:scene]; } return; }
@@ -248,7 +253,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
         if(i==GDColorYellow){
             if(self.yellowArmed){ self.yellowArmed=NO; GDEvent *event=[self.engine activateYellow]; if(event){ [GDSettings.sharedSettings playFeedback:GDFeedbackSweep]; [self animateEvent:event]; } }
             else if(self.engine.energy[GDColorYellow].integerValue>=[self.engine energyThresholdForColor:GDColorYellow]){ self.yellowArmed=YES; [self highlightCells:[self.engine yellowTargets] color:[GummyUI color:GDColorYellow]]; }
-        } else { self.yellowArmed=NO; if([self.engine activateSkill:i]){ [GDSettings.sharedSettings playFeedback:i==GDColorBlue?GDFeedbackFreeze:(i==GDColorRed?GDFeedbackTap:GDFeedbackWild)]; [self skillEffect:i]; } }
+        } else { self.yellowArmed=NO; if([self.engine activateSkill:i]){ if(i!=GDColorRed || self.engine.blastArmed) [GDSettings.sharedSettings playFeedback:i==GDColorBlue?GDFeedbackFreeze:(i==GDColorRed?GDFeedbackBlastReady:GDFeedbackWild)]; [self skillEffect:i]; } }
     }
     [self refreshHUD];
 }
@@ -327,7 +332,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     for(GDCell *cell in cells){ SKShapeNode *ring=[SKShapeNode shapeNodeWithCircleOfRadius:24]; ring.position=ScenePoint([self.engine centerOfCell:cell]); ring.strokeColor=color; ring.fillColor=[color colorWithAlphaComponent:.12]; ring.lineWidth=2.5; [self.aimLayer addChild:ring]; }
 }
 - (void)flyShot:(GDShot *)shot {
-    [GDSettings.sharedSettings playFeedback:GDFeedbackShot];
+    [GDSettings.sharedSettings playFeedback:GDFeedbackShot intensity:.5 color:shot.blast?GDColorRed:self.engine.currentColor];
     SKNode *projectile=[GummyUI piece:shot.blast?GDColorRed:self.engine.currentColor diameter:45]; projectile.position=ScenePoint(shot.points.firstObject.CGPointValue); [self.effects addChild:projectile];
     NSMutableArray *actions=[NSMutableArray array];
     NSTimeInterval trailTime=0;
@@ -381,7 +386,15 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     [self clearAim]; self.yellowArmed=NO;
     NSInteger count=event.removed.count+event.fallen.count;
     if(event.source==GDSourceNormal || event.source==GDSourceWild){
-        if(count){ self.combo++; GDFeedbackType type=event.fallen.count>=6?GDFeedbackFall:(self.combo>1 || count>=10?GDFeedbackCombo:GDFeedbackMatch); [GDSettings.sharedSettings playFeedback:type intensity:MIN(1,.35+count/30.0)]; }
+        if(count){
+            self.combo++;
+            CGFloat intensity=MIN(1,.35+count/30.0);
+            if(event.removed.count) [GDSettings.sharedSettings playFeedback:GDFeedbackMatch intensity:intensity color:event.placed?event.placed.color:event.removed.firstObject.color];
+            if(GDSettings.sharedSettings.soundEffectsEnabled){
+                if(event.fallen.count) [GDAudioFeedback.sharedPlayer playFeedback:GDFeedbackFall intensity:intensity];
+                if(self.combo>1 || count>=10) [GDAudioFeedback.sharedPlayer playFeedback:GDFeedbackCombo intensity:intensity];
+            }
+        }
         else self.combo=0;
     } else if(event.source==GDSourceBlast) [GDSettings.sharedSettings playFeedback:GDFeedbackBlast];
 
@@ -416,7 +429,21 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     NSTimeInterval delta=self.lastTime>0?MIN(.25,MAX(0,currentTime-self.lastTime)):0; self.lastTime=currentTime;
     [self advanceGameClock:delta];
     [self refreshHUD];
+    [self refreshMusic];
     if([self finished] && !self.overlay) [self showOverlay:YES];
+}
+- (void)refreshMusic {
+    if(!self.view) return;
+    if(self.engine.phase==GDPhasePaused){ [GDAudioFeedback.sharedPlayer pauseMusic]; return; }
+    if([self finished]){ [GDAudioFeedback.sharedPlayer setMusicMode:GDMusicSilent]; return; }
+    CGFloat clearance=self.engine.dangerY;
+    for(GDCell *cell in self.engine.cells) clearance=MIN(clearance,self.engine.dangerY-([self.engine centerOfCell:cell].y+self.engine.radius));
+    CGFloat rowHeight=self.engine.radius*sqrt(3);
+    // Enter within two pressure rows; recover beyond three to avoid rapid toggles.
+    if(self.engine.freezeRemaining>0) self.musicDanger=NO;
+    else if(clearance<=2*rowHeight) self.musicDanger=YES;
+    else if(clearance>3*rowHeight) self.musicDanger=NO;
+    [GDAudioFeedback.sharedPlayer setMusicMode:self.musicDanger?GDMusicDanger:GDMusicRelaxed];
 }
 - (void)advanceGameClock:(NSTimeInterval)delta {
     // Split at authoritative phase boundaries so a long frame cannot shorten
@@ -445,6 +472,36 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     }
 }
 #if DEBUG
+- (void)validateMusicTransitions {
+    GDEngine *original=self.engine; BOOL originalDanger=self.musicDanger;
+    self.engine=[[GDEngine alloc] initWithSeed:20261008];
+    for(NSNumber *depth in @[@8,@7,@6]) {
+        NSMutableArray *cells=[NSMutableArray array];
+        for(NSInteger row=0;row<=depth.integerValue;row++) [cells addObject:[GDCell row:row column:8 color:GDColorBlue]];
+        [self.engine loadFixture:cells phase:0 current:GDColorBlue next:GDColorRed];
+        [self refreshMusic];
+        NSInteger expected=depth.integerValue==6?GDMusicRelaxed:GDMusicDanger;
+        NSAssert([GDAudioFeedback.sharedPlayer.qaAudioState[@"mode"] integerValue]==expected,@"Music must track danger geometry and recovery hysteresis");
+    }
+    NSMutableArray *cells=[NSMutableArray array];
+    for(NSInteger row=0;row<=8;row++) [cells addObject:[GDCell row:row column:8 color:GDColorBlue]];
+    [self.engine loadFixture:cells phase:0 current:GDColorBlue next:GDColorRed];
+    [self.engine setFixtureEnergy:@[@20,@0,@0,@0]];
+    [self.engine activateSkill:GDColorBlue]; [self refreshMusic];
+    NSAssert([GDAudioFeedback.sharedPlayer.qaAudioState[@"mode"] integerValue]==GDMusicRelaxed,@"Freeze must relax the danger arrangement");
+    [self.engine advanceTime:30]; [self refreshMusic];
+    NSAssert([GDAudioFeedback.sharedPlayer.qaAudioState[@"mode"] integerValue]==GDMusicDanger,@"Expired freeze must restore danger music");
+    [self.engine pause]; [self refreshMusic];
+    NSAssert(![GDAudioFeedback.sharedPlayer.qaAudioState[@"playing"] boolValue],@"Paused game must silence music");
+    [self.engine resume]; [self refreshMusic]; [GDAudioFeedback.sharedPlayer resumeMusic];
+    NSAssert([GDAudioFeedback.sharedPlayer.qaAudioState[@"playing"] boolValue],@"Game resume must resume the danger arrangement");
+    NSMutableDictionary *terminal=[self.engine.snapshot mutableCopy]; terminal[@"gameOver"]=@YES; terminal[@"completionRecorded"]=@YES;
+    self.engine=[[GDEngine alloc] initWithSnapshot:terminal]; [self refreshMusic];
+    NSAssert(![GDAudioFeedback.sharedPlayer.qaAudioState[@"playing"] boolValue],@"Game Over must stop music");
+    self.engine=original; self.musicDanger=originalDanger; [self refreshMusic];
+    [self.engine pause]; self.playfield.paused=YES; [self refreshMusic]; [self showOverlay:NO];
+    NSLog(@"QA music gameplay PASS danger hysteresis freeze expire pause resume gameOver");
+}
 - (GameScene *)clockProbe {
     GameScene *probe=[[GameScene alloc] initWithSize:self.size runSnapshot:nil];
     probe.clockValidation=YES; probe.engine=[[GDEngine alloc] initWithSeed:20260930];
@@ -491,7 +548,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
 - (BOOL)finished { return self.engine.phase==GDPhaseGameOver || self.engine.phase==GDPhaseWon; }
 - (void)saveRun {
 #if DEBUG
-    if(self.qaPresentationFixture) return;
+    if(self.qaPresentationFixture || [NSProcessInfo.processInfo.arguments containsObject:@"-qa-music"]) return;
 #endif
     if([self finished]) [NSUserDefaults.standardUserDefaults removeObjectForKey:[self snapshotKey]];
     else [NSUserDefaults.standardUserDefaults setObject:self.engine.snapshot forKey:[self snapshotKey]];
@@ -500,6 +557,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
 - (void)pauseGame {
     if(self.overlay || [self finished]) return;
     [self clearAim]; self.yellowArmed=NO; [self.engine cancelBlast]; [self.engine pause]; self.playfield.paused=YES;
+    [GDAudioFeedback.sharedPlayer pauseMusic];
     [self saveRun];
     [NSUserDefaults.standardUserDefaults setObject:self.engine.diagnostics forKey:@"GummyLastDiagnostics"];
     [self showOverlay:NO];
@@ -560,7 +618,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     self.generation++; [self.playfield removeAllActions]; [self.effects removeAllChildren]; [self clearAim]; [self.overlay removeFromParent]; self.overlay=nil; self.playfield.paused=NO;
     NSInteger levelID=self.engine.mode==GDGameModeLevel?self.engine.levelID:0;
     self.engine=levelID?[[GDEngine alloc] initWithLevelID:levelID seed:[GDLevelCatalog levelForID:levelID].seed]:[[GDEngine alloc] initWithSeed:[self newRunSeed]];
-    self.combo=0; self.flightRemaining=self.resolutionRemaining=-1; self.displayedEnergy=[self.engine.energy copy];
+    self.combo=0; self.musicDanger=NO; self.flightRemaining=self.resolutionRemaining=-1; self.displayedEnergy=[self.engine.energy copy];
     for(SKNode *node in self.launcherNodes){ [node removeAllActions]; node.xScale=node.yScale=1; }
     for(SKNode *node in self.skillCards){ [node removeAllActions]; node.xScale=node.yScale=1; }
     for(SKNode *node in [self.hud.children copy]) if([node.name isEqualToString:@"feedback"]) [node removeFromParent];
@@ -570,5 +628,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     self.yellowArmed=NO; self.renderedRevision=-1; self.lastTime=0; self.displayedCurrent=-99;
     for(SKNode *node in self.pieceNodes.allValues) [node removeFromParent]; [self.pieceNodes removeAllObjects];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:[self snapshotKey]]; [self syncBoard]; [self refreshHUD];
+    [self refreshMusic];
+    [GDAudioFeedback.sharedPlayer resumeMusic];
 }
 @end

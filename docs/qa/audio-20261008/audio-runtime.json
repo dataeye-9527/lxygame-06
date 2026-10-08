@@ -1,0 +1,32 @@
+{
+  "clipsPlayed": [
+    "blast",
+    "blast_ready",
+    "combo",
+    "error",
+    "fall",
+    "freeze",
+    "game_over",
+    "match",
+    "match_blue",
+    "match_red",
+    "match_white",
+    "match_yellow",
+    "ready",
+    "shot",
+    "shot_blue",
+    "shot_red",
+    "shot_white",
+    "shot_yellow",
+    "skill",
+    "sweep",
+    "tap",
+    "wild",
+    "win"
+  ],
+  "maxEffectVoices": 3,
+  "independentMute": "PASS",
+  "crossfadeRetiresOutgoing": "PASS",
+  "lifecycleNotificationSimulation": "PASS",
+  "routePauseAndExplicitResume": "PASS"
+}

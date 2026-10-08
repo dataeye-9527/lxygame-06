@@ -1,0 +1,13 @@
+2026-10-08 15:08:12.779 GummyRicochet[38320:478666] QA music mode=1 playing=1 time=0.000 duration=43.636 loops=-1
+2026-10-08 15:08:12.831 GummyRicochet[38320:478666] SKView: no drawables available for rendering. Skipping this frame.
+2026-10-08 15:08:13.174 GummyRicochet[38320:478666] QA music mode=2 playing=1 time=0.233 duration=29.091 loops=-1
+2026-10-08 15:08:13.206 GummyRicochet[38320:478666] QA music mode=1 playing=1 time=0.350 duration=43.636 loops=-1
+2026-10-08 15:08:13.238 GummyRicochet[38320:478666] QA music mode=2 playing=1 time=0.233 duration=29.091 loops=-1
+2026-10-08 15:08:13.314 GummyRicochet[38320:478666] QA music mode=2 playing=1 time=0.229 duration=29.091 loops=-1
+objc[38320]: Class UIAccessibilityLoaderWebShared is implemented in both /Library/Developer/CoreSimulator/Volumes/iOS_23E254a/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.4.simruntime/Contents/Resources/RuntimeRoot/System/Library/AccessibilityBundles/WebKit.axbundle/WebKit (0x10738c398) and /Library/Developer/CoreSimulator/Volumes/iOS_23E254a/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.4.simruntime/Contents/Resources/RuntimeRoot/System/Library/AccessibilityBundles/WebCore.axbundle/WebCore (0x111670310). This may cause spurious casting failures and mysterious crashes. One of the duplicates must be removed or renamed.
+2026-10-08 15:08:13.378 GummyRicochet[38320:478666] QA music mode=1 playing=1 time=0.366 duration=43.636 loops=-1
+2026-10-08 15:08:13.486 GummyRicochet[38320:478666] QA music gameplay PASS danger hysteresis freeze expire pause resume gameOver
+2026-10-08 15:08:29.304 GummyRicochet[38320:478666] QA sound clip=tap feedback=0 playing=1 volume=0.40 rate=1.00 voices=1
+2026-10-08 15:08:29.365 GummyRicochet[38320:478666] QA music mode=1 playing=1 time=0.384 duration=43.636 loops=-1
+2026-10-08 15:08:46.383 GummyRicochet[38320:478666] SKView: no drawables available for rendering. Skipping this frame.
+2026-10-08 15:08:47.060 GummyRicochet[38320:478666] QA sound clip=tap feedback=0 playing=1 volume=0.40 rate=1.00 voices=1

@@ -3,6 +3,7 @@
 #import "GummyUI.h"
 #import "GDEngine.h"
 #import "GDSettings.h"
+#import "GDAudioFeedback.h"
 #import "GDLevelCatalog.h"
 #import "GDProgressStore.h"
 #import "GDRunRecords.h"
@@ -29,7 +30,7 @@ static UIColor *MenuBlue(void) { return [UIColor colorWithRed:.65 green:.86 blue
 + (instancetype)leaderboardScene { FrontendScene *s=[self homeScene]; s.page=@"leaderboard"; return s; }
 + (instancetype)helpScene { FrontendScene *s=[self homeScene]; s.page=@"help"; return s; }
 + (instancetype)settingsSceneReturningTo:(SKScene *)scene { FrontendScene *s=[self homeScene]; s.page=@"settings"; s.returnScene=scene; return s; }
-- (void)didMoveToView:(SKView *)view { [GummyUI setOverlayDimmed:NO]; [self rebuild]; }
+- (void)didMoveToView:(SKView *)view { [GummyUI setOverlayDimmed:NO]; [GDAudioFeedback.sharedPlayer setMusicMode:GDMusicRelaxed]; [GDAudioFeedback.sharedPlayer resumeMusic]; [self rebuild]; }
 - (void)text:(NSString *)text size:(CGFloat)size at:(CGPoint)p { SKLabelNode *label=[GummyUI label:text size:size color:MenuInk()]; label.position=p; [self addChild:label]; }
 - (void)button:(NSString *)text name:(NSString *)name center:(CGPoint)p size:(CGSize)size color:(UIColor *)color {
     SKNode *node=[GummyUI button:text size:size name:name color:color]; node.position=p; node.zPosition=5; [self addChild:node]; self.controls[name]=[NSValue valueWithCGRect:CGRectMake(p.x-size.width/2,p.y-size.height/2,size.width,size.height)];
@@ -160,14 +161,14 @@ static UIColor *MenuBlue(void) { return [UIColor colorWithRed:.65 green:.86 blue
 }
 - (void)buildSettings {
     [self pageFrame:@"SETTINGS"];
-    NSArray *titles=@[@"Sound Effects",@"Haptics",@"Aim Guide"];
+    NSArray *titles=@[@"Music",@"Sound Effects",@"Haptics",@"Aim Guide"];
     GDSettings *settings=GDSettings.sharedSettings;
-    NSArray *values=@[@(settings.soundEffectsEnabled),@(settings.hapticsEnabled),@(settings.aimGuideEnabled)];
-    NSArray *keys=@[@"sound",@"haptics",@"guide"];
-    for(NSInteger i=0;i<3;i++){
-        CGFloat y=438-i*112;
-        SKNode *row=[GummyUI surface:CGSizeMake(760,86) color:[UIColor colorWithRed:.98 green:.88 blue:.86 alpha:1] radius:24]; row.position=CGPointMake(600,y); [self addChild:row];
-        SKNode *icon=[GummyUI symbol:@[@"speaker.wave.2.fill",@"hand.tap.fill",@"scope"][i] size:32 color:MenuInk()]; icon.position=CGPointMake(273,y); [self addChild:icon];
+    NSArray *values=@[@(settings.musicEnabled),@(settings.soundEffectsEnabled),@(settings.hapticsEnabled),@(settings.aimGuideEnabled)];
+    NSArray *keys=@[@"music",@"sound",@"haptics",@"guide"];
+    for(NSInteger i=0;i<4;i++){
+        CGFloat y=473-i*91;
+        SKNode *row=[GummyUI surface:CGSizeMake(760,77) color:[UIColor colorWithRed:.98 green:.88 blue:.86 alpha:1] radius:24]; row.position=CGPointMake(600,y); [self addChild:row];
+        SKNode *icon=[GummyUI symbol:@[@"music.note",@"speaker.wave.2.fill",@"hand.tap.fill",@"scope"][i] size:32 color:MenuInk()]; icon.position=CGPointMake(273,y); [self addChild:icon];
         SKLabelNode *label=[GummyUI label:titles[i] size:27 color:MenuInk()]; label.horizontalAlignmentMode=SKLabelHorizontalAlignmentModeLeft; label.position=CGPointMake(315,y); [self addChild:label];
         [self button:[values[i] boolValue]?@"On":@"Off" name:keys[i] center:CGPointMake(860,y) size:CGSizeMake(140,56) color:[values[i] boolValue]?MenuBlue():[UIColor colorWithRed:.81 green:.77 blue:.86 alpha:1]];
     }
@@ -218,6 +219,7 @@ static UIColor *MenuBlue(void) { return [UIColor colorWithRed:.65 green:.86 blue
     else if([control isEqualToString:@"help"]) [self.view presentScene:[FrontendScene helpScene]];
     else if([control isEqualToString:@"back"]){ SKScene *destination=self.returnScene?:[FrontendScene homeScene]; self.returnScene=nil; [self.view presentScene:destination]; }
     else {
+        if([control isEqualToString:@"music"]) settings.musicEnabled=!settings.musicEnabled;
         if([control isEqualToString:@"sound"]) settings.soundEffectsEnabled=!settings.soundEffectsEnabled;
         if([control isEqualToString:@"haptics"]) settings.hapticsEnabled=!settings.hapticsEnabled;
         if([control isEqualToString:@"guide"]) settings.aimGuideEnabled=!settings.aimGuideEnabled;

@@ -93,6 +93,60 @@
       "peak": 0.31747,
       "rms": 0.07619,
       "clippedSamples": 0
+    },
+    "shot_blue": {
+      "duration": 0.26,
+      "peak": 0.3544,
+      "rms": 0.08098,
+      "clippedSamples": 0
+    },
+    "match_blue": {
+      "duration": 0.4,
+      "peak": 0.4404,
+      "rms": 0.08482,
+      "clippedSamples": 0
+    },
+    "shot_red": {
+      "duration": 0.26,
+      "peak": 0.43188,
+      "rms": 0.08273,
+      "clippedSamples": 0
+    },
+    "match_red": {
+      "duration": 0.4,
+      "peak": 0.43399,
+      "rms": 0.0857,
+      "clippedSamples": 0
+    },
+    "shot_yellow": {
+      "duration": 0.26,
+      "peak": 0.37131,
+      "rms": 0.08072,
+      "clippedSamples": 0
+    },
+    "match_yellow": {
+      "duration": 0.4,
+      "peak": 0.45877,
+      "rms": 0.08551,
+      "clippedSamples": 0
+    },
+    "shot_white": {
+      "duration": 0.26,
+      "peak": 0.32001,
+      "rms": 0.08158,
+      "clippedSamples": 0
+    },
+    "match_white": {
+      "duration": 0.4,
+      "peak": 0.46292,
+      "rms": 0.09064,
+      "clippedSamples": 0
+    },
+    "blast_ready": {
+      "duration": 0.32,
+      "peak": 0.3266,
+      "rms": 0.09974,
+      "clippedSamples": 0
     }
   }
 }
