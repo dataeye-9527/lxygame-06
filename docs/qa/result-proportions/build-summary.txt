@@ -1,0 +1,7 @@
+2026-10-08 result proportions
+Device: existing iPhone 17 Pro / iOS 26.4 / 32C8A380-995E-44FD-83D2-1695230AF4F7
+Project: GummyRicochet.xcodeproj / scheme GummyRicochet
+SDK: iphonesimulator / CODE_SIGNING_ALLOWED=NO
+DerivedData: build/HomeReferenceDerivedData
+Debug: BUILD SUCCEEDED
+Release: BUILD SUCCEEDED

@@ -63,13 +63,25 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     self.engine=saved ? [[GDEngine alloc] initWithSnapshot:saved] : (self.initialLevelID>0?[[GDEngine alloc] initWithLevelID:self.initialLevelID seed:[GDLevelCatalog levelForID:self.initialLevelID].seed]:[[GDEngine alloc] initWithSeed:seed]);
     if(!self.engine) self.engine=[[GDEngine alloc] initWithSeed:seed];
 #if DEBUG
-    if([args containsObject:@"-qa-last-level"]){
-        GDLevel *last=GDLevelCatalog.levels.lastObject;
-        GDEngine *fixtureEngine=[[GDEngine alloc] initWithLevelID:last.levelID seed:last.seed];
+    NSUInteger resultIndex=[args indexOfObject:@"-qa-result"];
+    NSString *resultVariant=resultIndex!=NSNotFound && resultIndex+1<args.count?args[resultIndex+1]:nil;
+    if([args containsObject:@"-qa-last-level"]) resultVariant=@"last-level-win";
+    if(resultIndex!=NSNotFound || resultVariant){
+        NSAssert(([@[@"endless-loss",@"level-loss",@"level-win",@"last-level-win"] containsObject:resultVariant]),@"Unknown QA result variant");
+        BOOL resultWon=[resultVariant hasSuffix:@"-win"];
+        NSInteger levelID=[resultVariant isEqualToString:@"endless-loss"]?0:([resultVariant isEqualToString:@"last-level-win"]?GDLevelCatalog.levels.lastObject.levelID:1);
+        GDLevel *fixtureLevel=[GDLevelCatalog levelForID:levelID];
+        GDEngine *fixtureEngine=levelID?[[GDEngine alloc] initWithLevelID:levelID seed:fixtureLevel.seed]:[[GDEngine alloc] initWithSeed:20260930];
         NSMutableDictionary *fixture=[fixtureEngine.snapshot mutableCopy];
-        fixture[@"won"]=@YES; fixture[@"stars"]=@3; fixture[@"completionRecorded"]=@YES;
-        fixture[@"clearedWaves"]=@(fixtureEngine.objectiveTarget); fixture[@"collected"]=@(fixtureEngine.objectiveTarget); fixture[@"fallenTotal"]=@(fixtureEngine.objectiveTarget); fixture[@"elapsed"]=@(MAX(fixtureEngine.objectiveTarget,1));
+        fixture[@"won"]=@(resultWon); fixture[@"gameOver"]=@(!resultWon); fixture[@"stars"]=@(resultWon?3:0); fixture[@"completionRecorded"]=@YES;
+        fixture[@"score"]=@(levelID?3200:123456);
+        if(!levelID){
+            NSDictionary *record=[[[GDRunRecords alloc] initWithDefaults:NSUserDefaults.standardUserDefaults] records].lastObject;
+            if(record){ fixture[@"runID"]=record[@"runID"]; fixture[@"score"]=record[@"score"]; }
+        }
+        if(resultWon){ fixture[@"clearedWaves"]=@(fixtureEngine.objectiveTarget); fixture[@"collected"]=@(fixtureEngine.objectiveTarget); fixture[@"fallenTotal"]=@(fixtureEngine.objectiveTarget); fixture[@"elapsed"]=@(MAX(fixtureEngine.objectiveTarget,1)); }
         self.engine=[[GDEngine alloc] initWithSnapshot:fixture]; self.qaPresentationFixture=YES;
+        NSAssert(self.engine,@"QA result snapshot must be valid");
     }
     if(!saved && ([args containsObject:@"-qa-ready"] || [args containsObject:@"-qa-freeze-art"] || [args containsObject:@"-qa-blast-art"])) [self.engine setFixtureEnergy:@[@20,@20,@20,@20]];
     if(!saved && [args containsObject:@"-qa-failure"]){
@@ -241,7 +253,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
 }
 - (void)handleControl:(NSString *)control {
 #if DEBUG
-    if(self.qaPresentationFixture && ![@[@"home",@"levels",@"allLevels"] containsObject:control]) return;
+    if(self.qaPresentationFixture && ![@[@"home",@"levels",@"allLevels",@"scores"] containsObject:control]) return;
 #endif
     if(![control isEqualToString:@"overlay"] && ![control isEqualToString:@"next"]) [GDSettings.sharedSettings playFeedback:GDFeedbackTap];
     if([control isEqualToString:@"pause"]){ [self pauseGame]; return; }
@@ -651,9 +663,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
 }
 - (void)backgroundPause:(NSNotification *)notification { [self pauseGame]; [self saveRun]; }
 - (void)addOverlayButton:(NSString *)title name:(NSString *)name y:(CGFloat)y color:(UIColor *)color {
-    [self addOverlayButton:title name:name y:y size:CGSizeMake(286,57) color:color];
-}
-- (void)addOverlayButton:(NSString *)title name:(NSString *)name y:(CGFloat)y size:(CGSize)size color:(UIColor *)color {
+    CGSize size=CGSizeMake(512,96);
     SKNode *button=[GummyUI button:title size:size name:name color:color]; button.position=CGPointMake(600,y); [self.overlay addChild:button];
     self.overlayControls[name]=[NSValue valueWithCGRect:CGRectMake(button.position.x-size.width/2,y-size.height/2,size.width,size.height)];
 }
@@ -662,38 +672,37 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     BOOL level=self.engine.mode==GDGameModeLevel, won=self.engine.phase==GDPhaseWon;
     [GummyUI setOverlayDimmed:YES]; [self clearAim]; self.overlay=[SKNode node]; self.overlay.zPosition=100; [self addChild:self.overlay]; self.overlayControls=[NSMutableDictionary dictionary];
     SKShapeNode *shade=[GummyUI panel:self.size fill:GummyUI.overlayShadeColor stroke:UIColor.clearColor radius:0]; shade.position=CGPointMake(600,340); [self.overlay addChild:shade];
-    SKNode *card=[GummyUI surface:gameOver?CGSizeMake(454,550):CGSizeMake(608,590) color:Cream() radius:34]; card.position=CGPointMake(600,340); [self.overlay addChild:card];
-    SKLabelNode *title=[GummyUI label:gameOver?(won?@"LEVEL CLEAR":@"GAME OVER"):@"PAUSED" size:gameOver?33:36 color:Ink()]; title.position=CGPointMake(600,gameOver?560:574); [self.overlay addChild:title];
+    SKNode *card=[GummyUI surface:CGSizeMake(608,won?630:590) color:Cream() radius:34]; card.position=CGPointMake(600,340); [self.overlay addChild:card];
+    SKLabelNode *title=[GummyUI label:gameOver?(won?@"LEVEL CLEAR":@"GAME OVER"):@"PAUSED" size:36 color:Ink()]; title.position=CGPointMake(600,won?610:574); [self.overlay addChild:title];
     NSString *mode=level?[NSString stringWithFormat:@"LEVEL %02ld",(long)self.engine.levelID]:@"ENDLESS";
 #if DEBUG
-    if(self.qaPresentationFixture){ SKLabelNode *fixture=[GummyUI label:@"QA FIXTURE" size:12 color:Ink()]; fixture.position=CGPointMake(600,587); [self.overlay addChild:fixture]; }
+    if(self.qaPresentationFixture){ SKLabelNode *fixture=[GummyUI label:@"QA FIXTURE" size:12 color:Ink()]; fixture.position=CGPointMake(600,won?640:600); [self.overlay addChild:fixture]; }
 #endif
-    SKLabelNode *modeLabel=[GummyUI label:mode size:gameOver?16:18 color:Ink()]; modeLabel.position=CGPointMake(600,gameOver?520:535); [self.overlay addChild:modeLabel];
-    SKLabelNode *score=[GummyUI label:[NSString stringWithFormat:@"SCORE  %ld",(long)self.engine.score] size:gameOver?24:28 color:Ink()]; score.position=CGPointMake(600,gameOver?477:500); [self.overlay addChild:score];
-    UIColor *blue=[UIColor colorWithRed:.64 green:.85 blue:1 alpha:1], *pink=[UIColor colorWithRed:.97 green:.75 blue:.82 alpha:1], *lilac=[UIColor colorWithRed:.85 green:.78 blue:.95 alpha:1];
+    SKLabelNode *modeLabel=[GummyUI label:mode size:18 color:Ink()]; modeLabel.position=CGPointMake(600,won?578:535); [self.overlay addChild:modeLabel];
+    SKLabelNode *score=[GummyUI label:[NSString stringWithFormat:@"SCORE  %ld",(long)self.engine.score] size:28 color:Ink()]; score.position=CGPointMake(600,won?546:500); [self.overlay addChild:score];
+    UIColor *blue=[UIColor colorWithRed:.64 green:.85 blue:1 alpha:1], *pink=[UIColor colorWithRed:.97 green:.75 blue:.82 alpha:1], *lilac=[UIColor colorWithRed:.85 green:.78 blue:.95 alpha:1], *gold=[UIColor colorWithRed:1 green:.87 blue:.64 alpha:1];
     if(!gameOver){
-        CGSize buttonSize=CGSizeMake(512,96);
-        [self addOverlayButton:@"Resume" name:@"resume" y:434 size:buttonSize color:blue];
-        [self addOverlayButton:@"Retry" name:@"retry" y:328 size:buttonSize color:pink];
-        [self addOverlayButton:@"Settings" name:@"settings" y:222 size:buttonSize color:lilac];
-        [self addOverlayButton:@"Home" name:@"home" y:116 size:buttonSize color:[UIColor colorWithRed:1 green:.87 blue:.64 alpha:1]];
+        [self addOverlayButton:@"Resume" name:@"resume" y:434 color:blue];
+        [self addOverlayButton:@"Retry" name:@"retry" y:328 color:pink];
+        [self addOverlayButton:@"Settings" name:@"settings" y:222 color:lilac];
+        [self addOverlayButton:@"Home" name:@"home" y:116 color:gold];
     } else {
         if(won){
-            for(NSInteger i=0;i<3;i++){ SKSpriteNode *star=[GummyUI star:38]; star.position=CGPointMake(548+i*52,431); BOOL earned=i<self.engine.stars; star.color=[UIColor colorWithRed:.59 green:.49 blue:.69 alpha:1]; star.colorBlendFactor=earned?0:.85; star.alpha=earned?1:.60; [self.overlay addChild:star]; if(earned){ star.xScale=star.yScale=.1; [star runAction:[SKAction sequence:@[[SKAction waitForDuration:i*.12],[SKAction scaleTo:1.16 duration:.15],[SKAction scaleTo:1 duration:.12]]]]; } }
+            for(NSInteger i=0;i<3;i++){ SKSpriteNode *star=[GummyUI star:44]; star.position=CGPointMake(536+i*64,506); BOOL earned=i<self.engine.stars; star.color=[UIColor colorWithRed:.59 green:.49 blue:.69 alpha:1]; star.colorBlendFactor=earned?0:.85; star.alpha=earned?1:.60; [self.overlay addChild:star]; if(earned){ star.xScale=star.yScale=.1; [star runAction:[SKAction sequence:@[[SKAction waitForDuration:i*.12],[SKAction scaleTo:1.16 duration:.15],[SKAction scaleTo:1 duration:.12]]]]; } }
             GDLevel *levelInfo=[GDLevelCatalog levelForID:self.engine.levelID];
             NSString *par=levelInfo.objective==GDObjectiveSurvive?[NSString stringWithFormat:@"3★: ≤%ld shots + ≥%ld points",(long)levelInfo.parShots,(long)levelInfo.parScore]:[NSString stringWithFormat:@"3★: ≤%ld shots + ≤%.0f seconds",(long)levelInfo.parShots,levelInfo.parTime];
-            SKLabelNode *criteria=[GummyUI label:par size:13 color:Ink()]; criteria.position=CGPointMake(600,404); [self.overlay addChild:criteria];
-            if([GDLevelCatalog levelForID:self.engine.levelID+1]) [self addOverlayButton:@"Next Level" name:@"nextLevel" y:367 color:blue];
-            else [self addOverlayButton:@"All Levels" name:@"allLevels" y:367 color:blue];
-            [self addOverlayButton:@"Replay" name:@"retry" y:294 color:pink]; [self addOverlayButton:@"Levels" name:@"levels" y:221 color:lilac]; [self addOverlayButton:@"Home" name:@"home" y:148 color:Cream()];
+            SKLabelNode *criteria=[GummyUI label:par size:17 color:Ink()]; criteria.position=CGPointMake(600,465); [self.overlay addChild:criteria];
+            if([GDLevelCatalog levelForID:self.engine.levelID+1]) [self addOverlayButton:@"Next Level" name:@"nextLevel" y:404 color:blue];
+            else [self addOverlayButton:@"All Levels" name:@"allLevels" y:404 color:blue];
+            [self addOverlayButton:@"Replay" name:@"retry" y:298 color:pink]; [self addOverlayButton:@"Levels" name:@"levels" y:192 color:lilac]; [self addOverlayButton:@"Home" name:@"home" y:86 color:gold];
         } else if(level){
-            SKLabelNode *goal=[GummyUI label:[NSString stringWithFormat:@"PROGRESS  %ld / %ld",(long)self.engine.objectiveCurrent,(long)self.engine.objectiveTarget] size:18 color:Ink()]; goal.position=CGPointMake(600,432); [self.overlay addChild:goal];
-            [self addOverlayButton:@"Retry" name:@"retry" y:352 color:blue]; [self addOverlayButton:@"Levels" name:@"levels" y:272 color:lilac]; [self addOverlayButton:@"Home" name:@"home" y:192 color:pink];
+            SKLabelNode *goal=[GummyUI label:[NSString stringWithFormat:@"PROGRESS  %ld / %ld",(long)self.engine.objectiveCurrent,(long)self.engine.objectiveTarget] size:22 color:Ink()]; goal.position=CGPointMake(600,449); [self.overlay addChild:goal];
+            [self addOverlayButton:@"Retry" name:@"retry" y:374 color:blue]; [self addOverlayButton:@"Levels" name:@"levels" y:260 color:lilac]; [self addOverlayButton:@"Home" name:@"home" y:146 color:gold];
         } else {
             GDRunRecords *records=[[GDRunRecords alloc] initWithDefaults:NSUserDefaults.standardUserDefaults]; NSInteger rank=[records rankForRunID:self.engine.runID];
             NSString *record=rank?[NSString stringWithFormat:@"LOCAL RANK  #%ld   ·   BEST %ld",(long)rank,(long)self.engine.bestScore]:[NSString stringWithFormat:@"BEST  %ld",(long)self.engine.bestScore];
-            SKLabelNode *best=[GummyUI label:record size:17 color:Ink()]; best.position=CGPointMake(600,432); [self.overlay addChild:best];
-            [self addOverlayButton:@"Retry" name:@"retry" y:352 color:blue]; [self addOverlayButton:@"Local Scores" name:@"scores" y:272 color:lilac]; [self addOverlayButton:@"Home" name:@"home" y:192 color:pink];
+            SKLabelNode *best=[GummyUI label:record size:22 color:Ink()]; best.position=CGPointMake(600,449); [self.overlay addChild:best];
+            [self addOverlayButton:@"Retry" name:@"retry" y:374 color:blue]; [self addOverlayButton:@"Local Scores" name:@"scores" y:260 color:lilac]; [self addOverlayButton:@"Home" name:@"home" y:146 color:gold];
         }
         [GDSettings.sharedSettings playFeedback:won?GDFeedbackWin:GDFeedbackGameOver]; [self saveRun];
     }

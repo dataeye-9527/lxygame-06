@@ -1,0 +1,17 @@
+{
+  "device": "32C8A380-995E-44FD-83D2-1695230AF4F7",
+  "allPreferenceValuesUnchanged": true,
+  "changedPreferenceKeys": [],
+  "verifiedPreferenceKeys": [
+    "GDCampaignProgress",
+    "GDEndlessRecords",
+    "GDPrototypeBestScore",
+    "GDPrototypeLastRun",
+    "GummyLastDiagnostics",
+    "GummyLevelRunSnapshot",
+    "GummySettingsAimGuide",
+    "GummySettingsHaptics",
+    "GummySettingsMusic",
+    "GummySettingsSoundEffects"
+  ]
+}
