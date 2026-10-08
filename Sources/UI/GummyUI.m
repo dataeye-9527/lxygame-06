@@ -145,7 +145,8 @@ static UIImage *TrimmedSymbol(UIImage *image) {
     // Three slices keep capsule ends round even on compact controls.
     CGFloat cap=MIN(size.height/2,size.width/2); CGFloat cuts[]={0,.14,.86,1}, widths[]={cap,MAX(0,size.width-2*cap),cap}; CGFloat x=-size.width/2;
     for(NSInteger i=0;i<3;i++){ if(widths[i]>0){ SKTexture *part=[SKTexture textureWithRect:CGRectMake(.034+.932*cuts[i],1-bottom/1254.0,.932*(cuts[i+1]-cuts[i]),(bottom-top)/1254.0) inTexture:texture]; SKSpriteNode *tile=[SKSpriteNode spriteNodeWithTexture:part size:CGSizeMake(widths[i],size.height)]; tile.position=CGPointMake(x+widths[i]/2,0); [root addChild:tile]; } x+=widths[i]; }
-    CGFloat iconSize=icon.length?MIN(utility?23:32,size.height*.46):0,gap=icon.length?(utility?8:12):0,padding=MIN(utility?16:22,size.height*.24);
+    CGFloat iconLimit=MAX(utility?23:32,fontSize);
+    CGFloat iconSize=icon.length?MIN(iconLimit,size.height*.46):0,gap=icon.length?(utility?8:12):0,padding=MIN(utility?16:22,size.height*.24);
     if(title.length){
         SKLabelNode *label=[self label:title size:fontSize color:color]; SKSpriteNode *face=(SKSpriteNode *)[label childNodeWithName:@"textFace"];
         while(face.size.width-2>size.width-iconSize-gap-padding*2 && label.fontSize>11) label.fontSize-=.5;
@@ -166,6 +167,6 @@ static UIImage *TrimmedSymbol(UIImage *image) {
     NSDictionary *icons=@{@"back":@"chevron.left",@"resume":@"play.fill",@"retry":@"arrow.clockwise",@"settings":@"gearshape.fill",@"home":@"house.fill",@"nextLevel":@"arrow.right",@"allLevels":@"square.grid.2x2.fill",@"levels":@"square.grid.2x2.fill",@"scores":@"trophy.fill",@"privacy":@"doc.text.fill",@"scoresPrev":@"chevron.left",@"scoresNext":@"chevron.right",@"pause":@"pause.fill"};
     NSString *icon=icons[name]; if([name hasPrefix:@"level"] && ![name isEqualToString:@"levels"]) icon=@"play.fill";
     if([name isEqualToString:@"music"] || [name isEqualToString:@"sound"] || [name isEqualToString:@"haptics"] || [name isEqualToString:@"guide"]) icon=[title isEqualToString:@"On"]?@"checkmark":@"xmark";
-    return [self candyButton:[name isEqualToString:@"pause"]?@"":title size:size name:name atlas:atlas row:row icon:icon fontSize:MIN(23,size.height*.40) color:ink enabled:YES];
+    return [self candyButton:[name isEqualToString:@"pause"]?@"":title size:size name:name atlas:atlas row:row icon:icon fontSize:MIN(36,size.height*.40) color:ink enabled:YES];
 }
 @end

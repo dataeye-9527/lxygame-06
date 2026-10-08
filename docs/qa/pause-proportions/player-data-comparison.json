@@ -1,0 +1,27 @@
+{
+  "device": "32C8A380-995E-44FD-83D2-1695230AF4F7",
+  "changedPreferenceKeys": [
+    "GummyLastDiagnostics",
+    "GummyRunSnapshot"
+  ],
+  "unchangedPreferenceKeys": [
+    "GDCampaignProgress",
+    "GDEndlessRecords",
+    "GDPrototypeBestScore",
+    "GDPrototypeLastRun",
+    "GummyLevelRunSnapshot",
+    "GummySettingsHaptics",
+    "GummySettingsMusic",
+    "GummySettingsSoundEffects"
+  ],
+  "changedDictionaryFields": {
+    "GummyLastDiagnostics": [
+      "elapsed"
+    ],
+    "GummyRunSnapshot": [
+      "difficulty",
+      "elapsed",
+      "pressure"
+    ]
+  }
+}

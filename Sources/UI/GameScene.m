@@ -651,24 +651,32 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
 }
 - (void)backgroundPause:(NSNotification *)notification { [self pauseGame]; [self saveRun]; }
 - (void)addOverlayButton:(NSString *)title name:(NSString *)name y:(CGFloat)y color:(UIColor *)color {
-    CGSize size=CGSizeMake(286,57); SKNode *button=[GummyUI button:title size:size name:name color:color]; button.position=CGPointMake(600,y); [self.overlay addChild:button]; self.overlayControls[name]=[NSValue valueWithCGRect:CGRectMake(457,y-28.5,286,57)];
+    [self addOverlayButton:title name:name y:y size:CGSizeMake(286,57) color:color];
+}
+- (void)addOverlayButton:(NSString *)title name:(NSString *)name y:(CGFloat)y size:(CGSize)size color:(UIColor *)color {
+    SKNode *button=[GummyUI button:title size:size name:name color:color]; button.position=CGPointMake(600,y); [self.overlay addChild:button];
+    self.overlayControls[name]=[NSValue valueWithCGRect:CGRectMake(button.position.x-size.width/2,y-size.height/2,size.width,size.height)];
 }
 - (void)showOverlay:(BOOL)gameOver {
     if(self.overlay) return;
     BOOL level=self.engine.mode==GDGameModeLevel, won=self.engine.phase==GDPhaseWon;
     [GummyUI setOverlayDimmed:YES]; [self clearAim]; self.overlay=[SKNode node]; self.overlay.zPosition=100; [self addChild:self.overlay]; self.overlayControls=[NSMutableDictionary dictionary];
     SKShapeNode *shade=[GummyUI panel:self.size fill:GummyUI.overlayShadeColor stroke:UIColor.clearColor radius:0]; shade.position=CGPointMake(600,340); [self.overlay addChild:shade];
-    SKNode *card=[GummyUI surface:CGSizeMake(454,550) color:Cream() radius:34]; card.position=CGPointMake(600,340); [self.overlay addChild:card];
-    SKLabelNode *title=[GummyUI label:gameOver?(won?@"LEVEL CLEAR":@"GAME OVER"):@"PAUSED" size:33 color:Ink()]; title.position=CGPointMake(600,560); [self.overlay addChild:title];
+    SKNode *card=[GummyUI surface:gameOver?CGSizeMake(454,550):CGSizeMake(608,590) color:Cream() radius:34]; card.position=CGPointMake(600,340); [self.overlay addChild:card];
+    SKLabelNode *title=[GummyUI label:gameOver?(won?@"LEVEL CLEAR":@"GAME OVER"):@"PAUSED" size:gameOver?33:36 color:Ink()]; title.position=CGPointMake(600,gameOver?560:574); [self.overlay addChild:title];
     NSString *mode=level?[NSString stringWithFormat:@"LEVEL %02ld",(long)self.engine.levelID]:@"ENDLESS";
 #if DEBUG
     if(self.qaPresentationFixture){ SKLabelNode *fixture=[GummyUI label:@"QA FIXTURE" size:12 color:Ink()]; fixture.position=CGPointMake(600,587); [self.overlay addChild:fixture]; }
 #endif
-    SKLabelNode *modeLabel=[GummyUI label:mode size:16 color:Ink()]; modeLabel.position=CGPointMake(600,520); [self.overlay addChild:modeLabel];
-    SKLabelNode *score=[GummyUI label:[NSString stringWithFormat:@"SCORE  %ld",(long)self.engine.score] size:24 color:Ink()]; score.position=CGPointMake(600,477); [self.overlay addChild:score];
+    SKLabelNode *modeLabel=[GummyUI label:mode size:gameOver?16:18 color:Ink()]; modeLabel.position=CGPointMake(600,gameOver?520:535); [self.overlay addChild:modeLabel];
+    SKLabelNode *score=[GummyUI label:[NSString stringWithFormat:@"SCORE  %ld",(long)self.engine.score] size:gameOver?24:28 color:Ink()]; score.position=CGPointMake(600,gameOver?477:500); [self.overlay addChild:score];
     UIColor *blue=[UIColor colorWithRed:.64 green:.85 blue:1 alpha:1], *pink=[UIColor colorWithRed:.97 green:.75 blue:.82 alpha:1], *lilac=[UIColor colorWithRed:.85 green:.78 blue:.95 alpha:1];
     if(!gameOver){
-        [self addOverlayButton:@"Resume" name:@"resume" y:407 color:blue]; [self addOverlayButton:@"Retry" name:@"retry" y:334 color:pink]; [self addOverlayButton:@"Settings" name:@"settings" y:261 color:lilac]; [self addOverlayButton:@"Home" name:@"home" y:188 color:[UIColor colorWithRed:1 green:.87 blue:.64 alpha:1]];
+        CGSize buttonSize=CGSizeMake(512,96);
+        [self addOverlayButton:@"Resume" name:@"resume" y:434 size:buttonSize color:blue];
+        [self addOverlayButton:@"Retry" name:@"retry" y:328 size:buttonSize color:pink];
+        [self addOverlayButton:@"Settings" name:@"settings" y:222 size:buttonSize color:lilac];
+        [self addOverlayButton:@"Home" name:@"home" y:116 size:buttonSize color:[UIColor colorWithRed:1 green:.87 blue:.64 alpha:1]];
     } else {
         if(won){
             for(NSInteger i=0;i<3;i++){ SKSpriteNode *star=[GummyUI star:38]; star.position=CGPointMake(548+i*52,431); BOOL earned=i<self.engine.stars; star.color=[UIColor colorWithRed:.59 green:.49 blue:.69 alpha:1]; star.colorBlendFactor=earned?0:.85; star.alpha=earned?1:.60; [self.overlay addChild:star]; if(earned){ star.xScale=star.yScale=.1; [star runAction:[SKAction sequence:@[[SKAction waitForDuration:i*.12],[SKAction scaleTo:1.16 duration:.15],[SKAction scaleTo:1 duration:.12]]]]; } }
