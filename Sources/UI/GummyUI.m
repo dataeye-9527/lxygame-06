@@ -156,6 +156,18 @@ static UIImage *TrimmedSymbol(UIImage *image) {
     } else if(icon.length){ [root addChild:[self symbol:icon size:iconSize color:color]]; root.isAccessibilityElement=YES; root.accessibilityLabel=[name isEqualToString:@"pause"]?@"Pause":name; }
     root.alpha=enabled?1:.48; return root;
 }
++ (void)setButton:(SKNode *)button pressed:(BOOL)pressed {
+    [button removeActionForKey:@"buttonPress"];
+    SKAction *scale=[SKAction scaleTo:pressed?.97:1 duration:pressed?.06:.10]; scale.timingMode=SKActionTimingEaseOut;
+    [button runAction:scale withKey:@"buttonPress"];
+}
++ (void)releaseButton:(SKNode *)button completion:(void (^)(void))completion {
+    [button removeActionForKey:@"buttonPress"];
+    button.xScale=button.yScale=.97;
+    SKAction *rebound=[SKAction scaleTo:1.02 duration:.08]; rebound.timingMode=SKActionTimingEaseOut;
+    SKAction *settle=[SKAction scaleTo:1 duration:.10]; settle.timingMode=SKActionTimingEaseInEaseOut;
+    [button runAction:[SKAction sequence:@[rebound,settle,[SKAction runBlock:completion]]] withKey:@"buttonPress"];
+}
 + (SKNode *)button:(NSString *)title size:(CGSize)size name:(NSString *)name color:(UIColor *)color {
     CGFloat r=0,g=0,b=0,a=0; [color getRed:&r green:&g blue:&b alpha:&a];
     NSString *atlas=@"home_footer_v4"; NSInteger row=2; UIColor *ink=[UIColor colorWithRed:.35 green:.14 blue:.48 alpha:1];

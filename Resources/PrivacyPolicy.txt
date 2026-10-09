@@ -1,0 +1,28 @@
+Gummy Ricochet
+Privacy Policy
+Effective date: September 30, 2026
+
+ABOUT THIS POLICY
+This policy describes how the current version of Gummy Ricochet handles information when you play the game.
+
+INFORMATION STORED ON YOUR DEVICE
+The game saves sound, haptic and aim-guide preferences; best scores and local leaderboard results; level progress and stars; and saved runs so you can resume playing. Run records include a random run identifier, scores, duration, date, game seed and wave. Saved runs and local diagnostic records may also contain the board, skill energy, game counters and recent gameplay actions.
+
+This information is used on your device to provide gameplay, restore runs, remember preferences and display progress and local scores. The game does not transmit this information to the developer or to third parties.
+
+PERSONAL INFORMATION AND TRACKING
+The current version does not require an account or ask for your name, email address or other contact details. It does not access your contacts, photos, camera, microphone or location. It does not use advertising identifiers, track you across apps or websites, or include advertising or third-party analytics SDKs. The game does not sell or share personal information.
+
+RETENTION AND DELETION
+Game data stays in the app's local storage until it is replaced during play or removed. The local leaderboard keeps up to 50 results; run identifiers used to avoid duplicate results are bounded separately. Settings and level progress persist between sessions.
+
+To remove the game's local data, delete the app using Delete App in iOS Settings. Offloading the app keeps its documents and data. Reinstalling without restoring a backup starts with fresh local data. Device backups may retain copies of app data, and restoring a backup may restore it; manage those backups through your device or Apple account settings.
+
+APPLE SERVICES
+Apple may process information through the App Store, device backups or system diagnostics according to your device settings and Apple's own privacy policy. The developer does not receive gameplay data from the game through those services.
+
+CHANGES
+If the game's data practices change, this policy will be updated with the corresponding app update. The effective date above identifies this version of the policy.
+
+CONTACT
+For privacy questions, use the developer's App Support contact listed on Gummy Ricochet's App Store product page.

@@ -33,6 +33,11 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
 @property(nonatomic) SKNode *nextPiece, *heldPiece, *currentPiece;
 @property(nonatomic) GDShot *preview;
 @property(nonatomic) UITouch *aimTouch;
+@property(nonatomic) UITouch *buttonTouch;
+@property(nonatomic) SKNode *pressedButton;
+@property(nonatomic) SKNode *activatingButton;
+@property(nonatomic,copy) NSString *pressedButtonControl;
+@property(nonatomic) BOOL buttonActivating;
 @property(nonatomic) CGPoint aimTouchStart;
 @property(nonatomic) BOOL aiming, yellowArmed, renderedGameOver;
 @property(nonatomic) BOOL musicDanger;
@@ -100,7 +105,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     if(saved && [args containsObject:@"-qa-feedback"]){ NSData *data=[NSJSONSerialization dataWithJSONObject:self.engine.snapshot options:0 error:nil]; NSLog(@"QA restored snapshot=%@",[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]); }
 #endif
 }
-- (void)willMoveFromView:(SKView *)view { [GummyUI setOverlayDimmed:NO]; }
+- (void)willMoveFromView:(SKView *)view { [self resetButtonTouch]; self.buttonActivating=NO; [GummyUI setOverlayDimmed:NO]; }
 - (void)buildLayout {
     [GummyUI addBackgroundTo:self];
     SKNode *boardFrame=[GummyUI surface:CGSizeMake(856,582) color:[UIColor colorWithRed:.73 green:.62 blue:.82 alpha:1] radius:25]; boardFrame.position=CGPointMake(588,326); [self addChild:boardFrame];
@@ -275,8 +280,10 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     [self refreshHUD];
 }
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    if(self.aimTouch) return;
+    if(self.aimTouch || self.buttonTouch || self.buttonActivating) return;
     UITouch *touch=touches.anyObject; CGPoint p=[touch locationInNode:self]; NSString *control=[self controlAt:p];
+    SKNode *button=self.overlay && control && self.overlayControls[control]?[self.overlay childNodeWithName:control]:([control isEqualToString:@"pause"]?[self.hud childNodeWithName:@"pause"]:nil);
+    if(button){ self.buttonTouch=touch; self.pressedButton=button; self.pressedButtonControl=control; [GummyUI setButton:button pressed:YES]; return; }
     if([control hasPrefix:@"launcher"] && self.engine.phase==GDPhaseReady){
         [self handleControl:control]; self.aimTouch=touch; self.aimTouchStart=p; return;
     }
@@ -285,6 +292,9 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     self.yellowArmed=NO; self.aimTouch=touch; self.aimTouchStart=p; self.aiming=YES; [self updateAim:p];
 }
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    if(self.buttonTouch && [touches containsObject:self.buttonTouch]){
+        [GummyUI setButton:self.pressedButton pressed:[[self controlAt:[self.buttonTouch locationInNode:self]] isEqualToString:self.pressedButtonControl]]; return;
+    }
     if(self.aimTouch && [touches containsObject:self.aimTouch]){
         CGPoint p=[self.aimTouch locationInNode:self];
         if(!self.aiming && hypot(p.x-self.aimTouchStart.x,p.y-self.aimTouchStart.y)<8) return;
@@ -292,6 +302,15 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     }
 }
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    if(self.buttonTouch && [touches containsObject:self.buttonTouch]){
+        NSString *control=self.pressedButtonControl; SKNode *button=self.pressedButton;
+        BOOL inside=[[self controlAt:[self.buttonTouch locationInNode:self]] isEqualToString:control]; [self resetButtonTouch];
+        if(inside){
+            self.buttonActivating=YES; self.activatingButton=button; __weak GameScene *scene=self;
+            [GummyUI releaseButton:button completion:^{ GameScene *current=scene; current.activatingButton=nil; current.buttonActivating=NO; if(current && current.view.scene==current) [current handleControl:control]; }];
+        }
+        return;
+    }
     if(!self.aimTouch || ![touches containsObject:self.aimTouch]) return;
     CGPoint p=[self.aimTouch locationInNode:self];
     BOOL cancel=p.y<120 || p.x<160 || p.x>1016 || [self controlAt:p]!=nil;
@@ -310,8 +329,13 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     [self refreshHUD];
 }
 - (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    if(self.buttonTouch && [touches containsObject:self.buttonTouch]){ [self resetButtonTouch]; return; }
     if(!self.aimTouch || ![touches containsObject:self.aimTouch]) return;
     [self clearAim]; [self.engine cancelBlast]; [self refreshHUD];
+}
+- (void)resetButtonTouch {
+    [GummyUI setButton:self.pressedButton pressed:NO]; [GummyUI setButton:self.activatingButton pressed:NO];
+    self.activatingButton=nil; self.buttonActivating=NO; self.buttonTouch=nil; self.pressedButton=nil; self.pressedButtonControl=nil;
 }
 - (void)clearAim { self.aiming=NO; self.aimTouch=nil; self.preview=nil; [self.aimLayer removeAllChildren]; self.statusLabel.text=@""; }
 - (void)updateAim:(CGPoint)point {
@@ -651,6 +675,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     [NSUserDefaults.standardUserDefaults setObject:self.engine.diagnostics forKey:@"GummyLastDiagnostics"];
 }
 - (void)pauseGame {
+    [self resetButtonTouch];
     if(self.overlay || [self finished]) return;
     [self clearAim]; self.yellowArmed=NO; [self.engine cancelBlast]; [self.engine pause]; self.playfield.paused=YES;
     [GDAudioFeedback.sharedPlayer pauseMusic];

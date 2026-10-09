@@ -1,0 +1,10 @@
+{
+  "device": "32C8A380-995E-44FD-83D2-1695230AF4F7",
+  "bundleIdentifier": "com.lxygame.gummydrop.prototype",
+  "beforeKeyCount": 11,
+  "afterKeyCount": 10,
+  "allValuesUnchanged": false,
+  "changedKeys": [
+    "GummyRunSnapshot"
+  ]
+}

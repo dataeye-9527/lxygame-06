@@ -11,6 +11,38 @@
 static UIColor *MenuInk(void) { return [UIColor colorWithRed:.35 green:.14 blue:.48 alpha:1]; }
 static UIColor *MenuCream(void) { return [UIColor colorWithRed:1 green:.93 blue:.87 alpha:1]; }
 static UIColor *MenuBlue(void) { return [UIColor colorWithRed:.65 green:.86 blue:1 alpha:1]; }
+
+@interface GDPrivacyPolicyViewController : UIViewController
+@property(nonatomic,copy) NSString *policyText;
+@end
+@implementation GDPrivacyPolicyViewController
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.title=@"Privacy Policy";
+    self.view.backgroundColor=MenuCream();
+    self.navigationItem.rightBarButtonItem=[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(closePolicy)];
+    UITextView *textView=[UITextView new];
+    textView.translatesAutoresizingMaskIntoConstraints=NO;
+    textView.editable=NO; textView.selectable=YES;
+    textView.backgroundColor=MenuCream(); textView.textColor=MenuInk();
+    textView.font=[UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+    textView.adjustsFontForContentSizeCategory=YES;
+    textView.textContainerInset=UIEdgeInsetsMake(20,24,24,24);
+    textView.text=self.policyText;
+    textView.accessibilityIdentifier=@"privacyPolicyText";
+    [self.view addSubview:textView];
+    UILayoutGuide *safe=self.view.safeAreaLayoutGuide;
+    [NSLayoutConstraint activateConstraints:@[
+        [textView.topAnchor constraintEqualToAnchor:safe.topAnchor],
+        [textView.bottomAnchor constraintEqualToAnchor:safe.bottomAnchor],
+        [textView.leadingAnchor constraintEqualToAnchor:safe.leadingAnchor],
+        [textView.trailingAnchor constraintEqualToAnchor:safe.trailingAnchor]
+    ]];
+}
+- (BOOL)prefersStatusBarHidden { return YES; }
+- (void)closePolicy { [self dismissViewControllerAnimated:YES completion:nil]; }
+@end
+
 @interface FrontendScene ()
 @property(nonatomic,copy) NSString *page;
 @property(nonatomic) SKScene *returnScene;
@@ -19,6 +51,8 @@ static UIColor *MenuBlue(void) { return [UIColor colorWithRed:.65 green:.86 blue
 @property(nonatomic) NSInteger chapter, leaderboardPage;
 @property(nonatomic) UITouch *activeTouch;
 @property(nonatomic,copy) NSString *pressedControl;
+@property(nonatomic) BOOL buttonActivating;
+@property(nonatomic) SKNode *activatingButton;
 @end
 @implementation FrontendScene
 + (instancetype)homeScene { FrontendScene *s=[self sceneWithSize:CGSizeMake(1200,680)]; s.page=@"home";
@@ -31,11 +65,13 @@ static UIColor *MenuBlue(void) { return [UIColor colorWithRed:.65 green:.86 blue
 + (instancetype)helpScene { FrontendScene *s=[self homeScene]; s.page=@"help"; return s; }
 + (instancetype)settingsSceneReturningTo:(SKScene *)scene { FrontendScene *s=[self homeScene]; s.page=@"settings"; s.returnScene=scene; return s; }
 - (void)didMoveToView:(SKView *)view { [GummyUI setOverlayDimmed:NO]; [GDAudioFeedback.sharedPlayer setMusicMode:GDMusicRelaxed]; [GDAudioFeedback.sharedPlayer resumeMusic]; [self rebuild]; }
+- (void)willMoveFromView:(SKView *)view { [self resetTouch]; self.buttonActivating=NO; }
 - (void)text:(NSString *)text size:(CGFloat)size at:(CGPoint)p { SKLabelNode *label=[GummyUI label:text size:size color:MenuInk()]; label.position=p; [self addChild:label]; }
 - (void)button:(NSString *)text name:(NSString *)name center:(CGPoint)p size:(CGSize)size color:(UIColor *)color {
     SKNode *node=[GummyUI button:text size:size name:name color:color]; node.position=p; node.zPosition=5; [self addChild:node]; self.controls[name]=[NSValue valueWithCGRect:CGRectMake(p.x-size.width/2,p.y-size.height/2,size.width,size.height)];
 }
 - (void)rebuild {
+    [self resetTouch];
     [self removeAllChildren]; self.controls=[NSMutableDictionary dictionary]; [GummyUI addBackgroundTo:self];
     if([self.page isEqualToString:@"home"]) [self buildHome];
     else if([self.page isEqualToString:@"settings"]) [self buildSettings];
@@ -172,6 +208,31 @@ static UIColor *MenuBlue(void) { return [UIColor colorWithRed:.65 green:.86 blue
         SKLabelNode *label=[GummyUI label:titles[i] size:27 color:MenuInk()]; label.horizontalAlignmentMode=SKLabelHorizontalAlignmentModeLeft; label.position=CGPointMake(315,y); [self addChild:label];
         [self button:[values[i] boolValue]?@"On":@"Off" name:keys[i] center:CGPointMake(860,y) size:CGSizeMake(140,56) color:[values[i] boolValue]?MenuBlue():[UIColor colorWithRed:.81 green:.77 blue:.86 alpha:1]];
     }
+    [self button:@"Privacy Policy" name:@"privacy" center:CGPointMake(600,115) size:CGSizeMake(300,52) color:MenuBlue()];
+}
+- (void)showPrivacyPolicy {
+    UIViewController *presenter=self.view.window.rootViewController;
+    if(!presenter || presenter.presentedViewController) return;
+    NSURL *url=[NSBundle.mainBundle URLForResource:@"PrivacyPolicy" withExtension:@"txt"];
+    NSError *error=nil;
+    NSString *text=url?[NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:&error]:nil;
+    if(!text.length){
+        NSLog(@"Privacy policy resource could not be loaded: %@",error?:@"PrivacyPolicy.txt missing or empty");
+        UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"Privacy Policy" message:@"The privacy policy could not be loaded. Please update the app and try again." preferredStyle:UIAlertControllerStyleAlert];
+        [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
+        [presenter presentViewController:alert animated:YES completion:nil];
+        return;
+    }
+    GDPrivacyPolicyViewController *policy=[GDPrivacyPolicyViewController new]; policy.policyText=text;
+    UINavigationController *navigation=[[UINavigationController alloc] initWithRootViewController:policy];
+    UINavigationBarAppearance *appearance=[UINavigationBarAppearance new];
+    [appearance configureWithOpaqueBackground]; appearance.backgroundColor=MenuCream();
+    appearance.titleTextAttributes=@{NSForegroundColorAttributeName:MenuInk()};
+    navigation.navigationBar.standardAppearance=appearance;
+    navigation.navigationBar.scrollEdgeAppearance=appearance;
+    navigation.navigationBar.tintColor=MenuInk();
+    navigation.modalPresentationStyle=UIModalPresentationFullScreen;
+    [presenter presentViewController:navigation animated:YES completion:nil];
 }
 - (void)buildHelp {
     [self pageFrame:@"HOW TO PLAY"];
@@ -195,14 +256,27 @@ static UIColor *MenuBlue(void) { return [UIColor colorWithRed:.65 green:.86 blue
 }
 - (NSString *)controlAt:(CGPoint)p { for(NSString *key in self.controls) if(CGRectContainsPoint(self.controls[key].CGRectValue,p)) return key; return nil; }
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    if(self.activeTouch) return; self.activeTouch=touches.anyObject; self.pressedControl=[self controlAt:[self.activeTouch locationInNode:self]];
-    if(self.pressedControl){ SKNode *node=[self childNodeWithName:self.pressedControl]; node.xScale=node.yScale=.97; }
+    if(self.activeTouch || self.buttonActivating) return; self.activeTouch=touches.anyObject; self.pressedControl=[self controlAt:[self.activeTouch locationInNode:self]];
+    if(self.pressedControl) [GummyUI setButton:[self childNodeWithName:self.pressedControl] pressed:YES];
 }
-- (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event { [self resetTouch]; }
-- (void)resetTouch { if(self.pressedControl){ SKNode *node=[self childNodeWithName:self.pressedControl]; node.xScale=node.yScale=1; } self.activeTouch=nil; self.pressedControl=nil; }
+- (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    if(!self.activeTouch || ![touches containsObject:self.activeTouch] || !self.pressedControl) return;
+    BOOL inside=[[self controlAt:[self.activeTouch locationInNode:self]] isEqualToString:self.pressedControl];
+    [GummyUI setButton:[self childNodeWithName:self.pressedControl] pressed:inside];
+}
+- (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event { if(self.activeTouch && [touches containsObject:self.activeTouch]) [self resetTouch]; }
+- (void)resetTouch {
+    if(self.pressedControl) [GummyUI setButton:[self childNodeWithName:self.pressedControl] pressed:NO];
+    [GummyUI setButton:self.activatingButton pressed:NO]; self.activatingButton=nil; self.buttonActivating=NO; self.activeTouch=nil; self.pressedControl=nil;
+}
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     if(!self.activeTouch || ![touches containsObject:self.activeTouch]) return;
-    NSString *control=[self controlAt:[self.activeTouch locationInNode:self]]; BOOL same=control && [control isEqualToString:self.pressedControl]; [self resetTouch]; if(same) [self activate:control];
+    NSString *control=[self controlAt:[self.activeTouch locationInNode:self]]; BOOL same=control && [control isEqualToString:self.pressedControl];
+    SKNode *button=self.pressedControl?[self childNodeWithName:self.pressedControl]:nil; [self resetTouch];
+    if(same){
+        self.buttonActivating=YES; self.activatingButton=button; __weak FrontendScene *scene=self;
+        [GummyUI releaseButton:button completion:^{ FrontendScene *current=scene; current.activatingButton=nil; current.buttonActivating=NO; if(current && current.view.scene==current) [current activate:control]; }];
+    }
 }
 - (void)activate:(NSString *)control {
     GDSettings *settings=GDSettings.sharedSettings; [settings playFeedback:GDFeedbackTap];
@@ -216,6 +290,7 @@ static UIColor *MenuBlue(void) { return [UIColor colorWithRed:.65 green:.86 blue
     else if([control hasPrefix:@"level"]){ NSInteger levelID=[[control substringFromIndex:5] integerValue]; if([[[GDProgressStore alloc] initWithDefaults:NSUserDefaults.standardUserDefaults] isLevelUnlocked:levelID]){ GameScene *game=[[GameScene alloc] initWithSize:self.size levelID:levelID]; game.scaleMode=SKSceneScaleModeAspectFit; [NSUserDefaults.standardUserDefaults removeObjectForKey:@"GummyLevelRunSnapshot"]; [self.view presentScene:game]; } }
     else if([control isEqualToString:@"scoresPrev"] || [control isEqualToString:@"scoresNext"]){ self.leaderboardPage+=[control isEqualToString:@"scoresNext"]?1:-1; [self rebuild]; }
     else if([control isEqualToString:@"settings"]) [self.view presentScene:[FrontendScene settingsSceneReturningTo:self]];
+    else if([control isEqualToString:@"privacy"]) [self showPrivacyPolicy];
     else if([control isEqualToString:@"help"]) [self.view presentScene:[FrontendScene helpScene]];
     else if([control isEqualToString:@"back"]){ SKScene *destination=self.returnScene?:[FrontendScene homeScene]; self.returnScene=nil; [self.view presentScene:destination]; }
     else {
