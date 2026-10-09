@@ -48,8 +48,6 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
 }
 - (void)didMoveToView:(SKView *)view {
     [GummyUI setOverlayDimmed:self.overlay!=nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillResignActiveNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(backgroundPause:) name:UIApplicationWillResignActiveNotification object:nil];
     if(self.engine){ self.lastTime=0; [self refreshHUD]; [self refreshMusic]; if(self.engine.phase!=GDPhasePaused) [GDAudioFeedback.sharedPlayer resumeMusic]; return; }
     self.anchorPoint=CGPointZero;
     self.pieceNodes=[NSMutableDictionary dictionary]; self.skillCards=[NSMutableArray array]; self.launcherNodes=[NSMutableArray array]; self.energyFills=[NSMutableArray array]; self.energyLabels=[NSMutableArray array];
@@ -102,8 +100,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     if(saved && [args containsObject:@"-qa-feedback"]){ NSData *data=[NSJSONSerialization dataWithJSONObject:self.engine.snapshot options:0 error:nil]; NSLog(@"QA restored snapshot=%@",[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]); }
 #endif
 }
-- (void)willMoveFromView:(SKView *)view { [GummyUI setOverlayDimmed:NO]; [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillResignActiveNotification object:nil]; }
-- (void)dealloc { [[NSNotificationCenter defaultCenter] removeObserver:self]; }
+- (void)willMoveFromView:(SKView *)view { [GummyUI setOverlayDimmed:NO]; }
 - (void)buildLayout {
     [GummyUI addBackgroundTo:self];
     SKNode *boardFrame=[GummyUI surface:CGSizeMake(856,582) color:[UIColor colorWithRed:.73 green:.62 blue:.82 alpha:1] radius:25]; boardFrame.position=CGPointMake(588,326); [self addChild:boardFrame];
@@ -661,7 +658,13 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     [NSUserDefaults.standardUserDefaults setObject:self.engine.diagnostics forKey:@"GummyLastDiagnostics"];
     [self showOverlay:NO];
 }
-- (void)backgroundPause:(NSNotification *)notification { [self pauseGame]; [self saveRun]; }
+- (void)pauseForSystemInterruption {
+    self.lastTime=0;
+    [self pauseGame]; [self saveRun];
+#if DEBUG
+    if([NSProcessInfo.processInfo.arguments containsObject:@"-qa-lifecycle"]) NSLog(@"QA lifecycle pause phase=%ld elapsed=%.9f pressure=%.9f",(long)self.engine.phase,self.engine.elapsed,self.engine.pressureRemaining);
+#endif
+}
 - (void)addOverlayButton:(NSString *)title name:(NSString *)name y:(CGFloat)y color:(UIColor *)color {
     CGSize size=CGSizeMake(512,96);
     SKNode *button=[GummyUI button:title size:size name:name color:color]; button.position=CGPointMake(600,y); [self.overlay addChild:button];

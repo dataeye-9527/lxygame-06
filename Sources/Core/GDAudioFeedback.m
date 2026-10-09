@@ -31,17 +31,20 @@
     if((self=[super init])) {
         _voices=[NSMutableArray array]; _clips=[NSMutableDictionary dictionary]; _lastPlayed=[NSMutableDictionary dictionary];
         _musicPlayers=[NSMutableDictionary dictionary];
-        _applicationSuspended=UIApplication.sharedApplication.applicationState!=UIApplicationStateActive;
+        _applicationSuspended=YES;
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(interrupted:) name:AVAudioSessionInterruptionNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(backgrounded:) name:UIApplicationDidEnterBackgroundNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(backgrounded:) name:UIApplicationWillResignActiveNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(activated:) name:UIApplicationDidBecomeActiveNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(routeChanged:) name:AVAudioSessionRouteChangeNotification object:nil];
     }
     return self;
 }
-- (void)backgrounded:(NSNotification *)notification { self.applicationSuspended=YES; [self stop]; self.sessionReady=NO; }
-- (void)activated:(NSNotification *)notification { self.applicationSuspended=NO; [self refreshMusicPreference]; }
+- (void)setSceneActive:(BOOL)active {
+    self.applicationSuspended=!active;
+    if(active) [self refreshMusicPreference];
+    else { [self stop]; self.sessionReady=NO; }
+#if DEBUG
+    if([NSProcessInfo.processInfo.arguments containsObject:@"-qa-lifecycle"]) NSLog(@"QA lifecycle audio active=%d state=%@",active,self.qaAudioState);
+#endif
+}
 - (void)routeChanged:(NSNotification *)notification {
     if([notification.userInfo[AVAudioSessionRouteChangeReasonKey] unsignedIntegerValue]==AVAudioSessionRouteChangeReasonOldDeviceUnavailable) {
         [self stopEffects]; [self pauseMusic];
@@ -204,9 +207,9 @@
             NSAssert(!self.musicPlayer.playing,@"Pause must stop the music timeline");
             [self resumeMusic];
             NSAssert(self.musicPlayer.playing,@"Resume must restart music");
-            [self backgrounded:nil];
+            [self setSceneActive:NO];
             NSAssert(!self.musicPlayer.playing && self.voices.count==0,@"Background must silence all audio");
-            [self activated:nil];
+            [self setSceneActive:YES];
             NSAssert(self.musicPlayer.playing,@"Foreground menu music resumes");
             [self interrupted:[NSNotification notificationWithName:AVAudioSessionInterruptionNotification object:nil userInfo:@{AVAudioSessionInterruptionTypeKey:@(AVAudioSessionInterruptionTypeBegan)}]];
             NSAssert(!self.musicPlayer.playing,@"Interruption must pause music");

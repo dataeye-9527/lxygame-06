@@ -1,0 +1,8 @@
+2026-10-09 16:49:06.866 GummyRicochet[13373:227744] QA lifecycle layout bounds={{0, 0}, {874, 402}} safe={{62, 0}, {750, 382}} content={{99.941176470588232, 0}, {674.11764705882354, 382}}
+2026-10-09 16:49:07.460 GummyRicochet[13373:227744] QA lifecycle audio active=1 state={
+    fading = 0;
+    mode = 1;
+    playing = 1;
+    suspended = 0;
+    voices = 0;
+}

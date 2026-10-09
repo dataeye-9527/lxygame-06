@@ -1,0 +1,18 @@
+build-debug.log
+/Users/edy/Documents/ChatGPT/lxygame-06/Sources/Core/GDEngine.m:18:16: warning: unused function 'GDReadPoint' [-Wunused-function]
+** BUILD SUCCEEDED **
+build-release-device.log
+/Users/edy/Documents/ChatGPT/lxygame-06/Sources/Core/GDEngine.m:18:16: warning: unused function 'GDReadPoint' [-Wunused-function]
+** BUILD SUCCEEDED **
+core-focused.log
+2026-10-09 16:40:00.513 core_tests[12087:211729] PASS: geometry, density, prediction and bounce fixtures
+2026-10-09 16:40:00.531 core_tests[12087:211729] PASS: matching, support, energy and four skills fixtures
+2026-10-09 16:40:00.559 core_tests[12087:211729] PASS: five wild shots, per-color endless costs, charging, cancellation, cap and restore
+2026-10-09 16:40:00.573 core_tests[12087:211729] PASS: queue, pressure priority, pause and cold-restore fixtures
+2026-10-09 16:40:00.573 core_tests[12087:211729] PASS: focused core validation (816 assertions)
+settings-tests.log
+2026-10-09 16:39:59.139 settings_tests[12077:211685] PASS: 5 persistent settings checks
+build-isolated-commit.log
+/Users/edy/Documents/ChatGPT/lxygame-06/build/qa-ios27/commit-checkout/Sources/Core/GDEngine.m:18:16: warning: unused function 'GDReadPoint' [-Wunused-function]
+/Users/edy/Documents/ChatGPT/lxygame-06/build/qa-ios27/commit-checkout/Sources/Core/GDEngine.m:18:16: warning: unused function 'GDReadPoint' [-Wunused-function]
+** BUILD SUCCEEDED **

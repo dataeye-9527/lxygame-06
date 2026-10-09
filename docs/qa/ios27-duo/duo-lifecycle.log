@@ -1,0 +1,40 @@
+2026-10-09 16:41:18.097 GummyRicochet[12221:214323] QA lifecycle layout bounds={{0, 0}, {678, 466}} safe={{84, 0}, {594, 432}} content={{84, 47.699999999999989}, {594, 336.60000000000002}}
+2026-10-09 16:41:20.776 GummyRicochet[12221:214323] QA lifecycle audio active=1 state={
+    fading = 0;
+    mode = 1;
+    playing = 1;
+    suspended = 0;
+    voices = 0;
+}
+2026-10-09 16:42:56.730 GummyRicochet[12221:214323] QA lifecycle layout bounds={{0, 0}, {678, 466}} safe={{84, 0}, {594, 432}} content={{84, 47.699999999999989}, {594, 336.60000000000002}}
+2026-10-09 16:42:57.450 GummyRicochet[12221:214323] QA lifecycle pause phase=3 elapsed=34.364000792 pressure=1.635999208
+2026-10-09 16:42:57.462 GummyRicochet[12221:214323] QA lifecycle layout bounds={{0, 0}, {951, 669}} safe={{0, 0}, {951, 635}} content={{0, 48.050000000000011}, {951, 538.89999999999998}}
+2026-10-09 16:44:11.408 GummyRicochet[12221:214323] QA lifecycle pause phase=3 elapsed=43.219468250 pressure=4.780531750
+2026-10-09 16:44:11.408 GummyRicochet[12221:214323] QA lifecycle audio active=0 state={
+    fading = 0;
+    mode = 2;
+    playing = 0;
+    suspended = 1;
+    voices = 0;
+}
+2026-10-09 16:44:13.823 GummyRicochet[12221:214323] QA lifecycle pause phase=3 elapsed=43.219468250 pressure=4.780531750
+2026-10-09 16:44:13.823 GummyRicochet[12221:214323] QA lifecycle audio active=0 state={
+    fading = 0;
+    mode = 2;
+    playing = 0;
+    suspended = 1;
+    voices = 0;
+}
+2026-10-09 16:44:16.465 GummyRicochet[12221:214323] QA lifecycle pause phase=3 elapsed=43.219468250 pressure=4.780531750
+2026-10-09 16:44:16.491 GummyRicochet[12221:214323] QA lifecycle layout bounds={{0, 0}, {466, 678}} safe={{0, 0}, {466, 644}} content={{2.8421709430404007e-14, 189.96666666666667}, {465.99999999999994, 264.06666666666666}}
+2026-10-09 16:44:16.892 GummyRicochet[12221:214323] QA lifecycle pause phase=3 elapsed=43.219468250 pressure=4.780531750
+2026-10-09 16:44:16.897 GummyRicochet[12221:214323] QA lifecycle layout bounds={{0, 0}, {951, 669}} safe={{0, 0}, {951, 635}} content={{0, 48.050000000000011}, {951, 538.89999999999998}}
+2026-10-09 16:45:11.356 GummyRicochet[12221:214323] QA lifecycle audio active=1 state={
+    fading = 0;
+    mode = 2;
+    playing = 0;
+    suspended = 1;
+    voices = 0;
+}
+2026-10-09 16:45:37.436 GummyRicochet[12221:214323] QA lifecycle pause phase=3 elapsed=43.219468250 pressure=4.780531750
+2026-10-09 16:45:37.463 GummyRicochet[12221:214323] QA lifecycle layout bounds={{0, 0}, {678, 466}} safe={{0, 0}, {594, 432}} content={{0, 47.699999999999989}, {594, 336.60000000000002}}

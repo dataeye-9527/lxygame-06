@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1607F7C750990F4F96D6FCAE /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = CF0AB7390AE6CB54527D91FB /* SceneDelegate.m */; };
+		40449AF945DA8C3D94361B19 /* GDViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 91F79DAD24BA59552969FB44 /* GDViewController.m */; };
 		8CB6C530817C02AA8A8FD5E1 /* shot_yellow.wav in Resources */ = {isa = PBXBuildFile; fileRef = C2A8E94F0A560C0303D1415C /* shot_yellow.wav */; };
 		ACEAFF1380EF6117480D40DA /* shot_white.wav in Resources */ = {isa = PBXBuildFile; fileRef = 9F6A02DE62EBA9C765975868 /* shot_white.wav */; };
 		F9A1A2765BC3CB4242BCBCA1 /* shot_red.wav in Resources */ = {isa = PBXBuildFile; fileRef = FC0BF9A253191E4043376182 /* shot_red.wav */; };
@@ -64,6 +66,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		65BAFC02307619527735957D /* SceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneDelegate.h; sourceTree = "<group>"; };
+		CF0AB7390AE6CB54527D91FB /* SceneDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SceneDelegate.m; sourceTree = "<group>"; };
+		7B696D65FBFC4C6E7D597821 /* GDViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GDViewController.h; sourceTree = "<group>"; };
+		91F79DAD24BA59552969FB44 /* GDViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GDViewController.m; sourceTree = "<group>"; };
 		C2A8E94F0A560C0303D1415C /* shot_yellow.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = shot_yellow.wav; sourceTree = "<group>"; };
 		9F6A02DE62EBA9C765975868 /* shot_white.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = shot_white.wav; sourceTree = "<group>"; };
 		FC0BF9A253191E4043376182 /* shot_red.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = shot_red.wav; sourceTree = "<group>"; };
@@ -220,6 +226,8 @@
 		4D54974C53CB8303248D069D /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				7B696D65FBFC4C6E7D597821 /* GDViewController.h */,
+				91F79DAD24BA59552969FB44 /* GDViewController.m */,
 				9940739B8D4FADE2A31A5E01 /* FrontendScene.h */,
 				72B0AA38080E279633E794D5 /* FrontendScene.m */,
 				30FA82514F83FD4FB0BD666F /* GameScene.h */,
@@ -233,6 +241,8 @@
 		A0FF068E74536EE2A1C045D6 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				65BAFC02307619527735957D /* SceneDelegate.h */,
+				CF0AB7390AE6CB54527D91FB /* SceneDelegate.m */,
 				5A28AB58ED4155C2CC91FA8C /* AppDelegate.h */,
 				89B4AB1508199764BAAE9035 /* AppDelegate.m */,
 				78572DC3C066FB6E345D5B5A /* Info.plist */,
@@ -401,6 +411,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1607F7C750990F4F96D6FCAE /* SceneDelegate.m in Sources */,
+				40449AF945DA8C3D94361B19 /* GDViewController.m in Sources */,
 				CC19F4F43EB24C6FBFDECF3C /* AppDelegate.m in Sources */,
 				CE89D5045C5EA6EFAD5BFAD1 /* FrontendScene.m in Sources */,
 				A58DC156905905714C80D75D /* GDAudioFeedback.m in Sources */,

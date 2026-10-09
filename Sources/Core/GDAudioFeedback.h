@@ -9,6 +9,7 @@ typedef NS_ENUM(NSInteger, GDMusicMode) { GDMusicSilent, GDMusicRelaxed, GDMusic
 - (void)playFeedback:(GDFeedbackType)feedback intensity:(CGFloat)intensity;
 - (void)playFeedback:(GDFeedbackType)feedback intensity:(CGFloat)intensity color:(NSInteger)color;
 - (void)setMusicMode:(GDMusicMode)mode;
+- (void)setSceneActive:(BOOL)active;
 - (void)pauseMusic;
 - (void)resumeMusic;
 - (void)refreshMusicPreference;
