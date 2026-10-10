@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B10000000000000000000001 /* GDBuffCatalog.m in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000002; };
 		0269E9F53FD478CA96A57AC7 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 905025C4FEBBFCB841184C93 /* CoreGraphics.framework */; };
 		02AF86FF0874E931B85D022D /* wild.wav in Resources */ = {isa = PBXBuildFile; fileRef = 7CFC7C61AE8CE7DFBA5152AA /* wild.wav */; };
 		0BF2195AAFD706A3E026C715 /* skill.wav in Resources */ = {isa = PBXBuildFile; fileRef = 33D86336EED43E49D733888B /* skill.wav */; };
@@ -67,6 +68,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B10000000000000000000002 /* GDBuffCatalog.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GDBuffCatalog.m; sourceTree = "<group>"; };
+		B10000000000000000000003 /* GDBuffCatalog.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GDBuffCatalog.h; sourceTree = "<group>"; };
 		106E2CB40DE878B4431C0ECC /* music_danger.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = music_danger.wav; sourceTree = "<group>"; };
 		1664F5ABD078B354451DD8E3 /* GDProgressStore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GDProgressStore.h; sourceTree = "<group>"; };
 		1963FB029408FEA6E3CBDC66 /* GDLevelCatalog.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GDLevelCatalog.h; sourceTree = "<group>"; };
@@ -161,6 +164,8 @@
 				D4ACEFEAE3082738199AE4FF /* GDAudioFeedback.h */,
 				367291599704709A047A983F /* GDAudioFeedback.m */,
 				74C183E99AE580D8352A2811 /* GDEngine.h */,
+				B10000000000000000000002 /* GDBuffCatalog.m */,
+				B10000000000000000000003 /* GDBuffCatalog.h */,
 				AF6639D30BE5211B884C355C /* GDEngine.m */,
 				1963FB029408FEA6E3CBDC66 /* GDLevelCatalog.h */,
 				F084813AB153F0BECE6A2AC6 /* GDLevelCatalog.m */,
@@ -420,6 +425,7 @@
 				CE89D5045C5EA6EFAD5BFAD1 /* FrontendScene.m in Sources */,
 				A58DC156905905714C80D75D /* GDAudioFeedback.m in Sources */,
 				A84031A3D5EE4C4BA9471806 /* GDEngine.m in Sources */,
+				B10000000000000000000001 /* GDBuffCatalog.m in Sources */,
 				E17399543C1400D7AE1CD339 /* GDLevelCatalog.m in Sources */,
 				F5E28CC881B782DA518E8528 /* GDProgressStore.m in Sources */,
 				7311F40092E2E3374EC494ED /* GDRunRecords.m in Sources */,

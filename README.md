@@ -6,6 +6,8 @@
 >
 > 产品名称：Gummy Ricochet。
 
+2026-10-09 无尽模式更新：有限弹药与 NEXT/HOLD 共用库存；同色坠落软糖三合一回收，积分可补给，波间三选一购买或升级 Buff，加入一次性保命清屏。关卡和旧无尽存档继续原规则。完整机制与 13 项 Buff 价格见 [endless-economy.md](docs/endless-economy.md)，运行验收见 [endless-20261009/README.md](docs/qa/endless-20261009/README.md)。
+
 2026-10-08 音频更新：新增原创悠闲背景音乐及同主题急促变奏，按棋盘与危险线的距离切换；Music 与 Sound Effects 可独立开关。补齐蓝、红、黄、白四色的发射/消除声和红色技能蓄力提示。试听、生成方法与本轮验证见 [audio-20261008/README.md](docs/qa/audio-20261008/README.md)。
 
 2026-10-08 技能反馈修正：红色技能增加爆炸冲击、火花与余响，蓝色技能增加冰晶、冰裂声和冻结霜边；Music 胶囊补齐与其他设置一致的勾选及关闭图标。试听和验收记录见 [skill-audio-20261008/README.md](docs/qa/skill-audio-20261008/README.md)。

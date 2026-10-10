@@ -77,6 +77,7 @@ static UIColor *MenuBlue(void) { return [UIColor colorWithRed:.65 green:.86 blue
     else if([self.page isEqualToString:@"settings"]) [self buildSettings];
     else if([self.page isEqualToString:@"levels"]) [self buildLevels];
     else if([self.page isEqualToString:@"leaderboard"]) [self buildLeaderboard];
+    else if([self.page isEqualToString:@"endlessHelp"]) [self buildEndlessHelp];
     else [self buildHelp];
 }
 - (NSDictionary *)validSnapshotForKey:(NSString *)key {
@@ -236,6 +237,7 @@ static UIColor *MenuBlue(void) { return [UIColor colorWithRed:.65 green:.86 blue
 }
 - (void)buildHelp {
     [self pageFrame:@"HOW TO PLAY"];
+    [self button:@"Endless" name:@"endlessHelp" center:CGPointMake(972,615) size:CGSizeMake(150,52) color:MenuCream()];
     [self text:@"Drag to aim. Release to shoot." size:23 at:CGPointMake(600,471)];
     [self text:@"Match 3 of one color. Unsupported gummies fall." size:20 at:CGPointMake(600,432)];
     [self text:@"Tap a cannon to switch. Bounce off a wall once." size:20 at:CGPointMake(600,393)];
@@ -253,6 +255,20 @@ static UIColor *MenuBlue(void) { return [UIColor colorWithRed:.65 green:.86 blue
     }
     [self text:@"Fill each color meter, then tap its skill." size:18 at:CGPointMake(600,116)];
     [self text:@"Endless: each skill costs +1 per use, up to 50." size:15 at:CGPointMake(600,88)];
+}
+- (void)buildEndlessHelp {
+    [self pageFrame:@"ENDLESS"];
+    [self button:@"Basics" name:@"basicHelp" center:CGPointMake(972,615) size:CGSizeMake(150,52) color:MenuCream()];
+    [self text:@"Start with 16 rounds. NEXT and HOLD share your ammo stock." size:20 at:CGPointMake(600,479)];
+    for(NSInteger i=0;i<3;i++){SKNode *piece=[GummyUI piece:GDColorBlue diameter:48];piece.position=CGPointMake(424+i*58,417);[self addChild:piece];}
+    SKNode *arrow=[GummyUI symbol:@"arrow.right" size:34 color:MenuInk()];arrow.position=CGPointMake(609,417);[self addChild:arrow];SKNode *round=[GummyUI piece:GDColorBlue diameter:48];round.position=CGPointMake(696,417);[self addChild:round];
+    [self text:@"3 fallen gummies = 1 round of the same color." size:22 at:CGPointMake(600,358)];
+    [self text:@"Leftovers carry across shots and waves. Direct matches do not recycle." size:18 at:CGPointMake(600,320)];
+    [self text:@"Earn 10 credits per cleared gummy and 15 per fall." size:20 at:CGPointMake(600,267)];
+    [self text:@"Supply: buy ammo for 100 credits per round. Score stays cumulative." size:18 at:CGPointMake(600,229)];
+    [self text:@"Clear a wave, then buy one of three upgrades or continue." size:19 at:CGPointMake(600,185)];
+    [self text:@"Buff levels, prices and skill options appear in Buffs and Supply." size:18 at:CGPointMake(600,147)];
+    [self text:@"Upgrades last for this run. Keep gummies above the danger line." size:17 at:CGPointMake(600,109)];
 }
 - (NSString *)controlAt:(CGPoint)p { for(NSString *key in self.controls) if(CGRectContainsPoint(self.controls[key].CGRectValue,p)) return key; return nil; }
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
@@ -292,6 +308,7 @@ static UIColor *MenuBlue(void) { return [UIColor colorWithRed:.65 green:.86 blue
     else if([control isEqualToString:@"settings"]) [self.view presentScene:[FrontendScene settingsSceneReturningTo:self]];
     else if([control isEqualToString:@"privacy"]) [self showPrivacyPolicy];
     else if([control isEqualToString:@"help"]) [self.view presentScene:[FrontendScene helpScene]];
+    else if([control isEqualToString:@"endlessHelp"]||[control isEqualToString:@"basicHelp"]){self.page=[control isEqualToString:@"endlessHelp"]?@"endlessHelp":@"help";[self rebuild];}
     else if([control isEqualToString:@"back"]){ SKScene *destination=self.returnScene?:[FrontendScene homeScene]; self.returnScene=nil; [self.view presentScene:destination]; }
     else {
         if([control isEqualToString:@"music"]) settings.musicEnabled=!settings.musicEnabled;

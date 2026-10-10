@@ -1,0 +1,41 @@
+{
+  "device": "B4013321-6131-4C5A-98C6-09A661AE1FA6",
+  "captureDisplay": "primary",
+  "bundle": "com.lxygame.gummydrop.prototype",
+  "variants": [
+    {
+      "variant": "flow",
+      "ready": true,
+      "screenshot": "flow.png"
+    },
+    {
+      "variant": "shop",
+      "ready": true,
+      "screenshot": "shop.png"
+    },
+    {
+      "variant": "supply",
+      "ready": true,
+      "screenshot": "supply.png"
+    },
+    {
+      "variant": "buffs",
+      "ready": true,
+      "screenshot": "buffs.png"
+    },
+    {
+      "variant": "cut",
+      "ready": true,
+      "screenshot": "cut.png"
+    },
+    {
+      "variant": "rescue",
+      "ready": true,
+      "screenshot": "rescue.png"
+    }
+  ],
+  "failure": null,
+  "preferencesUnchanged": true,
+  "changedKeys": [],
+  "scope": "DEBUG scene controls and render fixtures; not synthetic or manual touch input"
+}

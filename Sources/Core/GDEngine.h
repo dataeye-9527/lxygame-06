@@ -1,12 +1,13 @@
 #import <Foundation/Foundation.h>
 #import <CoreGraphics/CoreGraphics.h>
+#import "GDBuffCatalog.h"
 
 NS_ASSUME_NONNULL_BEGIN
 typedef NS_ENUM(NSInteger, GDColor) { GDColorBlue, GDColorRed, GDColorYellow, GDColorWhite };
-typedef NS_ENUM(NSInteger, GDPhase) { GDPhaseReady, GDPhaseFlying, GDPhaseResolving, GDPhasePaused, GDPhaseGameOver, GDPhaseWon };
+typedef NS_ENUM(NSInteger, GDPhase) { GDPhaseReady, GDPhaseFlying, GDPhaseResolving, GDPhasePaused, GDPhaseGameOver, GDPhaseWon, GDPhaseShop };
 typedef NS_ENUM(NSInteger, GDGameMode) { GDGameModeEndless, GDGameModeLevel };
 typedef NS_ENUM(NSInteger, GDObjective) { GDObjectiveClear, GDObjectiveCollect, GDObjectiveFall, GDObjectiveSurvive };
-typedef NS_ENUM(NSInteger, GDSource) { GDSourceNormal, GDSourceWild, GDSourceBlast, GDSourceYellow, GDSourcePressure };
+typedef NS_ENUM(NSInteger, GDSource) { GDSourceNormal, GDSourceWild, GDSourceBlast, GDSourceYellow, GDSourcePressure, GDSourceRescue };
 
 @interface GDCell : NSObject <NSCopying>
 @property(nonatomic) NSInteger row, column;
@@ -16,7 +17,7 @@ typedef NS_ENUM(NSInteger, GDSource) { GDSourceNormal, GDSourceWild, GDSourceBla
 @end
 
 @interface GDShot : NSObject
-@property(nonatomic) BOOL valid, blast, bounced;
+@property(nonatomic) BOOL valid, blast, bounced, wildcard, verticalBlast;
 @property(nonatomic) NSInteger boardRevision, landingRow, landingColumn;
 @property(nonatomic) GDColor resolvedColor;
 @property(nonatomic, copy) NSArray<NSValue *> *points; // CGPoint, board-local x right / y down
@@ -29,7 +30,8 @@ typedef NS_ENUM(NSInteger, GDSource) { GDSourceNormal, GDSourceWild, GDSourceBla
 @property(nonatomic) GDSource source;
 @property(nonatomic, copy) NSArray<GDCell *> *removed, *fallen;
 @property(nonatomic, nullable) GDCell *placed;
-@property(nonatomic) BOOL pushed, newWave, gameOver, won;
+@property(nonatomic) BOOL pushed, newWave, gameOver, won, rescued;
+@property(nonatomic, copy) NSArray<GDCell *> *rescuedCells;
 @property(nonatomic) NSInteger points, rowPhase; // phase used by removed/fallen coordinates before any new wave
 @end
 
@@ -52,6 +54,18 @@ typedef NS_ENUM(NSInteger, GDSource) { GDSourceNormal, GDSourceWild, GDSourceBla
 @property(nonatomic, readonly) NSUInteger seed;
 @property(nonatomic, readonly) NSTimeInterval pressureRemaining, pressureInterval, freezeRemaining, elapsed;
 @property(nonatomic, readonly) NSArray<NSNumber *> *energy;
+@property(nonatomic, readonly) BOOL economyEnabled, rescueUsed, verticalBlast, bankWildReady;
+@property(nonatomic, readonly) NSInteger credits, totalAmmo, secondHeldColor, selectedWildColor, recolorsRemaining, bankMatches;
+@property(nonatomic, readonly) NSArray<NSNumber *> *ammoCounts, *materials, *buffLevels, *overflowEnergy, *shopOffers;
+- (NSInteger)buffLevel:(GDBuff)buff;
+- (NSInteger)nextBuffPrice:(GDBuff)buff;
+- (BOOL)buyAmmo:(GDColor)color count:(NSInteger)count;
+- (BOOL)buyBuff:(GDBuff)buff;
+- (BOOL)skipShop;
+- (BOOL)holdSlot:(NSInteger)slot;
+- (BOOL)recolorCurrentTo:(GDColor)color;
+- (BOOL)selectWildColor:(NSInteger)color; // -1 restores automatic maximum matching
+- (BOOL)toggleVerticalBlast;
 - (NSInteger)energyThresholdForColor:(GDColor)color; // endless: 20 + successful uses of this color, capped at 50; levels: 20
 - (nullable instancetype)initWithLevelID:(NSInteger)levelID seed:(NSUInteger)seed;
 - (instancetype)initWithSeed:(NSUInteger)seed;
@@ -78,6 +92,7 @@ typedef NS_ENUM(NSInteger, GDSource) { GDSourceNormal, GDSourceWild, GDSourceBla
 // Deterministic fixtures for core validation and acceptance; production UI never alters cells.
 #if DEBUG || GD_CORE_TESTS
 - (void)loadFixture:(NSArray<GDCell *> *)cells phase:(NSInteger)phase current:(GDColor)current next:(GDColor)next;
+- (void)setFixtureEconomyCredits:(NSInteger)credits ammo:(NSArray<NSNumber *> *)ammo buffs:(NSArray<NSNumber *> *)buffs;
 - (void)setFixtureEnergy:(NSArray<NSNumber *> *)energy;
 #endif
 @end

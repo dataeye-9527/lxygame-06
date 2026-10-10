@@ -1,0 +1,13 @@
+{
+  "device": "B4013321-6131-4C5A-98C6-09A661AE1FA6",
+  "scope": "Actual CUA clicks in DEBUG fixture states; not a full gameplay run",
+  "checks": [
+    "Supply buy-two: blue ammo 4 to 7, credits 1000 to 800",
+    "Blast Area to Cut",
+    "Wild color Auto to RED",
+    "Buff list Next page and upgrade prices",
+    "Shop Color Swap purchase: credits 1000 to 650, level 2, next price 600"
+  ],
+  "preferencesUnchangedAfterShopClicks": true,
+  "changedKeys": []
+}

@@ -15,6 +15,12 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
 
 @interface GameScene ()
 @property(nonatomic) GDEngine *engine;
+@property(nonatomic) SKNode *economyHUD, *secondHeldPiece;
+@property(nonatomic) SKLabelNode *creditsLabel;
+@property(nonatomic) NSMutableArray<SKLabelNode *> *ammoLabels;
+@property(nonatomic,copy) NSString *economyOverlay;
+@property(nonatomic) BOOL supplyFromShop, displayedDoubleHold;
+@property(nonatomic) NSInteger buffInfoPage, displayedSecondHeld;
 @property(nonatomic) NSDictionary *initialRunSnapshot;
 @property(nonatomic) NSInteger initialLevelID, combo;
 #if DEBUG
@@ -56,7 +62,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     if(self.engine){ self.lastTime=0; [self refreshHUD]; [self refreshMusic]; if(self.engine.phase!=GDPhasePaused) [GDAudioFeedback.sharedPlayer resumeMusic]; return; }
     self.anchorPoint=CGPointZero;
     self.pieceNodes=[NSMutableDictionary dictionary]; self.skillCards=[NSMutableArray array]; self.launcherNodes=[NSMutableArray array]; self.energyFills=[NSMutableArray array]; self.energyLabels=[NSMutableArray array];
-    self.displayedNext=self.displayedHeld=self.displayedCurrent=-99; self.renderedRevision=-1;
+    self.displayedNext=self.displayedHeld=self.displayedCurrent=self.displayedSecondHeld=-99; self.renderedRevision=-1;
     self.flightRemaining=self.resolutionRemaining=-1; self.displayedEnergy=@[@0,@0,@0,@0];
 #if DEBUG
     NSArray *args=NSProcessInfo.processInfo.arguments;
@@ -99,6 +105,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     [self refreshMusic];
     [GDAudioFeedback.sharedPlayer resumeMusic];
 #if DEBUG
+    if([args containsObject:@"-qa-economy"]) [self setupEconomyQA];
     if([args containsObject:@"-qa-clock"]) [self validatePresentationClock];
     if([args containsObject:@"-qa-music"]) dispatch_after(dispatch_time(DISPATCH_TIME_NOW,NSEC_PER_SEC),dispatch_get_main_queue(),^{ [self validateMusicTransitions]; });
     if([args containsObject:@"-qa-freeze-art"] || [args containsObject:@"-qa-blast-art"]) dispatch_after(dispatch_time(DISPATCH_TIME_NOW,NSEC_PER_SEC),dispatch_get_main_queue(),^{ [self captureSkillArt]; });
@@ -166,6 +173,107 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     self.wildLabel=[GummyUI label:@"" size:18 color:Cream()]; self.wildLabel.position=CGPointMake(814,90); self.wildLabel.zPosition=50; [self.hud addChild:self.wildLabel];
     self.statusLabel=[GummyUI label:@"" size:17 color:Cream()]; self.statusLabel.position=CGPointMake(588,190); self.statusLabel.zPosition=60; [self.hud addChild:self.statusLabel];
 }
+- (void)refreshEconomyHUD {
+    if(!self.economyHUD){
+        self.economyHUD=[SKNode node];[self.hud addChild:self.economyHUD];self.ammoLabels=[NSMutableArray new];
+        SKNode *creditCard=[GummyUI surface:CGSizeMake(112,54) color:Cream() radius:22];creditCard.position=CGPointMake(466,645);[self.economyHUD addChild:creditCard];
+        SKLabelNode *title=[GummyUI label:@"CREDITS" size:12 color:Ink()];title.position=CGPointMake(466,659);[self.economyHUD addChild:title];
+        self.creditsLabel=[GummyUI label:@"0" size:23 color:Ink()];self.creditsLabel.position=CGPointMake(466,637);[self.economyHUD addChild:self.creditsLabel];
+        for(NSInteger color=0;color<4;color++){
+            CGFloat x=1077+(color%2)*69,y=244-(color/2)*40;SKNode *piece=[GummyUI piece:color diameter:21];piece.position=CGPointMake(x,y);[self.economyHUD addChild:piece];
+            SKLabelNode *label=[GummyUI label:@"" size:13 color:Ink()];label.position=CGPointMake(x,y-20);[self.economyHUD addChild:label];[self.ammoLabels addObject:label];
+        }
+        SKNode *supply=[GummyUI button:@"Supply" size:CGSizeMake(136,50) name:@"supply" color:Cream()];supply.position=CGPointMake(1110,150);[self.economyHUD addChild:supply];
+        SKNode *buffs=[GummyUI button:@"Buffs" size:CGSizeMake(136,44) name:@"buffInfo" color:Cream()];buffs.position=CGPointMake(1110,82);[self.economyHUD addChild:buffs];
+        self.secondHeldPiece=[SKNode node];self.secondHeldPiece.position=CGPointMake(1140,317);[self.hud addChild:self.secondHeldPiece];
+    }
+    self.creditsLabel.text=[NSString stringWithFormat:@"%ld",(long)self.engine.credits];
+    for(NSInteger color=0;color<4;color++)self.ammoLabels[color].text=[NSString stringWithFormat:@"%ld · %ld/3",(long)self.engine.ammoCounts[color].integerValue,(long)self.engine.materials[color].integerValue];
+    BOOL doubleHold=[self.engine buffLevel:GDBuffDoubleHold]>0;
+    if(self.displayedDoubleHold!=doubleHold){self.displayedHeld=-99;self.displayedDoubleHold=doubleHold;}
+    self.heldPiece.position=CGPointMake(doubleHold?1079:1110,317);self.secondHeldPiece.hidden=!doubleHold;
+    if(doubleHold){if(self.displayedSecondHeld!=self.engine.secondHeldColor){[self.secondHeldPiece removeAllChildren];if(self.engine.secondHeldColor>=0)[self.secondHeldPiece addChild:[GummyUI piece:self.engine.secondHeldColor diameter:48]];else [self.secondHeldPiece addChild:[GummyUI label:@"+" size:28 color:Ink()]];self.displayedSecondHeld=self.engine.secondHeldColor;}self.secondHeldPiece.alpha=self.engine.holdUsed?.52:1;}
+    SKNode *rescue=[self.economyHUD childNodeWithName:@"rescueBadge"];
+    if([self.engine buffLevel:GDBuffRescue]&&!rescue){rescue=[GummyUI image:@"rescue_charm" size:CGSizeMake(28,28)];rescue.name=@"rescueBadge";rescue.position=CGPointMake(1034,645);[self.economyHUD addChild:rescue];}
+    rescue.hidden=![self.engine buffLevel:GDBuffRescue];
+    rescue.alpha=self.engine.rescueUsed?.3:1;
+}
+- (void)economyPanel:(NSString *)title {
+    [self resetButtonTouch];[self clearAim];self.yellowArmed=NO;[self.engine cancelBlast];[self.overlay removeFromParent];
+    self.overlay=[SKNode node];self.overlay.zPosition=100;[self addChild:self.overlay];self.overlayControls=[NSMutableDictionary new];[GummyUI setOverlayDimmed:YES];
+    SKShapeNode *shade=[GummyUI panel:self.size fill:GummyUI.overlayShadeColor stroke:UIColor.clearColor radius:0];shade.position=CGPointMake(600,340);[self.overlay addChild:shade];
+    SKNode *panel=[GummyUI surface:CGSizeMake(1050,562) color:Cream() radius:30];panel.position=CGPointMake(600,340);[self.overlay addChild:panel];
+    SKLabelNode *heading=[GummyUI label:title size:31 color:Ink()];heading.position=CGPointMake(600,583);[self.overlay addChild:heading];
+    SKLabelNode *balance=[GummyUI label:[NSString stringWithFormat:@"WAVE %ld   ·   CREDITS %ld",(long)self.engine.wave,(long)self.engine.credits] size:18 color:Ink()];balance.position=CGPointMake(600,550);[self.overlay addChild:balance];
+}
+- (void)economyButton:(NSString *)title name:(NSString *)name center:(CGPoint)p size:(CGSize)size enabled:(BOOL)enabled {
+    SKNode *button=[GummyUI button:title size:size name:name color:enabled?[UIColor colorWithRed:.64 green:.85 blue:1 alpha:1]:[UIColor colorWithWhite:.8 alpha:1]];button.position=p;button.alpha=enabled?1:.5;[self.overlay addChild:button];
+    self.overlayControls[name]=[NSValue valueWithCGRect:CGRectMake(p.x-size.width/2,p.y-size.height/2,size.width,size.height)];
+}
+- (void)effectText:(NSString *)text x:(CGFloat)x y:(CGFloat)y width:(CGFloat)width size:(CGFloat)size {
+    NSMutableArray *lines=[NSMutableArray new];NSString *line=@"";
+    for(NSString *word in [text componentsSeparatedByString:@" "]){NSString *candidate=line.length?[line stringByAppendingFormat:@" %@",word]:word;if(candidate.length*size*.56>width&&line.length){[lines addObject:line];line=word;}else line=candidate;}if(line.length)[lines addObject:line];
+    NSInteger index=0;for(NSString *part in lines){SKLabelNode *label=[GummyUI label:part size:size color:Ink()];label.position=CGPointMake(x,y-index*(size+6));[self.overlay addChild:label];index++;}
+}
+- (void)showWaveShop {
+    self.economyOverlay=@"shop";[self economyPanel:@"UPGRADES"];[GDAudioFeedback.sharedPlayer pauseMusic];
+    NSInteger i=0;for(NSNumber *offer in self.engine.shopOffers){GDBuff buff=offer.integerValue;CGFloat x=284+i*316;NSInteger level=[self.engine buffLevel:buff]+1,price=[self.engine nextBuffPrice:buff];
+        SKNode *card=[GummyUI surface:CGSizeMake(292,327) color:[UIColor colorWithRed:.96 green:.87 blue:1 alpha:1] radius:23];card.position=CGPointMake(x,358);[self.overlay addChild:card];
+        SKNode *icon=buff==GDBuffRescue?[GummyUI image:@"rescue_charm" size:CGSizeMake(86,86)]:[GummyUI symbol:[GDBuffCatalog symbol:buff] size:68 color:Ink()];icon.position=CGPointMake(x,465);[self.overlay addChild:icon];
+        SKLabelNode *name=[GummyUI label:[GDBuffCatalog title:buff] size:22 color:Ink()];name.position=CGPointMake(x,405);[self.overlay addChild:name];
+        SKLabelNode *tier=[GummyUI label:buff==GDBuffRescue?@"ONE USE":[NSString stringWithFormat:@"LEVEL %ld / %ld",(long)level,(long)[GDBuffCatalog maximumLevel:buff]] size:14 color:Ink()];tier.position=CGPointMake(x,377);[self.overlay addChild:tier];
+        [self effectText:[GDBuffCatalog effect:buff level:level] x:x y:340 width:258 size:15];
+        [self economyButton:[NSString stringWithFormat:@"Buy  ·  %ld",(long)price] name:[NSString stringWithFormat:@"buyBuff%ld",(long)buff] center:CGPointMake(x,235) size:CGSizeMake(248,48) enabled:self.engine.credits>=price];i++;
+    }
+    if(!i)[self effectText:@"All upgrades maxed." x:600 y:350 width:700 size:24];
+    [self economyButton:@"Supply" name:@"supply" center:CGPointMake(450,130) size:CGSizeMake(220,52) enabled:YES];[self economyButton:@"Continue" name:@"shopSkip" center:CGPointMake(750,130) size:CGSizeMake(220,52) enabled:YES];[self saveRun];
+}
+- (void)showSupply {
+    self.economyOverlay=@"supply";[self economyPanel:@"SUPPLY"];NSArray *names=@[@"BLUE",@"RED",@"YELLOW",@"WHITE"];
+    for(NSInteger color=0;color<4;color++){CGFloat x=300+color*200;SKNode *icon=[GummyUI piece:color diameter:64];icon.position=CGPointMake(x,474);[self.overlay addChild:icon];
+        SKLabelNode *name=[GummyUI label:names[color] size:19 color:Ink()];name.position=CGPointMake(x,424);[self.overlay addChild:name];
+        SKLabelNode *stock=[GummyUI label:[NSString stringWithFormat:@"AMMO %ld   FALL %ld/3",(long)self.engine.ammoCounts[color].integerValue,(long)self.engine.materials[color].integerValue] size:14 color:Ink()];stock.position=CGPointMake(x,392);[self.overlay addChild:stock];
+        [self economyButton:@"+1  ·  100" name:[NSString stringWithFormat:@"ammo1_%ld",(long)color] center:CGPointMake(x,346) size:CGSizeMake(168,44) enabled:self.engine.credits>=100];
+        [self economyButton:@"+2  ·  200" name:[NSString stringWithFormat:@"ammo2_%ld",(long)color] center:CGPointMake(x,291) size:CGSizeMake(168,44) enabled:self.engine.credits>=200];
+        if([self.engine buffLevel:GDBuffRecolor])[self economyButton:[NSString stringWithFormat:@"Swap  ·  %ld",(long)self.engine.recolorsRemaining] name:[NSString stringWithFormat:@"recolor%ld",(long)color] center:CGPointMake(x,236) size:CGSizeMake(168,38) enabled:!self.supplyFromShop&&self.engine.recolorsRemaining>0&&self.engine.currentColor>=0&&self.engine.currentColor!=color];
+    }
+    if([self.engine buffLevel:GDBuffWildChoice]){for(NSInteger c=-1;c<4;c++){NSString *name=c<0?@"Auto":names[c];if(self.engine.selectedWildColor==c)name=[name stringByAppendingString:@" ✓"];[self economyButton:name name:[NSString stringWithFormat:@"wildColor%ld",(long)(c+1)] center:CGPointMake(270+(c+1)*165,185) size:CGSizeMake(150,34) enabled:!self.supplyFromShop];}}
+    [self economyButton:self.supplyFromShop?@"Upgrades":@"Close" name:@"supplyClose" center:CGPointMake(600,123) size:CGSizeMake(220,48) enabled:YES];
+    if([self.engine buffLevel:GDBuffVerticalBlast])[self economyButton:self.engine.verticalBlast?@"Blast: Cut":@"Blast: Area" name:@"blastMode" center:CGPointMake(865,123) size:CGSizeMake(200,48) enabled:!self.supplyFromShop];[self saveRun];
+}
+- (void)showBuffInfo {
+    self.economyOverlay=@"buffs";[self economyPanel:@"BUFFS"];NSMutableArray *owned=[NSMutableArray new];
+    for(GDBuff buff=0;buff<GDBuffCount;buff++)if([self.engine buffLevel:buff])[owned addObject:@(buff)];
+    NSInteger pages=MAX(1,(owned.count+5)/6);self.buffInfoPage=MAX(0,MIN(self.buffInfoPage,pages-1));
+    for(NSInteger i=self.buffInfoPage*6;i<MIN((self.buffInfoPage+1)*6,(NSInteger)owned.count);i++){GDBuff buff=[owned[i] integerValue];NSInteger level=[self.engine buffLevel:buff],slot=i%6;CGFloat x=350+(slot%2)*500,y=490-(slot/2)*117;
+        NSString *title=[NSString stringWithFormat:@"%@  ·  %@",[GDBuffCatalog title:buff],buff==GDBuffRescue?(self.engine.rescueUsed?@"USED":@"READY"):[NSString stringWithFormat:@"LV %ld",(long)level]];[self effectText:title x:x y:y width:440 size:20];
+        [self effectText:[GDBuffCatalog effect:buff level:level] x:x y:y-32 width:440 size:15];
+        NSInteger price=[self.engine nextBuffPrice:buff];if(price&&!(buff==GDBuffRescue&&self.engine.rescueUsed))[self effectText:[NSString stringWithFormat:@"Next level: %ld credits",(long)price] x:x y:y-82 width:440 size:13];
+    }
+    if(!owned.count)[self effectText:@"Buy upgrades between waves." x:600 y:360 width:700 size:22];
+    if(pages>1){[self economyButton:@"Previous" name:@"buffPrevious" center:CGPointMake(350,123) size:CGSizeMake(180,48) enabled:self.buffInfoPage>0];[self economyButton:@"Next" name:@"buffNext" center:CGPointMake(850,123) size:CGSizeMake(180,48) enabled:self.buffInfoPage<pages-1];}
+    [self economyButton:@"Close" name:@"supplyClose" center:CGPointMake(600,123) size:CGSizeMake(200,48) enabled:YES];
+}
+- (void)closeEconomy {
+    [self.overlay removeFromParent];self.overlay=nil;self.economyOverlay=nil;[GummyUI setOverlayDimmed:NO];[self.engine resume];self.playfield.paused=NO;self.lastTime=0;[self refreshHUD];[self saveRun];[GDAudioFeedback.sharedPlayer resumeMusic];
+}
+- (BOOL)handleEconomyControl:(NSString *)control {
+    if(!self.engine.economyEnabled)return NO;
+    if([control isEqualToString:@"supply"]){if(self.engine.phase!=GDPhaseReady&&self.engine.phase!=GDPhaseShop)return YES;self.supplyFromShop=self.engine.phase==GDPhaseShop;if(!self.supplyFromShop){[self.engine cancelBlast];[self.engine pause];self.playfield.paused=YES;}[GDAudioFeedback.sharedPlayer pauseMusic];[self showSupply];return YES;}
+    if([control isEqualToString:@"buffInfo"]){if(self.engine.phase==GDPhaseReady){self.supplyFromShop=NO;self.buffInfoPage=0;[self.engine cancelBlast];[self.engine pause];self.playfield.paused=YES;[GDAudioFeedback.sharedPlayer pauseMusic];[self showBuffInfo];}return YES;}
+    if([control isEqualToString:@"buffPrevious"]||[control isEqualToString:@"buffNext"]){self.buffInfoPage+=[control isEqualToString:@"buffNext"]?1:-1;[self showBuffInfo];return YES;}
+    if([control isEqualToString:@"supplyClose"]){if(self.supplyFromShop){self.supplyFromShop=NO;[self showWaveShop];}else [self closeEconomy];return YES;}
+    if([control isEqualToString:@"shopSkip"]){if([self.engine skipShop])[self closeEconomy];return YES;}
+    if([control hasPrefix:@"buyBuff"]){if([self.engine buyBuff:[[control substringFromIndex:7] integerValue]])[self closeEconomy];return YES;}
+    BOOL ammo=[control hasPrefix:@"ammo"],recolor=[control hasPrefix:@"recolor"],wild=[control hasPrefix:@"wildColor"],blast=[control isEqualToString:@"blastMode"];
+    if(ammo||recolor||wild||blast){BOOL paused=self.engine.phase==GDPhasePaused;if(paused)[self.engine resume];
+        if(ammo){NSArray *parts=[control componentsSeparatedByString:@"_"];[self.engine buyAmmo:[parts.lastObject integerValue] count:[[parts.firstObject substringFromIndex:4] integerValue]];}
+        if(recolor)[self.engine recolorCurrentTo:[[control substringFromIndex:7] integerValue]];
+        if(wild)[self.engine selectWildColor:[[control substringFromIndex:9] integerValue]-1];
+        if(blast)[self.engine toggleVerticalBlast];if(paused)[self.engine pause];[self refreshHUD];[self showSupply];return YES;
+    }
+    return NO;
+}
 - (void)syncBoard {
 #if DEBUG
     if(self.clockValidation) return;
@@ -181,6 +289,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     self.renderedRevision=self.engine.revision;
 }
 - (void)refreshHUD {
+    if(self.engine.economyEnabled)[self refreshEconomyHUD];
     self.scoreLabel.text=[NSString stringWithFormat:@"%ld",(long)self.engine.score];
     BOOL frozen=self.engine.freezeRemaining>0;
     SKNode *frost=[self.playfield childNodeWithName:@"frozenBoardRim"];
@@ -221,16 +330,16 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     }
     self.displayedEnergy=[self.engine.energy copy];
     for(NSInteger i=0;i<3;i++){ self.launcherNodes[i].alpha=self.engine.launcher==i?1:.80; [self.launcherNodes[i] childNodeWithName:@"activeGlow"].hidden=self.engine.launcher!=i; }
-    if(self.displayedNext!=self.engine.nextColor){ [self.nextPiece removeAllChildren]; [self.nextPiece addChild:[GummyUI piece:self.engine.nextColor diameter:74]]; self.displayedNext=self.engine.nextColor; }
-    if(self.displayedHeld!=self.engine.heldColor){ [self.heldPiece removeAllChildren]; if(self.engine.heldColor>=0) [self.heldPiece addChild:[GummyUI piece:self.engine.heldColor diameter:74]]; else { SKLabelNode *empty=[GummyUI label:@"+" size:37 color:[UIColor colorWithRed:.66 green:.52 blue:.64 alpha:1]]; [self.heldPiece addChild:empty]; } self.displayedHeld=self.engine.heldColor; }
+    if(self.displayedNext!=self.engine.nextColor){ [self.nextPiece removeAllChildren]; if(self.engine.nextColor>=0)[self.nextPiece addChild:[GummyUI piece:self.engine.nextColor diameter:74]]; self.displayedNext=self.engine.nextColor; }
+    if(self.displayedHeld!=self.engine.heldColor){ [self.heldPiece removeAllChildren]; if(self.engine.heldColor>=0) [self.heldPiece addChild:[GummyUI piece:self.engine.heldColor diameter:[self.engine buffLevel:GDBuffDoubleHold]?48:74]]; else { SKLabelNode *empty=[GummyUI label:@"+" size:37 color:[UIColor colorWithRed:.66 green:.52 blue:.64 alpha:1]]; [self.heldPiece addChild:empty]; } self.displayedHeld=self.engine.heldColor; }
     self.heldPiece.alpha=self.engine.holdUsed?.52:1; self.holdLabel.alpha=self.engine.holdUsed?.52:1;
     NSInteger shown=self.engine.blastArmed?GDColorRed:self.engine.currentColor;
-    if(self.displayedCurrent!=shown){ [self.currentPiece removeAllChildren]; [self.currentPiece addChild:[GummyUI piece:shown diameter:54]]; self.displayedCurrent=shown; }
+    if(self.displayedCurrent!=shown){ [self.currentPiece removeAllChildren]; if(shown>=0)[self.currentPiece addChild:[GummyUI piece:shown diameter:54]];else [self.currentPiece addChild:[GummyUI label:@"EMPTY" size:13 color:Cream()]]; self.displayedCurrent=shown; }
     self.currentPiece.position=ScenePoint([self.engine launcherPoint:self.engine.launcher]);
     self.currentPiece.hidden=self.engine.phase==GDPhaseFlying;
-    self.wildLabel.text=self.engine.wildRemaining>0?[NSString stringWithFormat:@"★ ×%ld",(long)self.engine.wildRemaining]:@"";
+    self.wildLabel.text=self.engine.wildRemaining>0?[NSString stringWithFormat:@"★ ×%ld",(long)self.engine.wildRemaining]:(self.engine.bankWildReady?@"★ BANK":@"");
     self.wildLabel.position=CGPointMake(self.currentPiece.position.x+92,93);
-    BOOL wild=self.engine.wildRemaining>0 && !self.engine.blastArmed;
+    BOOL wild=(self.engine.wildRemaining>0||self.engine.bankWildReady) && !self.engine.blastArmed;
     SKNode *ring=[self.currentPiece childNodeWithName:@"wildRing"];
     if(wild && !ring){ SKShapeNode *r=[SKShapeNode shapeNodeWithCircleOfRadius:32]; r.name=@"wildRing"; r.strokeColor=UIColor.whiteColor; r.lineWidth=2.5; r.fillColor=UIColor.clearColor; [self.currentPiece addChild:r]; }
     if(!wild) [ring removeFromParent];
@@ -239,6 +348,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     if(!self.engine.blastArmed) [blastRing removeFromParent];
     if(self.engine.blastArmed) self.statusLabel.text=@"BLAST  ·  Drag to aim";
     else if(self.yellowArmed) self.statusLabel.text=@"SWEEP  ·  Tap again to use";
+    else if(self.engine.economyEnabled&&self.engine.currentColor<0)self.statusLabel.text=@"EMPTY  ·  Use Hold, Supply or a skill";
     else if(!self.aiming) self.statusLabel.text=@"";
 }
 - (NSString *)controlAt:(CGPoint)point {
@@ -248,7 +358,8 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     }
     if(CGRectContainsPoint(CGRectMake(1101,616,64,57),point)) return @"pause";
     for(NSInteger i=0;i<4;i++) if(CGRectContainsPoint(CGRectMake(15,483-i*146,134,138),point)) return [NSString stringWithFormat:@"skill%ld",(long)i];
-    if(CGRectContainsPoint(CGRectMake(1040,256,140,155),point)) return @"hold";
+    if(self.engine.economyEnabled){if(CGRectContainsPoint(CGRectMake(1042,125,136,50),point))return @"supply";if(CGRectContainsPoint(CGRectMake(1042,60,136,44),point))return @"buffInfo";}
+    if(CGRectContainsPoint(CGRectMake(1040,256,140,155),point)) return [self.engine buffLevel:GDBuffDoubleHold]&&point.x>1110?@"hold2":@"hold";
     if(CGRectContainsPoint(CGRectMake(1040,417,140,164),point)) return @"next";
     if(point.y<143){ for(NSInteger i=0;i<3;i++){ CGPoint p=ScenePoint([self.engine launcherPoint:i]); if(fabs(p.x-point.x)<74 && fabs(p.y-point.y)<60) return [NSString stringWithFormat:@"launcher%ld",(long)i]; } }
     return nil;
@@ -257,6 +368,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
 #if DEBUG
     if(self.qaPresentationFixture && ![@[@"home",@"levels",@"allLevels",@"scores"] containsObject:control]) return;
 #endif
+    if([self handleEconomyControl:control])return;
     if(![control isEqualToString:@"overlay"] && ![control isEqualToString:@"next"]) [GDSettings.sharedSettings playFeedback:GDFeedbackTap];
     if([control isEqualToString:@"pause"]){ [self pauseGame]; return; }
     if([control isEqualToString:@"resume"]){ [self.overlay removeFromParent]; self.overlay=nil; [GummyUI setOverlayDimmed:NO]; self.playfield.paused=NO; [self.engine resume]; self.lastTime=0; [self refreshMusic]; [GDAudioFeedback.sharedPlayer resumeMusic]; return; }
@@ -269,7 +381,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     if(self.engine.phase!=GDPhaseReady) return;
     [self clearAim];
     if([control hasPrefix:@"launcher"]){ if([self.engine selectLauncher:[[control substringFromIndex:8] integerValue]]) [self pulse:self.launcherNodes[self.engine.launcher] amount:1.07]; self.yellowArmed=NO; }
-    else if([control isEqualToString:@"hold"]){ if([self.engine hold]){ [self pulse:self.heldPiece amount:1.17]; [self pulse:self.currentPiece amount:1.13]; } self.yellowArmed=NO; }
+    else if([control isEqualToString:@"hold"]||[control isEqualToString:@"hold2"]){ if([self.engine holdSlot:[control isEqualToString:@"hold2"]?1:0]){ [self pulse:self.heldPiece amount:1.17]; [self pulse:self.currentPiece amount:1.13]; } self.yellowArmed=NO; }
     else if([control hasPrefix:@"skill"]){
         NSInteger i=[[control substringFromIndex:5] integerValue];
         if(i==GDColorYellow){
@@ -363,14 +475,22 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
         [self highlightCells:self.preview.expectedMatches color:color];
         self.statusLabel.text=self.engine.wildRemaining>0?[NSString stringWithFormat:@"WILD  ·  %ld match",(long)self.preview.expectedMatches.count]:@"";
     } else if(self.preview.valid && self.preview.hitCell){
-        CGPoint p=ScenePoint([self.engine centerOfCell:self.preview.hitCell]); SKShapeNode *blast=[SKShapeNode shapeNodeWithCircleOfRadius:self.engine.blastRadius+self.engine.radius]; blast.position=p; blast.strokeColor=[GummyUI color:GDColorRed]; blast.fillColor=[[GummyUI color:GDColorRed] colorWithAlphaComponent:.14]; blast.lineWidth=2; [self.aimLayer addChild:blast]; [self highlightCells:self.preview.expectedMatches color:[GummyUI color:GDColorRed]]; self.statusLabel.text=@"BLAST";
-    } else self.statusLabel.text=@"Drag up to aim  ·  Release below cannons to cancel";
+        CGPoint p=ScenePoint([self.engine centerOfCell:self.preview.hitCell]);SKShapeNode *blast;
+        if(self.preview.verticalBlast)blast=[self cutArea:self.preview.expectedMatches rowPhase:self.engine.rowPhase];
+        else {blast=[SKShapeNode shapeNodeWithCircleOfRadius:self.engine.blastRadius+self.engine.radius];blast.position=p;}
+        blast.strokeColor=[GummyUI color:GDColorRed];blast.fillColor=[[GummyUI color:GDColorRed] colorWithAlphaComponent:.14];blast.lineWidth=2;[self.aimLayer addChild:blast];[self highlightCells:self.preview.expectedMatches color:[GummyUI color:GDColorRed]];self.statusLabel.text=self.preview.verticalBlast?@"CUT":@"BLAST";
+    } else self.statusLabel.text=self.engine.economyEnabled&&self.engine.currentColor<0?@"EMPTY  ·  Open Supply or use a skill":@"Drag up to aim  ·  Release below cannons to cancel";
 #if DEBUG
     if([NSProcessInfo.processInfo.arguments containsObject:@"-qa-feedback"]) NSLog(@"QA aim guide enabled=1 nodes=%lu valid=%d",(unsigned long)self.aimLayer.children.count,self.preview.valid);
 #endif
 }
 - (void)highlightCells:(NSArray<GDCell *> *)cells color:(UIColor *)color {
     for(GDCell *cell in cells){ SKShapeNode *ring=[SKShapeNode shapeNodeWithCircleOfRadius:24]; ring.position=ScenePoint([self.engine centerOfCell:cell]); ring.strokeColor=color; ring.fillColor=[color colorWithAlphaComponent:.12]; ring.lineWidth=2.5; [self.aimLayer addChild:ring]; }
+}
+- (SKShapeNode *)cutArea:(NSArray<GDCell *> *)cells rowPhase:(NSInteger)phase {
+    CGFloat minX=1200,minY=680,maxX=0,maxY=0;
+    for(GDCell *cell in cells){CGPoint p=ScenePoint([self.engine centerOfCell:cell rowPhase:phase]);minX=MIN(minX,p.x);minY=MIN(minY,p.y);maxX=MAX(maxX,p.x);maxY=MAX(maxY,p.y);}
+    SKShapeNode *area=[GummyUI panel:CGSizeMake(maxX-minX+46,maxY-minY+46) fill:[[GummyUI color:GDColorRed] colorWithAlphaComponent:.24] stroke:[GummyUI color:GDColorRed] radius:16];area.position=CGPointMake((minX+maxX)/2,(minY+maxY)/2);return area;
 }
 - (void)flyShot:(GDShot *)shot {
     if(shot.blast) self.blastImpactPoint=shot.hitCell?ScenePoint([self.engine centerOfCell:shot.hitCell]):ScenePoint(shot.points.lastObject.CGPointValue);
@@ -498,7 +618,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
 
     CGPoint center=CGPointZero;
     for(GDCell *cell in event.removed){ CGPoint p=ScenePoint([self.engine centerOfCell:cell rowPhase:event.rowPhase]); center.x+=p.x; center.y+=p.y; }
-    if(event.source==GDSourceBlast) [self explodeAt:self.blastImpactPoint radius:self.engine.blastRadius];
+    if(event.source==GDSourceBlast){if(self.engine.verticalBlast&&[self.engine buffLevel:GDBuffVerticalBlast]&&event.removed.count){SKShapeNode *cut=[self cutArea:event.removed rowPhase:event.rowPhase];cut.glowWidth=5;cut.lineWidth=4;[self.effects addChild:cut];[cut runAction:[SKAction sequence:@[[SKAction group:@[[SKAction scaleXTo:.12 duration:.3],[SKAction fadeOutWithDuration:.3]]],[SKAction removeFromParent]]]];}else [self explodeAt:self.blastImpactPoint radius:self.engine.blastRadius];}
     else if(event.removed.count){ center.x/=event.removed.count; center.y/=event.removed.count; [self burstAt:center radius:24 color:Cream()]; }
     if(event.source==GDSourceYellow && event.removed.count){
         CGFloat minY=680,maxY=0; for(GDCell *cell in event.removed){ CGFloat y=ScenePoint([self.engine centerOfCell:cell rowPhase:event.rowPhase]).y; minY=MIN(minY,y); maxY=MAX(maxY,y); }
@@ -516,7 +636,13 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
         SKAction *fall=[SKAction moveByX:(cell.column%5-2)*13 y:-170 duration:.46]; fall.timingMode=SKActionTimingEaseIn;
         [node runAction:[SKAction sequence:@[[SKAction waitForDuration:(cell.column%4)*.013],[SKAction scaleTo:1.06 duration:.05],[SKAction group:@[fall,[SKAction rotateByAngle:(cell.column%2?.7:-.7) duration:.46],[SKAction sequence:@[[SKAction waitForDuration:.17],[SKAction fadeOutWithDuration:.29]]]]],[SKAction removeFromParent]]]];
     }
-    if(event.pushed){ for(SKNode *node in self.pieceNodes.allValues) [node runAction:[SKAction moveByX:0 y:-self.engine.radius*sqrt(3) duration:.20]]; self.renderedRevision=-1; }
+    if(event.rescued){
+        [GDSettings.sharedSettings playFeedback:GDFeedbackSweep];
+        SKNode *charm=[GummyUI image:@"rescue_charm" size:CGSizeMake(124,124)];charm.position=CGPointMake(588,340);[self.effects addChild:charm];[charm runAction:[SKAction sequence:@[[SKAction group:@[[SKAction scaleTo:2.5 duration:.45],[SKAction fadeOutWithDuration:.45]]],[SKAction removeFromParent]]]];
+        for(GDCell *cell in event.rescuedCells){SKNode *piece=self.pieceNodes[cell.key];[piece removeFromParent];[self.pieceNodes removeObjectForKey:cell.key];}
+        [self floatingText:@"RESCUE  +3 AMMO" at:CGPointMake(588,230) color:Cream() size:25 layer:self.effects];self.renderedRevision=-1;[self syncBoard];
+    }
+    if(event.pushed&&!event.rescued){ for(SKNode *node in self.pieceNodes.allValues) [node runAction:[SKAction moveByX:0 y:-self.engine.radius*sqrt(3) duration:.20]]; self.renderedRevision=-1; }
     else [self syncBoard];
     if(event.placed){ SKNode *node=self.pieceNodes[event.placed.key]; [node runAction:[SKAction sequence:@[[SKAction group:@[[SKAction scaleXTo:1.15 duration:.06],[SKAction scaleYTo:.8 duration:.06]]],[SKAction group:@[[SKAction scaleXTo:.97 duration:.09],[SKAction scaleYTo:1.06 duration:.09]]],[SKAction scaleTo:1 duration:.12]]]]; }
     if(event.points>0){ [self pulse:self.scoreLabel amount:1.12]; [self floatingText:[NSString stringWithFormat:@"+%ld",(long)event.points] at:CGPointMake(325,608) color:Ink() size:23 layer:self.hud]; }
@@ -529,11 +655,12 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     [self advanceGameClock:delta];
     [self refreshHUD];
     [self refreshMusic];
+    if(self.engine.phase==GDPhaseShop&&!self.overlay)[self showWaveShop];
     if([self finished] && !self.overlay) [self showOverlay:YES];
 }
 - (void)refreshMusic {
     if(!self.view) return;
-    if(self.engine.phase==GDPhasePaused){ [GDAudioFeedback.sharedPlayer pauseMusic]; return; }
+    if(self.engine.phase==GDPhasePaused||self.engine.phase==GDPhaseShop){ [GDAudioFeedback.sharedPlayer pauseMusic]; return; }
     if([self finished]){ [GDAudioFeedback.sharedPlayer setMusicMode:GDMusicSilent]; return; }
     CGFloat clearance=self.engine.dangerY;
     for(GDCell *cell in self.engine.cells) clearance=MIN(clearance,self.engine.dangerY-([self.engine centerOfCell:cell].y+self.engine.radius));
@@ -548,7 +675,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     // Split at authoritative phase boundaries so a long frame cannot shorten
     // flight/resolution or count its remaining time in the wrong phase.
     NSTimeInterval remaining=delta;
-    for(NSInteger boundary=0;boundary<8 && remaining>0 && self.engine.phase!=GDPhasePaused && ![self finished];boundary++){
+    for(NSInteger boundary=0;boundary<8 && remaining>0 && self.engine.phase!=GDPhasePaused && self.engine.phase!=GDPhaseShop && ![self finished];boundary++){
         BOOL flying=self.flightRemaining>=0 && self.engine.phase==GDPhaseFlying;
         BOOL resolving=self.resolutionRemaining>=0 && self.engine.phase==GDPhaseResolving;
         NSTimeInterval interval=flying?self.flightRemaining:(resolving?self.resolutionRemaining:remaining);
@@ -571,6 +698,47 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     }
 }
 #if DEBUG
+- (void)setupEconomyQA {
+    NSArray *args=NSProcessInfo.processInfo.arguments;NSUInteger index=[args indexOfObject:@"-qa-economy"];
+    NSString *variant=index+1<args.count?args[index+1]:@"shop";
+    NSMutableArray *buffs=[NSMutableArray new];for(NSInteger b=0;b<GDBuffCount;b++)[buffs addObject:@1];buffs[GDBuffOverflow]=@2;buffs[GDBuffBankWild]=@2;buffs[GDBuffRescue]=@0;
+    [self.engine setFixtureEconomyCredits:1000 ammo:@[@3,@3,@3,@3] buffs:buffs];
+    if([variant isEqualToString:@"shop"]||[variant isEqualToString:@"flow"]){
+        NSMutableDictionary *s=[self.engine.snapshot mutableCopy],*d=[s[@"economy"] mutableCopy];d[@"shopPending"]=@YES;d[@"offers"]=@[@(GDBuffRecolor),@(GDBuffRescue),@(GDBuffBankWild)];s[@"economy"]=d;self.engine=[[GDEngine alloc]initWithSnapshot:s];[self.engine resume];[self showWaveShop];
+    } else if([variant isEqualToString:@"supply"])[self handleControl:@"supply"];
+    else if([variant isEqualToString:@"buffs"]){buffs[GDBuffRescue]=@1;[self.engine setFixtureEconomyCredits:1000 ammo:@[@3,@3,@3,@3] buffs:buffs];[self handleControl:@"buffInfo"];}
+    else if([variant isEqualToString:@"cut"]){
+        NSMutableArray *board=[NSMutableArray new];for(NSInteger r=0;r<6;r++)for(NSInteger c=7;c<=9;c++)[board addObject:[GDCell row:r column:c color:(r+c)%4]];
+        [self.engine loadFixture:board phase:0 current:GDColorBlue next:GDColorWhite];[self.engine setFixtureEnergy:@[@0,@20,@0,@0]];[self.engine toggleVerticalBlast];[self.engine activateSkill:GDColorRed];[self syncBoard];[self updateAim:ScenePoint([self.engine centerOfCell:[GDCell row:5 column:8 color:GDColorBlue]])];NSAssert(self.preview.valid&&self.preview.verticalBlast,@"Cut fixture must show actual legal targets");[self.engine pause];self.playfield.paused=YES;
+    }
+    else if([variant isEqualToString:@"rescue"]){
+        self.engine=[[GDEngine alloc]initWithSeed:20260930];
+        NSMutableArray *board=[NSMutableArray new];for(NSInteger r=0;r<=8;r++)[board addObject:[GDCell row:r column:8 color:GDColorRed]];
+        [self.engine loadFixture:board phase:0 current:GDColorBlue next:GDColorWhite];buffs[GDBuffRescue]=@1;[self.engine setFixtureEconomyCredits:0 ammo:@[@0,@0,@0,@0] buffs:buffs];[self syncBoard];GDEvent *event=[self.engine advanceTime:12];NSAssert(event.rescued&&!event.gameOver,@"Fixture must rescue before failure");[self animateEvent:event];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW,(int64_t)(.12*NSEC_PER_SEC)),dispatch_get_main_queue(),^{self.paused=YES;});
+    }
+    [self refreshHUD];SKLabelNode *mark=[GummyUI label:@"QA FIXTURE" size:13 color:[UIColor colorWithRed:.7 green:.1 blue:.2 alpha:1]];mark.position=CGPointMake(600,18);mark.zPosition=1000;[self addChild:mark];
+    NSLog(@"QA economy READY: %@",variant);
+    if([variant isEqualToString:@"flow"])[self validateEconomyControls];
+}
+- (void)validateEconomyControls {
+    NSUserDefaults *defaults=NSUserDefaults.standardUserDefaults;NSString *domain=NSBundle.mainBundle.bundleIdentifier;NSDictionary *prefs=[defaults persistentDomainForName:domain]?:@{};
+    NSAssert(self.engine.phase==GDPhaseShop&&[self.economyOverlay isEqual:@"shop"],@"Wave shop must be visible");
+    NSAssert([[self controlAt:CGPointMake(450,130)] isEqual:@"supply"],@"Shop supply hit region");[self handleControl:@"supply"];
+    NSInteger total=self.engine.totalAmmo;[self handleControl:@"ammo1_0"];NSAssert(self.engine.totalAmmo==total+1&&self.engine.credits==900&&self.engine.phase==GDPhaseShop,@"Shop supply purchase");
+    [self handleControl:@"supplyClose"];NSAssert([self.economyOverlay isEqual:@"shop"],@"Supply returns to wave upgrades");[self handleControl:@"buyBuff0"];
+    NSAssert([self.engine buffLevel:GDBuffRecolor]==2&&self.engine.credits==550&&!self.overlay&&self.engine.phase==GDPhaseReady,@"Upgrade applies once and closes shop");
+    [self.engine setFixtureEnergy:@[@0,@20,@0,@0]];[self.engine activateSkill:GDColorRed];[self handleControl:@"supply"];
+    NSAssert(self.engine.phase==GDPhasePaused&&!self.engine.blastArmed,@"Supply pauses and cancels armed blast");NSDictionary *paused=self.engine.snapshot;[self.engine advanceTime:60];NSAssert([self.engine.snapshot isEqual:paused],@"Supply clock stays paused");
+    [self handleControl:@"ammo2_1"];NSAssert(self.engine.credits==350&&self.engine.totalAmmo==total+4&&self.engine.phase==GDPhasePaused,@"Paused supply bonus purchase");
+    NSInteger color=(self.engine.currentColor+1)%4;[self handleControl:[NSString stringWithFormat:@"recolor%ld",(long)color]];NSAssert(self.engine.currentColor==color&&self.engine.recolorsRemaining==1,@"Paused color swap");
+    [self handleControl:@"wildColor2"];[self handleControl:@"blastMode"];NSAssert(self.engine.selectedWildColor==GDColorRed&&self.engine.verticalBlast,@"Wild and blast options persist from supply");
+    [self handleControl:@"supplyClose"];NSAssert(self.engine.phase==GDPhaseReady&&!self.playfield.paused&&!self.overlay,@"Supply returns to battle");
+    NSAssert([[self controlAt:CGPointMake(1140,317)] isEqual:@"hold2"],@"Second hold touch region");[self handleControl:@"hold2"];NSAssert(self.engine.secondHeldColor==color&&self.engine.totalAmmo==total+4,@"Second hold conserves stock");
+    [self handleControl:@"buffInfo"];NSAssert(self.engine.phase==GDPhasePaused&&[self.economyOverlay isEqual:@"buffs"],@"Buff list pauses gameplay");[self handleControl:@"buffNext"];NSAssert(self.buffInfoPage==1,@"Buff list supports paging");[self handleControl:@"supplyClose"];
+    [self saveRun];NSAssert([[defaults persistentDomainForName:domain]?:@{} isEqual:prefs],@"Economy QA must preserve player preferences and saves");
+    [self.engine pause];self.playfield.paused=YES;NSLog(@"QA economy PASS: shop supply, tier purchase, time pause, blast cancel, bonus supply, recolor, wild/cut options, second hold, buff paging, prefs unchanged");
+}
 - (void)captureSkillArt {
     BOOL freeze=[NSProcessInfo.processInfo.arguments containsObject:@"-qa-freeze-art"];
     [self handleControl:freeze?@"skill0":@"skill1"];
@@ -668,7 +836,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
 - (void)saveRun {
 #if DEBUG
     NSArray *args=NSProcessInfo.processInfo.arguments;
-    if(self.qaPresentationFixture || [args containsObject:@"-qa-music"] || [args containsObject:@"-qa-freeze-art"] || [args containsObject:@"-qa-blast-art"]) return;
+    if(self.qaPresentationFixture || [args containsObject:@"-qa-economy"] || [args containsObject:@"-qa-music"] || [args containsObject:@"-qa-freeze-art"] || [args containsObject:@"-qa-blast-art"]) return;
 #endif
     if([self finished]) [NSUserDefaults.standardUserDefaults removeObjectForKey:[self snapshotKey]];
     else [NSUserDefaults.standardUserDefaults setObject:self.engine.snapshot forKey:[self snapshotKey]];
@@ -741,7 +909,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
 - (NSUInteger)newRunSeed {
 #if DEBUG
     NSArray *args=NSProcessInfo.processInfo.arguments;
-    if([args containsObject:@"-qa-ready"] || [args containsObject:@"-qa-failure"] || [args containsObject:@"-qa-new"] || [args containsObject:@"-qa-freeze-art"] || [args containsObject:@"-qa-blast-art"]) return 20260930;
+    if([args containsObject:@"-qa-economy"] || [args containsObject:@"-qa-ready"] || [args containsObject:@"-qa-failure"] || [args containsObject:@"-qa-new"] || [args containsObject:@"-qa-freeze-art"] || [args containsObject:@"-qa-blast-art"]) return 20260930;
 #endif
     return ((NSUInteger)arc4random()<<16)^arc4random();
 }
@@ -750,7 +918,7 @@ static CGPoint BoardPoint(CGPoint p) { return CGPointMake(p.x-174,603-p.y); }
     self.generation++; [self.playfield removeAllActions]; [self.effects removeAllChildren]; [self clearAim]; [self.overlay removeFromParent]; self.overlay=nil; self.playfield.paused=NO;
     NSInteger levelID=self.engine.mode==GDGameModeLevel?self.engine.levelID:0;
     self.engine=levelID?[[GDEngine alloc] initWithLevelID:levelID seed:[GDLevelCatalog levelForID:levelID].seed]:[[GDEngine alloc] initWithSeed:[self newRunSeed]];
-    self.combo=0; self.musicDanger=NO; self.flightRemaining=self.resolutionRemaining=-1; self.displayedEnergy=[self.engine.energy copy];
+    self.economyOverlay=nil;self.supplyFromShop=NO;self.combo=0; self.musicDanger=NO; self.flightRemaining=self.resolutionRemaining=-1; self.displayedEnergy=[self.engine.energy copy];
     for(SKNode *node in self.launcherNodes){ [node removeAllActions]; node.xScale=node.yScale=1; }
     for(SKNode *node in self.skillCards){ [node removeAllActions]; node.xScale=node.yScale=1; }
     for(SKNode *node in [self.hud.children copy]) if([node.name isEqualToString:@"feedback"]) [node removeFromParent];

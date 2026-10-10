@@ -1,0 +1,25 @@
+economy-tests.log:
+2026-10-09 17:57:07.698 economy_tests[20768:305914] PASS: finite queue, flight refunds, support collapse, color remainders and skill-source recycling
+2026-10-09 17:57:07.981 economy_tests[20768:305914] PASS: purchases, score isolation, buff prices and tiers, paused shop, deterministic offers and double hold
+2026-10-09 17:57:08.048 economy_tests[20768:305914] PASS: depletion, resupply, emergency once per wave and zero-ammo skill escapes
+2026-10-09 17:57:08.473 economy_tests[20768:305914] PASS: bank energy/wild, double bounce, manual wild, overflow, ice reserve, upward cut and sweep delay
+2026-10-09 17:57:08.900 economy_tests[20768:305914] PASS: one-use rescue accounting, cold restore, malformed saves and legacy/campaign compatibility
+2026-10-09 17:59:05.095 economy_tests[20768:305914] Bounded economy audit: 8 seeds, 285 shots, 118 supply purchases, 0 wave shops
+2026-10-09 17:59:05.095 economy_tests[20768:305914] PASS: economy validation (2710 assertions)
+
+endless-core.log:
+2026-10-09 17:57:33.923 core_tests[20769:305913] PASS: geometry, density, prediction and bounce fixtures
+2026-10-09 17:57:34.024 core_tests[20769:305913] PASS: matching, support, energy and four skills fixtures
+2026-10-09 17:57:34.406 core_tests[20769:305913] PASS: five wild shots, per-color endless costs, charging, cancellation, cap and restore
+2026-10-09 17:57:34.639 core_tests[20769:305913] PASS: queue, pressure priority, pause and cold-restore fixtures
+2026-10-09 17:57:34.639 core_tests[20769:305913] PASS: focused core validation (816 assertions)
+
+endless-campaign.log:
+2026-10-09 17:45:11.785 campaign_tests[19020:288478] PASS: terminal ordering, finite waves, stars, freeze, records and v1 migration
+2026-10-09 17:46:14.325 campaign_tests[19020:288478] REPLAY COMPLETE count=30 unique=30 topology=28 assertions=8948 allWon=1
+
+endless-build.log:
+** BUILD SUCCEEDED **
+
+endless-release.log:
+** BUILD SUCCEEDED **
